@@ -1,3 +1,8 @@
 Model Description:
 
-* Agents: groups
+* Agents are each group (node in the network)
+
+* Variable of each group:
+*   resources (money?)
+
+* Dynamic
