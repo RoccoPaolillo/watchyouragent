@@ -1,0 +1,2 @@
+Model Description:
+Agents: groups
