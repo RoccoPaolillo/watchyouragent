@@ -1,2 +1,3 @@
 Model Description:
-Agents: groups
+
+* Agents: groups
