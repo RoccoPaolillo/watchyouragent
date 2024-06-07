@@ -1,12 +1,17 @@
 Model Description, adapted from Tragedy of the common:
 
-* General scenario: agriculture, goats are now plants that feed on grass (soil) in the geographic area of each group (see below), if they have no grass in their spot, they die
+* General scenario: agriculture, goats are now plants that feed on grass (soil) in 4 geographic area representing each group (see below), if they have no grass in their spot, they die
 * Each spot where a plant can be calculated hold grass that is consumed as long a plant is cultivated there
 * Differently from the original Tragedy of the common, the amount of grass of each spot is made up of
 ```
-* a stored-grass that is unique to each geographic area + dynamic grass-growth-rate that is the same by all geographic areas and that depends on a ```sustainble-tax``` each geographic area can choose to pay for or not
+* grass of each spot: stored-grass (unique to each geographic area) + dynamic grass-growth-rate (shared by all geographic area depends on the ```sustainable tax``` geographic areas decide to pay or not)
 ```
 
+This is the main difference with the original Tragedy of the common model:
+  + in the original model each spot had the same initial amount of grass-stored, now it is unequal distributed (input by modeler) by geographic areas: the higher the initial grass-stored, the less the geographic area is affected by famine
+  + grass-growth-rate, i.e. equivalent to renewable speed of resources, now depends on how much the geographic areas want to pay. Even if only one geographic area pays, everyone will benefit from the investment, proportional to the ```sustainable-tax``` paid. Taking 2 as the max grass-growth-rate in the original model, each geographic area can spend up to 0.25: if everyone pays, there is max renew for everyone (2*0,25); if no one pays the tax, there is no renew for everyone, they can count only on their grass-stored  (that will expire  eventually); if one pays 0.25, the renew is equivalent to 0.25 for  everyone
+
+  
 * Agents are each group of student (node in the network): they geographic areas NW, NE, SE, SW
 
 * Resources:
@@ -22,9 +27,5 @@ Model Description, adapted from Tragedy of the common:
 * In the front-end of each individual group (a geographic area):
   + they have an initial unequal amount of stored grass to count on
   + competition: how much plants they want to buy ```num-plants-to-buy```
-  
-    
-* Dynamics scenario:
-  + Groups must decide on a scenario of common limited resources, e.g. water to clean up
-  + Each group must pay a fee to purify water choosing the amount to invest (e.g. 10 50 100)
-  + Return of investment based on the fee
+  + cooperation: ```sustainable-tax``` how much they want to contribute to renew of grass (soil) for everyone
+  + how this should affect
