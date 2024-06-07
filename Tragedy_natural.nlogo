@@ -109,9 +109,6 @@ to setup-patches
     if pxcor > 0 and pycor > 0 [set grass-stored NE_grass_stored]
     if pxcor > 0 and pycor < 0 [set grass-stored SE_grass_stored]
     if pxcor < 0 and pycor < 0 [set grass-stored SW_grass_stored]
-;    ifelse pxcor < 0 and pycor > 0 [set grass-stored 10000]
-;    [ifelse pxcor > 0 and pycor < 0 [set grass-stored 0]
-;      [set grass-stored grass-max]]
     color-patches
   ]
 end
@@ -866,7 +863,7 @@ INPUTBOX
 436
 137
 NW_grass_stored
-5000.0
+100.0
 1
 0
 Number
@@ -907,9 +904,18 @@ Number
 @#$#@#$#@
 ## WHAT IS IT?
 
-This model simulates the utilization of a common resource by multiple users.  In this example, the common resource is represented by the common grazing area, used by goat farmers to feed their goats.  Depending on the actions of the participants, the outcome may demonstrate a phenomenon called the "tragedy of the commons", where a common good or resource is over-utilized.
+Adaptation of Tragedy of the commons. Each region leads an agriculture investment.
+Exploitation of grass (soil) for each plant. The amount of grass for growing plants depends on the initial stored grass of each region imputed by modeler, and a dynamic component depending on renewable resources. This component depends on the tax that each region is willing to pay.
 
-This is a counterexample to the efficient (as defined in "Pareto efficiency") market theorem.  (The efficient market theorem states that agents, looking out for their own best interest [i.e., everyone trying to increase their own wealth], leads to the most efficient social outcome [i.e., the highest quantity of milk].)
+## ISSUE
+
+Plot of grass-stored of first line gives random peaks, tested also changing first line report, to solve
+
+## TO ADD
+* Resources used to grow plants should take from shared resources of all of the population, now it dependends on the single spot (therefore on the geographic area)
+* The tax to be paid should become a cost to the bearer, now it is not
+* The return from the social investment should not be equal for all, but proportional to how much you have paid
+* Visualizations etc
 
 ## HOW IT WORKS
 
@@ -923,57 +929,34 @@ Initially, the abundance of GRASS-SUPPLY of the patches can sustain the goats an
 
 ## HOW TO USE IT
 
-Quickstart Instructions:
+The student-groups participate as geographic areas (they represent one node linked to the central server), they need to enter in the server as: 
+ * north-west
+ * north-east
+ * south-east
+ * south-west
 
-Teacher: Follow these directions to run the HubNet activity.
-Optional: Zoom In (see Tools in the Menu Bar)
-Optional: Change any of the settings.  If you do change the settings, press the SETUP button.
-Press the LOGIN button to allow people to login.
-Everyone: Open up a HubNet Client on your machine and enter your name, select this activity, and press ENTER.
 
-Teacher: Once everyone has logged in, turn off the LOGIN button by pressing it again.
-Have the students acquaint themselves with the various information available to them in the monitors, buttons, and sliders.
-Then press the GO button to start the simulation.
-Please note that you may adjust the length of time, GRAZING-PERIOD, that goats allowed to graze each day.
-For a quicker demonstration, reduce the GRASS-GROWTH-RATE slider.
-To curb buying incentives of the students, increase the COST/GOAT slider.
-Any of the above mentioned parameters - GRAZING-PERIOD, GRASS-GROWTH-RATE, and COST/GOAT - may be altered without stopping the simulation.
+Resources:
+  * unqueal for each group (grass-stored): each geographic area (one group) has an initial reservation of grass-stored their cultivation can count on
+  * shared (grass-growth-rate): the speed to how fast soil regenerates, it is shared equally by all geographic area and depends on the ```sustainable tax``` they are willing to pay
 
-Teacher: To run the activity again with the same group, stop the model by pressing the GO button, if it is on.
-Change any of the settings that you would like.
-Press the SETUP button.
-Restart the simulation by pressing the GO button.
 
-Teacher: To start the simulation over with a new group, stop the model by pressing the GO button if it is on, press the RESET button in the Control Center to kick out all the clients  and follow these instructions again from the beginning.
+Scenario (cost/profit mechanisms to check, but it is the same as Tragedy of common, I did not touch it):
+  * every country has an initial ```init-num-plants\farmer``` which is the same for all
+  * after every ```harvest-period```, every geographic area makes profit from their agriculture: the more plants they based, the more profit they have that can spend
+  * They can spend to reinvest in more plants in their area at ```cost\plant```
+  * They can also spend for a ```sustainable-tax``` that affects how much the renewal of the shared grass-growth-rate will be (see below). This is the common resource
 
-Buttons:
 
-SETUP - returns all farmers, goats, and patches to initial condition and clears the plot.
-LOGIN - allows users to log into the activity without running the model or collecting data
-GO - runs the simulation
+In the front-end of each individual group (a geographic area):
+  * they have an initial unequal amount of stored grass to count on
+  * competition: how much plants they want to buy ```num-plants-to-buy```. The more plants, the more grass will be consumed
+  * cooperation: ```sustainable-tax``` how much they want to contribute to renew grass (soil) for everyone
 
-Sliders:
 
-INIT-NUM-GOATS/FARMER - initial number of goats per farmer at the beginning of the simulation
-GRASS-GROWTH-RATE - amount of grass growth for each tick of the clock
-COST/GOAT - cost for a goat
-GRAZING-PERIOD - the time frame in which goats are allowed to graze each day
 
-Monitors:
 
-GRASS SUPPLY - amount of grass available to eat
-MILK SUPPLY - amount of milk produced each day
-AVG-PROFIT/DAY - amount of revenue collected from milk sale per day
-GOAT POPULATION - number of goats grazing in the common area
-
-Plots:
-
-GRASS SUPPLY - amount of grass available to graze upon over time (in days)
-MILK SUPPLY - amount of milk produced over time (in days)
-AVERAGE REVENUE - average revenue of all farmers over time (in days)
-GOAT POPULATION - number of goats on grazing field over time (in days)
-
-Client Information
+Client Information [FROM TRAGEDY OF COMMONS, TO REVIEW]
 
 After logging in, the client interface will appear for the students, and if GO is pressed in NetLogo, they will be assigned a farmer which will be described by the color in the MY GOAT COLOR monitor.  The MY GOAT POPULATION monitor will display the number of goats each student owns.  Their revenue for the last day will be displayed in the CURRENT REVENUE monitor and their total assets in the TOTAL ASSETS monitor.
 
@@ -983,25 +966,16 @@ The student manages his/her goat population.  During the course of each grazing 
 
 The progress of the community's welfare as measured by the grass available for grazing, average revenue of farmers, and milk supply is plotted in the GRASS SUPPLY, AVERAGE REVENUE, and MILK SUPPLY plots (if present), which are each identical to the plot of the same name in NetLogo.
 
-## THINGS TO NOTICE
-
-Note that if the students do not confer with each other, the tragedy of the commons arises.  The general patterns of the plots for average revenue and milk supply are similar -- the curves eventually peak and are followed by a decrease.  After the initial run, ask the students which parameters helped them to decide to purchase or not purchase goats.  Ask the students to switch objectives for the simulation; instead of maximizing total-assets, ask them to maximize milk-supply.  Also, ask the students to confer and act as cooperative unit.
-
-## THINGS TO TRY
-
-Use the model with the entire class to serve as an introduction to the topic.  Upon running the initial set of simulations, ask the students to switch objective - instead of maximizing their own total-assets, ask them to maximize milk-supply for the entire community.  Ask the students to confer and act as a cooperative unit.  Observe and discuss the changes in AVG-REV/FARMER and MILK-SUPPLY from the initial simulation and the later simulation with altered objectives.  Continue to discuss how the "Tragedy of the Commons" can be avoided and why or why not a society would want to avoid this phenomenon.  Then, have students use the NetLogo model individually, in a computer lab, to explore the effects of the various parameters.  Discuss what they find, observe, and can conclude from this model.
-
 ## EXTENDING THE MODEL
 
 Is there other information about the state of the simulation that the farmers might want access to? Do you think this would change the outcome of the simulation? From what other phenomena (e.g. prisoner's dilemma or free-rider problem) would the student's behavior to not sell the goats arise (if it arises)?
 
 ## HOW TO CITE
 
+Autor: Rocco Paolillo
+
 If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
 
-For the model itself:
-
-* Wilensky, U. (2002).  NetLogo Tragedy of the Commons HubNet model.  http://ccl.northwestern.edu/netlogo/models/TragedyoftheCommonsHubNet.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 Please cite the NetLogo software as:
 
@@ -1022,8 +996,6 @@ This work is licensed under the Creative Commons Attribution-NonCommercial-Share
 Commercial licenses are also available. To inquire about commercial licenses, please contact Uri Wilensky at uri@northwestern.edu.
 
 This activity and associated models and materials were created as part of the projects: PARTICIPATORY SIMULATIONS: NETWORK-BASED DESIGN FOR SYSTEMS LEARNING IN CLASSROOMS and/or INTEGRATED SIMULATION AND MODELING ENVIRONMENT. The project gratefully acknowledges the support of the National Science Foundation (REPP & ROLE programs) -- grant numbers REC #9814682 and REC-0126227.
-
-<!-- 2002 -->
 @#$#@#$#@
 default
 true
