@@ -11,9 +11,7 @@ This is the main difference with the original Tragedy of the common model:
   + in the original model each spot had the same initial amount of grass-stored, now it is unequally distributed by geographic areas (or else, input by modeler)
   + grass-growth-rate, i.e. equivalent to renewable speed of resources, now depends on how much the geographic areas want to pay. Even if only one geographic area pays, everyone will benefit from the investment, proportional to the ```sustainable-tax``` paid. Taking 2 as the max grass-growth-rate speed in the original model, each geographic area can spend up to 0.25: if everyone pays, there is max renew for everyone (2*0,5); if no one pays the tax, there is no renew for everyone, they can count only on their grass-stored  (that will expire  eventually); if one pays 0.01, the renew is equivalent to 0.01 (the min) for everyone
 
-  
-* Agents are each group of student (node in the network): they represent geographic areas NW, NE, SE, SW
-* The student-groups participate as geographic areas, they need to enter in the server as: 
+* The student-groups participate as geographic areas (they represent one node linked to the central server), they need to enter in the server as: 
  + north-west
  + north-east
  + south-east
