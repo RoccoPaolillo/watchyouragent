@@ -1,3 +1,9 @@
+The student-groups participate as geographic areas, they need to be enter in the server as: 
+* north-west
+* north-east
+* south-east
+* south-west
+
 Model Description, adapted from Tragedy of the common:
 
 * General scenario: agriculture, goats are now plants that feed on grass (soil) in 4 geographic area representing each group (see below), if they have no grass in their spot, they die
