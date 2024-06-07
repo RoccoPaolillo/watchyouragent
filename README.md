@@ -26,6 +26,6 @@ This is the main difference with the original Tragedy of the common model:
 
 * In the front-end of each individual group (a geographic area):
   + they have an initial unequal amount of stored grass to count on
-  + competition: how much plants they want to buy ```num-plants-to-buy```
+  + competition: how much plants they want to buy ```num-plants-to-buy```. The more plants, the more grass will be consumed
   + cooperation: ```sustainable-tax``` how much they want to contribute to renew of grass (soil) for everyone
   + how this should affect
