@@ -52,6 +52,7 @@ farmers-own
   total-assets       ;; total of past revenue, minus expenses
   current-revenue    ;; the revenue collected at the end of the last day
   sustainable-tax
+  own_return
 
 ]
 
@@ -79,6 +80,7 @@ to setup
     (word "Everyone starts with " init-num-plants/farmer " plants.")
   hubnet-broadcast "num-plants-to-buy" 1
    hubnet-broadcast "sustainable-tax" 0
+  hubnet-broadcast "own_return" 0
   broadcast-system-info
 end
 
@@ -283,7 +285,31 @@ to reset-patches
   ask patches [
   if (grass-stored < grass-max)
   [
-    let new-grass-amt (grass-stored + grass-growth-rate)
+      if (pxcor < 0 and pycor > 0)  [let new-grass-amt (grass-stored +  ([sustainable-tax] of one-of farmers with [user-id = "north-west"] * [own_return] of one-of farmers with [user-id = "north-west"]) + grass-growth-rate_shared)]
+      if (pxcor > 0 and pycor > 0) [let new-grass-amt ([sustainable-tax] of one-of farmers with [user-id = "north-east"] * [own_return] of one-of farmers with [user-id = "north-east"]) + grass-growth-rate_shared]
+      if (pxcor > 0 and pycor < 0) [let new-grass-amt ([sustainable-tax] of one-of farmers with [user-id = "south-west"] * [own_return] of one-of farmers with [user-id = "south-west"]) + grass-growth-rate_shared]
+      if (pxcor < 0 and pycor < 0) [let new-grass-amt ([sustainable-tax] of one-of farmers with [user-id = "south-west"] * [own_return] of one-of farmers with [user-id = "south-west"]) + grass-growth-rate_shared]
+  ;  let new-grass-amt (grass-stored + grass-growth-rate)
+    ;  let new-grass-amt (
+     ;    if (pxcor < 0 and pycor > 0) [(grass-stored +  ([sustainable-tax] of one-of farmers with [user-id = "north-west"] * [own_return] of one-of farmers with [user-id = "north-west"]) + grass-growth-rate_shared)]
+     ;    if (pxcor > 0 and pycor > 0) [(grass-stored +  ([sustainable-tax] of one-of farmers with [user-id = "north-east"] * [own_return] of one-of farmers with [user-id = "north-east"]) + grass-growth-rate_shared)]
+      ;   if (pxcor > 0 and pycor < 0) [(grass-stored +  ([sustainable-tax] of one-of farmers with [user-id = "south-west"] * [own_return] of one-of farmers with [user-id = "south-west"]) + grass-growth-rate_shared)]
+      ;   if (pxcor < 0 and pycor < 0) [(grass-stored +  ([sustainable-tax] of one-of farmers with [user-id = "south-west"] * [own_return] of one-of farmers with [user-id = "south-west"]) + grass-growth-rate_shared)]
+      ;  )
+
+
+  ;      grass-stored +
+       ; grass-growth-rate_own pxcor pycor +
+ ;        if pxcor < 0 and pycor > 0 [ ([sustainable-tax] of one-of farmers with [user-id = "north-west"] * [own_return] of one-of farmers with [user-id = "north-west"])] +
+
+
+ ;   if pxcor > 0 and pycor > 0 [ ([sustainable-tax] of one-of farmers with [user-id = "north-east"] * [own_return] of one-of farmers with [user-id = "north-east"])] +
+;    if pxcor > 0 and pycor < 0 [ ([sustainable-tax] of one-of farmers with [user-id = "south-east"] * [own_return] of one-of farmers with [user-id = "south-east"])] +
+ ;   if pxcor < 0 and pycor < 0 [ ([sustainable-tax] of one-of farmers with [user-id = "south-west"] * [own_return] of one-of farmers with [user-id = "south-west"])] +
+
+ ;         grass-growth-rate_shared)
+
+
     ifelse (new-grass-amt > grass-max)
       [ set grass-stored grass-max ]
       [ set grass-stored new-grass-amt ]
@@ -331,9 +357,17 @@ to-report grass-supply
   report sum [ grass-stored ] of patches
 end
 
-to-report grass-growth-rate
-  report sum [sustainable-tax] of farmers
+to-report grass-growth-rate_shared
+  report sum [sustainable-tax  * (1 - own_return)] of farmers
 end
+
+;to-report grass-growth-rate_own [xc yc]
+ ; report 5
+ ; if pxcor < 0 and pycor > 0 [report ([sustainable-tax] of one-of farmers with [user-id = "north-west"] * [own_return] of one-of farmers with [user-id = "north-west"])]
+ ; if xc > 0 and yc > 0 [report ([sustainable-tax] of one-of farmers with [user-id = "north-east"] * [own_return] of one-of farmers with [user-id = "north-east"])]
+ ; if pxcor > 0 and pycor < 0 [report ([sustainable-tax] of one-of farmers with [user-id = "south-east"] * [own_return] of one-of farmers with [user-id = "south-east"])]
+ ; if pxcor < 0 and pycor < 0 [report ([sustainable-tax] of one-of farmers with [user-id = "south-west"] * [own_return] of one-of farmers with [user-id = "south-west"])]
+;end
 
 to-report avg-revenue
   report mean [ current-revenue ] of farmers
@@ -606,7 +640,7 @@ init-num-plants/farmer
 init-num-plants/farmer
 0
 1
-1.0
+0.0
 1
 1
 plants
@@ -1376,20 +1410,20 @@ NIL
 1
 
 MONITOR
-100
-276
-171
-325
+97
+306
+168
+355
 Grass Amt
 NIL
 0
 1
 
 MONITOR
-7
-276
-97
-325
+4
+306
+94
+355
 Cost per Plant
 NIL
 3
@@ -1416,20 +1450,20 @@ NIL
 1
 
 MONITOR
-174
-276
-248
-325
+171
+306
+245
+355
 Veggie Amt
 NIL
 3
 1
 
 TEXTBOX
-9
-257
-126
-275
+6
+287
+123
+305
 System Variables:
 11
 0.0
@@ -1461,20 +1495,20 @@ NIL
 HORIZONTAL
 
 MONITOR
-384
-275
-441
-324
+381
+305
+438
+354
 Day
 NIL
 3
 1
 
 MONITOR
-9
-203
-455
-252
+6
+233
+452
+282
 Plant Seller Says:
 NIL
 3
@@ -1491,9 +1525,9 @@ Selecting a negative number here will eliminate some of your goats.
 0
 
 SLIDER
-0
+8
 133
-158
+160
 166
 sustainable-tax
 sustainable-tax
@@ -1501,6 +1535,21 @@ sustainable-tax
 0.5
 0
 0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+9
+171
+162
+204
+own_return
+own_return
+0.0
+1.0
+0
+0.1
 1
 NIL
 HORIZONTAL
