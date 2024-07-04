@@ -347,6 +347,11 @@ to-report round-to-place [ num decimal-place ]
   report (round (num * decimal-place)) / decimal-place
 end
 
+to-report own_consumption
+
+  if owner# = "tutti" [report 10]
+end
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Quick Start functions ;;
