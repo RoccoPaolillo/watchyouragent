@@ -266,9 +266,14 @@ end
 to setup-plants [ farmer# ]  ;; turtle procedure
   set breed plants
   setxy random-xcor random-ycor
-  set shape "plant"
-  set food-stored 0
   set owner# farmer#
+  if owner# = "plant" [set shape "plant" set color cyan]
+  if owner# = "car" [set shape "car" set color violet]
+  if owner# = "cow" [set shape "cow" set color brown]
+  if owner# = "house" [set shape "house" set color red]
+; set shape "plant"
+  set food-stored 0
+
 ;;  if owner# = "north-west" [setxy random-float min-pxcor  random-float max-pycor]
 ;;  if owner# = "north-east" [setxy random-float max-pxcor  random-float max-pycor]
  ;; if owner# = "south-west" [setxy random-float min-pxcor  random-float min-pycor]
@@ -281,7 +286,7 @@ to reset-patches
   ask patches [
   if (grass-stored < grass-max)
   [
-    let new-grass-amt (grass-stored + grass-growth-rate)
+    let new-grass-amt ((grass-stored + grass-growth-rate) - drought)
     ifelse (new-grass-amt > grass-max)
       [ set grass-stored grass-max ]
       [ set grass-stored new-grass-amt ]
@@ -349,7 +354,10 @@ end
 
 to-report own_consumption
 
-  if owner# = "tutti" [report 0]
+  if owner# = "plant" [report 0.1]
+  if owner# = "car" [report 0.05]
+  if owner# = "cow" [report 0.2]
+  if owner# = "house" [report 0.5]
 end
 
 
@@ -906,6 +914,21 @@ SW_grass_stored
 1
 0
 Number
+
+SLIDER
+22
+62
+118
+95
+drought
+drought
+0
+100
+0.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
