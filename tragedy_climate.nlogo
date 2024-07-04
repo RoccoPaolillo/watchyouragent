@@ -47,7 +47,7 @@ farmers-own
 [
   user-id            ;; unique user-id, input by the client when they log in,
                      ;; to identify each student turtle
-  num-plants-to-buy   ;; desired quantity of plants to purchase
+  invest-new-item   ;; desired quantity of plants to purchase
   revenue-lst        ;; list of each days' revenue collection
   total-assets       ;; total of past revenue, minus expenses
   current-revenue    ;; the revenue collected at the end of the last day
@@ -77,7 +77,7 @@ to setup
     [ reset-farmers-vars ]
   hubnet-broadcast "Plant Seller Says:"
     (word "Everyone starts with " init-num-plants/farmer " plants.")
-  hubnet-broadcast "num-plants-to-buy" 1
+  hubnet-broadcast "invest-new-item" 1
    hubnet-broadcast "sustainable-tax" 0
   broadcast-system-info
 end
@@ -201,11 +201,11 @@ end
 to go-to-market
   ask farmers
   [
-    if num-plants-to-buy > 0
-      [ buy-plants num-plants-to-buy ]
-    if num-plants-to-buy < 0
-      [ lose-plants (- num-plants-to-buy) ]
-    if num-plants-to-buy = 0
+    if invest-new-item > 0
+      [ buy-plants invest-new-item ]
+    if invest-new-item < 0
+      [ lose-plants (- invest-new-item) ]
+    if invest-new-item = 0
       [ hubnet-send user-id "Plant Seller Says:" "You did not buy any plant." ]
     send-personal-info
  ;   set tax-paid sustainable-tax
@@ -451,12 +451,12 @@ end
 
 ;; NetLogo knows what each student turtle is supposed to be
 ;; doing based on the tag sent by the node:
-;; num-plants-to-buy - determine quantity of student's desired purchase
+;; invest-new-item - determine quantity of student's desired purchase
 to execute-command [command]
-  if command = "num-plants-to-buy"
+  if command = "invest-new-item"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set num-plants-to-buy hubnet-message ]
+      [ set invest-new-item hubnet-message ]
     stop
   ]
 
@@ -475,7 +475,7 @@ to create-new-farmer [ id ]
     setup-farm
     set-unique-color
     reset-farmers-vars
-    hubnet-send id "num-plants-to-buy" num-plants-to-buy
+    hubnet-send id "invest-new-item" invest-new-item
     send-system-info
   ]
 end
@@ -505,7 +505,7 @@ end
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
-  set num-plants-to-buy 1
+  set invest-new-item 1
   set sustainable-tax 0
   set total-assets cost/plant
   set current-revenue 0
@@ -764,10 +764,10 @@ NIL
 1
 
 MONITOR
-323
-182
-386
-227
+37
+172
+100
+217
 Day
 day
 3
@@ -920,14 +920,14 @@ Number
 
 SLIDER
 17
-94
+88
 113
-127
+121
 drought
 drought
 0
 5
-3.5
+0.0
 0.1
 1
 NIL
@@ -935,25 +935,25 @@ HORIZONTAL
 
 SLIDER
 17
-135
+129
 141
-168
+162
 grass-growth-rate
 grass-growth-rate
 0
 10
-0.6
+0.3
 0.1
 1
 NIL
 HORIZONTAL
 
 PLOT
-29
-225
-229
-375
-plot 1
+15
+216
+244
+366
+currenr-venue
 NIL
 NIL
 0.0
@@ -961,13 +961,34 @@ NIL
 -10.0
 10.0
 true
-false
+true
 "" ""
 PENS
 "car" 1.0 0 -8630108 true "" "plot [current-revenue] of one-of farmers with [user-id = \"car\"]"
 "cow" 1.0 0 -6459832 true "" "plot [current-revenue] of one-of farmers with [user-id = \"cow\"]"
 "house" 1.0 0 -2674135 true "" "plot [current-revenue] of one-of farmers with [user-id = \"house\"]"
 "plant" 1.0 0 -11221820 true "" "plot [current-revenue] of one-of farmers with [user-id = \"plant\"]"
+
+PLOT
+16
+368
+243
+518
+count item
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"car" 1.0 0 -8630108 true "" "plot count plants with [owner# = \"car\"]"
+"cow" 1.0 0 -6459832 true "" "plot count plants with [owner# = \"cow\"]"
+"house" 1.0 0 -2674135 true "" "plot count plants with [owner# = \"house\"]"
+"plant" 1.0 0 -11221820 true "" "plot count plants with [owner# = \"plant\"]"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1490,8 +1511,8 @@ SLIDER
 95
 157
 128
-num-plants-to-buy
-num-plants-to-buy
+invest-new-item
+invest-new-item
 1.0
 10.0
 0
