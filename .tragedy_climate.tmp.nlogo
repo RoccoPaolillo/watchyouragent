@@ -53,6 +53,7 @@ farmers-own
   current-revenue    ;; the revenue collected at the end of the last day
   sustainable-tax
 
+
 ]
 
 
@@ -335,9 +336,9 @@ to-report grass-supply
   report sum [ grass-stored ] of patches
 end
 
-to-report grass-growth-rate
-  report sum [sustainable-tax] of farmers
-end
+;; to-report grass-growth-rate
+;;  report sum [sustainable-tax] of farmers
+;; end
 
 to-report avg-revenue
   report mean [ current-revenue ] of farmers
@@ -359,6 +360,14 @@ to-report own_consumption
   if owner# = "car" [report 0.9]
   if owner# = "cow" [report 0.2]
   if owner# = "house" [report 0.5]
+end
+
+; to-report own_resource
+
+;   if owner# = "plant" [report 0.1]
+;   if owner# = "car" [report 0.9]
+;   if owner# = "cow" [report 0.2]
+;   if owner# = "house" [report 0.5]
 end
 
 
@@ -610,10 +619,10 @@ NIL
 1
 
 SLIDER
-133
-131
-301
-164
+158
+136
+326
+169
 init-num-plants/farmer
 init-num-plants/farmer
 0
@@ -625,10 +634,10 @@ plants
 HORIZONTAL
 
 SLIDER
-133
-46
-303
-79
+158
+51
+328
+84
 cost/plant
 cost/plant
 1
@@ -699,9 +708,9 @@ PENS
 
 PLOT
 23
-331
+365
 315
-489
+523
 Grass Supply
 Day
 Grass (lbs)
@@ -719,10 +728,10 @@ PENS
 "South-west" 1.0 0 -6459832 true "" "plot sum [grass-stored] of patches with [pxcor < 0 and pycor < 0]"
 
 SLIDER
-133
-96
-302
-129
+158
+101
+327
+134
 harvest-period
 harvest-period
 2
@@ -762,10 +771,10 @@ NIL
 1
 
 MONITOR
-16
-121
-79
-166
+18
+165
+81
+210
 Day
 day
 3
@@ -853,9 +862,9 @@ NIL
 
 PLOT
 21
-177
+211
 313
-327
+361
 Count_plants
 NIL
 NIL
@@ -917,16 +926,31 @@ SW_grass_stored
 Number
 
 SLIDER
-22
-62
-118
-95
+12
+66
+141
+99
 drought
 drought
 0
-100
+10
 0.0
+0.1
 1
+NIL
+HORIZONTAL
+
+SLIDER
+11
+104
+140
+137
+grass-growth-rate
+grass-growth-rate
+0
+2
+2.0
+0.1
 1
 NIL
 HORIZONTAL
