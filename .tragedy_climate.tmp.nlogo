@@ -53,7 +53,6 @@ farmers-own
   current-revenue    ;; the revenue collected at the end of the last day
   sustainable-tax
 
-
 ]
 
 
@@ -190,7 +189,7 @@ end
 ;; collect milk and sells them at market ($1 = 1 gallon)
 to milk-plants  ;; farmer procedure
   set current-revenue
-    (round-to-place (sum [food-stored] of my-plants) 10)
+    (round-to-place (sum [food-stored] of my-plants) 10) - sustainable-tax
   ask my-plants
     [ set food-stored 0 ]
   set revenue-lst (fput current-revenue revenue-lst)
@@ -288,7 +287,7 @@ to reset-patches
     set grass-stored (grass-stored - drought)
   if (grass-stored < grass-max)
   [
-    let new-grass-amt (grass-stored + grass-growth-rate)
+    let new-grass-amt (grass-stored + grass-growth-rate + grass-growth-rate_emergency)
     ifelse (new-grass-amt > grass-max)
       [ set grass-stored grass-max ]
       [ set grass-stored new-grass-amt]
@@ -336,9 +335,9 @@ to-report grass-supply
   report sum [ grass-stored ] of patches
 end
 
-;; to-report grass-growth-rate
-;;  report sum [sustainable-tax] of farmers
-;; end
+to-report grass-growth-rate_emergency
+  report sum [sustainable-tax] of farmers
+end
 
 to-report avg-revenue
   report mean [ current-revenue ] of farmers
@@ -360,14 +359,6 @@ to-report own_consumption
   if owner# = "car" [report 0.9]
   if owner# = "cow" [report 0.2]
   if owner# = "house" [report 0.5]
-end
-
-; to-report own_resource
-
-;   if owner# = "plant" [report 0.1]
-;   if owner# = "car" [report 0.9]
-;   if owner# = "cow" [report 0.2]
-;   if owner# = "house" [report 0.5]
 end
 
 
@@ -620,9 +611,9 @@ NIL
 
 SLIDER
 158
-136
+132
 326
-169
+165
 init-num-plants/farmer
 init-num-plants/farmer
 0
@@ -634,10 +625,10 @@ plants
 HORIZONTAL
 
 SLIDER
-158
-51
-328
-84
+133
+46
+303
+79
 cost/plant
 cost/plant
 1
@@ -707,10 +698,10 @@ PENS
 "milk-amt" 1.0 0 -16777216 true "" ""
 
 PLOT
-23
-365
-315
-523
+1173
+332
+1465
+490
 Grass Supply
 Day
 Grass (lbs)
@@ -729,9 +720,9 @@ PENS
 
 SLIDER
 158
-101
+97
 327
-134
+130
 harvest-period
 harvest-period
 2
@@ -771,10 +762,10 @@ NIL
 1
 
 MONITOR
-18
-165
-81
-210
+323
+182
+386
+227
 Day
 day
 3
@@ -861,10 +852,10 @@ NIL
 1
 
 PLOT
-21
-211
-313
-361
+1171
+178
+1463
+328
 Count_plants
 NIL
 NIL
@@ -926,12 +917,27 @@ SW_grass_stored
 Number
 
 SLIDER
-12
-66
+17
+94
+113
+127
+drought
+drought
+0
+100
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+17
+135
 141
-99
-drought
-drought
+168
+grass-growth-rate
+grass-growth-rate
 0
 10
 0.0
@@ -940,20 +946,26 @@ drought
 NIL
 HORIZONTAL
 
-SLIDER
-11
-104
-140
-137
-grass-growth-rate
-grass-growth-rate
-0
-2
-2.0
-0.1
-1
+PLOT
+29
+225
+229
+375
+plot 1
 NIL
-HORIZONTAL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"car" 1.0 0 -8630108 true "" "plot [current-revenue] of one-of farmers with [user-id = \"car\"]"
+"cow" 1.0 0 -6459832 true "" "plot [current-revenue] of one-of farmers with [user-id = \"cow\"]"
+"house" 1.0 0 -2674135 true "" "plot [current-revenue] of one-of farmers with [user-id = \"house\"]"
+"plant" 1.0 0 -11221820 true "" "plot [current-revenue] of one-of farmers with [user-id = \"plant\"]"
 
 @#$#@#$#@
 ## WHAT IS IT?
