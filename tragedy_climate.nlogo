@@ -285,9 +285,11 @@ end
 to reset-patches
   ask patches [
     set grass-stored (grass-stored - drought)
+
+
   if (grass-stored < grass-max)
   [
-    let new-grass-amt (grass-stored + grass-growth-rate + grass-growth-rate_emergency)
+    let new-grass-amt (grass-stored + grass-growth-rate + grass-growth-rate_emergency )
     ifelse (new-grass-amt > grass-max)
       [ set grass-stored grass-max ]
       [ set grass-stored new-grass-amt]
@@ -924,9 +926,9 @@ SLIDER
 drought
 drought
 0
-100
-0.0
-1
+5
+3.5
+0.1
 1
 NIL
 HORIZONTAL
@@ -940,7 +942,7 @@ grass-growth-rate
 grass-growth-rate
 0
 10
-0.0
+0.6
 0.1
 1
 NIL
@@ -956,7 +958,7 @@ NIL
 NIL
 0.0
 10.0
-0.0
+-10.0
 10.0
 true
 false
