@@ -159,7 +159,7 @@ to graze  ;; goat procedure
 
   if (food-stored != food-max) or (other plants-here = nobody)
   [
-    let new-food-amt (food-stored + get-amt-eaten)
+    let new-food-amt (food-stored + get-amt-eaten )
     ifelse (new-food-amt < food-max)
       [ set food-stored new-food-amt ]
       [ set food-stored food-max ]
@@ -174,7 +174,7 @@ end
 ;; returns amount of grass eaten at patch and
 ;; sets the patch grass amount accordingly
 to-report get-amt-eaten  ;; goat procedure
-  let reduced-amt (grass-stored - bite-size)
+  let reduced-amt (grass-stored - (bite-size * own_consumption))
   ifelse (reduced-amt < 0)
   [
     set grass-stored 0
@@ -345,6 +345,11 @@ end
 ;; rounds given number to certain decimal-place
 to-report round-to-place [ num decimal-place ]
   report (round (num * decimal-place)) / decimal-place
+end
+
+to-report own_consumption
+
+  if owner# = "tutti" [report 0]
 end
 
 
