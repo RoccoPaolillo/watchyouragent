@@ -300,7 +300,7 @@ end
 
 ;; plots the graph of the system
 to plot-graph
-  plot-value "Veggie Supply" veggie-supply
+;  plot-value "Veggie Supply" veggie-supply
   plot-value "Grass Supply" grass-supply
  ; plot-value "Plants Population" count plants
   plot-value "Average Revenue" avg-revenue
@@ -685,27 +685,6 @@ false
 PENS
 "milk-amt" 1.0 0 -16777216 true "" ""
 
-PLOT
-1173
-332
-1465
-490
-Grass Supply
-Day
-Grass (lbs)
-0.0
-20.0
-0.0
-100.0
-true
-true
-"" ""
-PENS
-"North-west" 1.0 0 -13345367 true "" "plot sum [grass-stored] of patches with [pxcor < 0 and pycor > 0]"
-"North-east" 1.0 0 -10899396 true "" "plot sum [grass-stored] of patches with [pxcor > 0 and pycor > 0]"
-"South-east" 1.0 0 -955883 true "" "plot sum [grass-stored] of patches with [pxcor > 0 and pycor < 0]"
-"South-west" 1.0 0 -6459832 true "" "plot sum [grass-stored] of patches with [pxcor < 0 and pycor < 0]"
-
 SLIDER
 158
 97
@@ -838,27 +817,6 @@ NIL
 NIL
 NIL
 1
-
-PLOT
-1171
-178
-1463
-328
-Count_plants
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"North-west" 1.0 0 -13345367 true "" "plot count plants with [owner# = \"north-west\"]"
-"North-east" 1.0 0 -10899396 true "" "plot count plants with [owner# = \"north-east\"]"
-"South-east" 1.0 0 -955883 true "" "plot count plants with [owner# = \"south-east\"]"
-"South-west" 1.0 0 -2674135 true "" "plot count plants with [owner# = \"south-west\"]"
 
 INPUTBOX
 339
