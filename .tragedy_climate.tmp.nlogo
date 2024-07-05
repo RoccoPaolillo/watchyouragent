@@ -300,9 +300,6 @@ end
 
 ;; plots the graph of the system
 to plot-graph
-;  plot-value "Veggie Supply" veggie-supply
-  plot-value "Grass Supply" grass-supply
- ; plot-value "Plants Population" count plants
   plot-value "Average Revenue" avg-revenue
 end
 
