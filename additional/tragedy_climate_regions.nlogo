@@ -47,7 +47,7 @@ farmers-own
 [
   user-id            ;; unique user-id, input by the client when they log in,
                      ;; to identify each student turtle
-  invest-new-item   ;; desired quantity of plants to purchase
+  num-plants-to-buy   ;; desired quantity of plants to purchase
   revenue-lst        ;; list of each days' revenue collection
   total-assets       ;; total of past revenue, minus expenses
   current-revenue    ;; the revenue collected at the end of the last day
@@ -77,7 +77,7 @@ to setup
     [ reset-farmers-vars ]
   hubnet-broadcast "Plant Seller Says:"
     (word "Everyone starts with " init-num-plants/farmer " plants.")
-  hubnet-broadcast "invest-new-item" 1
+  hubnet-broadcast "num-plants-to-buy" 1
    hubnet-broadcast "sustainable-tax" 0
   broadcast-system-info
 end
@@ -105,11 +105,10 @@ end
 to setup-patches
   ask patches [
  ;; set amount of food at each patch
- ;;   if pxcor < 0 and pycor > 0 [set grass-stored NW_grass_stored]
- ;;  if pxcor > 0 and pycor > 0 [set grass-stored NE_grass_stored]
- ;;   if pxcor > 0 and pycor < 0 [set grass-stored SE_grass_stored]
- ;;   if pxcor < 0 and pycor < 0 [set grass-stored SW_grass_stored]
- set grass-stored 50
+    if pxcor < 0 and pycor > 0 [set grass-stored NW_grass_stored]
+    if pxcor > 0 and pycor > 0 [set grass-stored NE_grass_stored]
+    if pxcor > 0 and pycor < 0 [set grass-stored SE_grass_stored]
+    if pxcor < 0 and pycor < 0 [set grass-stored SW_grass_stored]
     color-patches
   ]
 end
@@ -159,7 +158,7 @@ to graze  ;; goat procedure
 
   if (food-stored != food-max) or (other plants-here = nobody)
   [
-    let new-food-amt (food-stored + get-amt-eaten )
+    let new-food-amt (food-stored + get-amt-eaten)
     ifelse (new-food-amt < food-max)
       [ set food-stored new-food-amt ]
       [ set food-stored food-max ]
@@ -174,7 +173,7 @@ end
 ;; returns amount of grass eaten at patch and
 ;; sets the patch grass amount accordingly
 to-report get-amt-eaten  ;; goat procedure
-  let reduced-amt (grass-stored - (bite-size * own_consumption))
+  let reduced-amt (grass-stored - bite-size)
   ifelse (reduced-amt < 0)
   [
     set grass-stored 0
@@ -189,7 +188,7 @@ end
 ;; collect milk and sells them at market ($1 = 1 gallon)
 to milk-plants  ;; farmer procedure
   set current-revenue
-    (round-to-place (sum [food-stored] of my-plants) 10) - sustainable-tax
+    (round-to-place (sum [food-stored] of my-plants) 10)
   ask my-plants
     [ set food-stored 0 ]
   set revenue-lst (fput current-revenue revenue-lst)
@@ -201,11 +200,11 @@ end
 to go-to-market
   ask farmers
   [
-    if invest-new-item > 0
-      [ buy-plants invest-new-item ]
-    if invest-new-item < 0
-      [ lose-plants (- invest-new-item) ]
-    if invest-new-item = 0
+    if num-plants-to-buy > 0
+      [ buy-plants num-plants-to-buy ]
+    if num-plants-to-buy < 0
+      [ lose-plants (- num-plants-to-buy) ]
+    if num-plants-to-buy = 0
       [ hubnet-send user-id "Plant Seller Says:" "You did not buy any plant." ]
     send-personal-info
  ;   set tax-paid sustainable-tax
@@ -265,34 +264,26 @@ end
 ;; initializes goat variables
 to setup-plants [ farmer# ]  ;; turtle procedure
   set breed plants
-  setxy random-xcor random-ycor
-  set owner# farmer#
-  if owner# = "plant" [set shape "plant" set color cyan]
-  if owner# = "car" [set shape "car" set color violet]
-  if owner# = "cow" [set shape "cow" set color brown]
-  if owner# = "house" [set shape "house" set color red]
-; set shape "plant"
+;  setxy random-xcor random-ycor
+  set shape "plant"
   set food-stored 0
-
-;;  if owner# = "north-west" [setxy random-float min-pxcor  random-float max-pycor]
-;;  if owner# = "north-east" [setxy random-float max-pxcor  random-float max-pycor]
- ;; if owner# = "south-west" [setxy random-float min-pxcor  random-float min-pycor]
- ;; if owner# = "south-east" [setxy random-float max-pxcor  random-float min-pycor]
+  set owner# farmer#
+  if owner# = "north-west" [setxy random-float min-pxcor  random-float max-pycor]
+  if owner# = "north-east" [setxy random-float max-pxcor  random-float max-pycor]
+  if owner# = "south-west" [setxy random-float min-pxcor  random-float min-pycor]
+  if owner# = "south-east" [setxy random-float max-pxcor  random-float min-pycor]
   show-turtle
 end
 
 ;; updates patches' color and increase grass supply with growth rate
 to reset-patches
   ask patches [
-    set grass-stored (grass-stored - drought)
-
-
   if (grass-stored < grass-max)
   [
-    let new-grass-amt (grass-stored + grass-growth-rate + grass-growth-rate_emergency )
+    let new-grass-amt (grass-stored + grass-growth-rate)
     ifelse (new-grass-amt > grass-max)
       [ set grass-stored grass-max ]
-      [ set grass-stored new-grass-amt]
+      [ set grass-stored new-grass-amt ]
     color-patches
   ]
   ]
@@ -337,7 +328,7 @@ to-report grass-supply
   report sum [ grass-stored ] of patches
 end
 
-to-report grass-growth-rate_emergency
+to-report grass-growth-rate
   report sum [sustainable-tax] of farmers
 end
 
@@ -353,14 +344,6 @@ end
 ;; rounds given number to certain decimal-place
 to-report round-to-place [ num decimal-place ]
   report (round (num * decimal-place)) / decimal-place
-end
-
-to-report own_consumption
-
-  if owner# = "plant" [report 0.1]
-  if owner# = "car" [report 0.9]
-  if owner# = "cow" [report 0.2]
-  if owner# = "house" [report 0.5]
 end
 
 
@@ -451,12 +434,12 @@ end
 
 ;; NetLogo knows what each student turtle is supposed to be
 ;; doing based on the tag sent by the node:
-;; invest-new-item - determine quantity of student's desired purchase
+;; num-plants-to-buy - determine quantity of student's desired purchase
 to execute-command [command]
-  if command = "invest-new-item"
+  if command = "num-plants-to-buy"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set invest-new-item hubnet-message ]
+      [ set num-plants-to-buy hubnet-message ]
     stop
   ]
 
@@ -475,19 +458,19 @@ to create-new-farmer [ id ]
     setup-farm
     set-unique-color
     reset-farmers-vars
-    hubnet-send id "invest-new-item" invest-new-item
+    hubnet-send id "num-plants-to-buy" num-plants-to-buy
     send-system-info
   ]
 end
 
 ;; situates the farmer in particular location
 to setup-farm  ;; farmer procedure
-  setxy ((random-float (world-width - 2)) + min-pxcor + 1)
-        ((random-float (world-height - 2)) + min-pycor + 1)
-;;  if user-id = "north-west" [setxy -5 5]
-;;  if user-id = "south-west" [setxy -5 -5]
-;;  if user-id = "north-east" [setxy 5 5]
-;;  if user-id = "south-east" [setxy 5 -5]
+;  setxy ((random-float (world-width - 2)) + min-pxcor + 1)
+;        ((random-float (world-height - 2)) + min-pycor + 1)
+  if user-id = "north-west" [setxy -5 5]
+  if user-id = "south-west" [setxy -5 -5]
+  if user-id = "north-east" [setxy 5 5]
+  if user-id = "south-east" [setxy 5 -5]
   hide-turtle
 end
 
@@ -505,7 +488,7 @@ end
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
-  set invest-new-item 1
+  set num-plants-to-buy 1
   set sustainable-tax 0
   set total-assets cost/plant
   set current-revenue 0
@@ -612,10 +595,10 @@ NIL
 1
 
 SLIDER
-158
-132
-326
-165
+133
+131
+301
+164
 init-num-plants/farmer
 init-num-plants/farmer
 0
@@ -700,10 +683,10 @@ PENS
 "milk-amt" 1.0 0 -16777216 true "" ""
 
 PLOT
-1173
-332
-1465
-490
+23
+331
+315
+489
 Grass Supply
 Day
 Grass (lbs)
@@ -721,10 +704,10 @@ PENS
 "South-west" 1.0 0 -6459832 true "" "plot sum [grass-stored] of patches with [pxcor < 0 and pycor < 0]"
 
 SLIDER
-158
-97
-327
-130
+133
+96
+302
+129
 harvest-period
 harvest-period
 2
@@ -764,10 +747,10 @@ NIL
 1
 
 MONITOR
-323
-182
-386
-227
+16
+121
+79
+166
 Day
 day
 3
@@ -854,10 +837,10 @@ NIL
 1
 
 PLOT
-1171
-178
-1463
-328
+21
+177
+313
+327
 Count_plants
 NIL
 NIL
@@ -917,78 +900,6 @@ SW_grass_stored
 1
 0
 Number
-
-SLIDER
-17
-94
-113
-127
-drought
-drought
-0
-5
-0.0
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-17
-135
-141
-168
-grass-growth-rate
-grass-growth-rate
-0
-10
-0.3
-0.1
-1
-NIL
-HORIZONTAL
-
-PLOT
-32
-186
-232
-336
-currenr-venue
-NIL
-NIL
-0.0
-10.0
--10.0
-10.0
-true
-true
-"" ""
-PENS
-"car" 1.0 0 -8630108 true "" "plot [current-revenue] of one-of farmers with [user-id = \"car\"]"
-"cow" 1.0 0 -6459832 true "" "plot [current-revenue] of one-of farmers with [user-id = \"cow\"]"
-"house" 1.0 0 -2674135 true "" "plot [current-revenue] of one-of farmers with [user-id = \"house\"]"
-"plant" 1.0 0 -11221820 true "" "plot [current-revenue] of one-of farmers with [user-id = \"plant\"]"
-
-PLOT
-51
-353
-251
-503
-plot 2
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"car" 1.0 0 -8630108 true "" "plot count plants with [owner# = \"car\"]"
-"cow" 1.0 0 -6459832 true "" "plot count plants with [owner# = \"cow\"]"
-"house" 1.0 0 -2674135 true "" "plot count plants with [owner# = \"house\"]"
-"plant" 1.0 0 -11221820 true "" "plot count plants with [owner# = \"plant\"]"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1511,8 +1422,8 @@ SLIDER
 95
 157
 128
-invest-new-item
-invest-new-item
+num-plants-to-buy
+num-plants-to-buy
 1.0
 10.0
 0
@@ -1559,7 +1470,7 @@ SLIDER
 sustainable-tax
 sustainable-tax
 0.0
-6.0
+0.5
 0
 0.01
 1
