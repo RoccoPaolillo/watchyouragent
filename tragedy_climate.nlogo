@@ -266,6 +266,7 @@ to setup-plants [ farmer# ]  ;; turtle procedure
   if owner# = "car" [set shape "car" set color violet]
   if owner# = "cow" [set shape "cow" set color brown]
   if owner# = "house" [set shape "house" set color red]
+  if owner# = "fish" [set shape "fish" set color blue]
   set food-stored 0
 
   show-turtle
@@ -348,6 +349,7 @@ to-report own_consumption
   if owner# = "car" [report 0.9]
   if owner# = "cow" [report 0.2]
   if owner# = "house" [report 0.5]
+  if owner# = "fish" [report 0.4]
 end
 
 
@@ -595,10 +597,10 @@ NIL
 1
 
 SLIDER
-158
-132
-326
-165
+210
+124
+378
+157
 init-num-plants/farmer
 init-num-plants/farmer
 0
@@ -683,10 +685,10 @@ PENS
 "milk-amt" 1.0 0 -16777216 true "" ""
 
 SLIDER
-158
-97
-327
-130
+210
+89
+379
+122
 harvest-period
 harvest-period
 2
@@ -818,7 +820,7 @@ NIL
 SLIDER
 17
 88
-113
+141
 121
 drought
 drought
@@ -832,9 +834,9 @@ HORIZONTAL
 
 SLIDER
 17
-129
+123
 141
-162
+156
 grass-growth-rate
 grass-growth-rate
 0
