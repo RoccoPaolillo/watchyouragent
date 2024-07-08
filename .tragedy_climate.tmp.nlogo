@@ -23,7 +23,7 @@ globals
 
   energia-max          ;; energia capacity
   food-max           ;; energia collection capacity
-  energia_richiesta          ;; amount of energia collected at each move
+            ;; amount of energia collected at each move
  ; tax-paid
 ]
 
@@ -93,7 +93,7 @@ to setup-globals
   set energia-max 50
   set food-max 50
   ;; why this particular calculation?
-  set energia_richiesta (round (100 / (ritmo_cicli - 1)))
+  set energia-richiesta (round (100 / (ritmo_cicli - 1)))
 
   set colori      [ white   gray   orange   brown    yellow    turquoise
                     cyan    sky    blue     violet   magenta   pink ]
@@ -173,7 +173,7 @@ end
 ;; returns amount of energia eaten at patch and
 ;; sets the patch energia amount accordingly
 to-report get-amt-eaten  ;; goat procedure
-  let reduced-amt (riserva-energetica - (energia_richiesta * consumo_individuale))
+  let reduced-amt (riserva-energetica - (energia-richiesta * consumo_individuale))
   ifelse (reduced-amt < 0)
   [
     set riserva-energetica 0
@@ -181,7 +181,7 @@ to-report get-amt-eaten  ;; goat procedure
   ]
   [
     set riserva-energetica reduced-amt
-    report energia_richiesta
+    report energia-richiesta
   ]
 end
 
