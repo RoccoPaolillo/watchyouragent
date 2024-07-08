@@ -252,11 +252,11 @@ to-report seller-says [ success? desired purchased ]
     ifelse (purchased > 1)
       [ set seller-message (word "Here are your " purchased " units.  ") ]
       [ set seller-message "Here is your unit.  " ]
-    set seller-message (word seller-message "You have spent $" cost ".")
+    set seller-message (word seller-message "You have spent €" cost ".")
   ]
   [
     set seller-message (word "You do not have enough to buy " desired ".  "
-      "You can afford " purchased " for $" cost ".")
+      "You can afford " purchased " for €" cost ".")
   ]
   report seller-message
 end
@@ -636,7 +636,7 @@ costo/unità
 6.0
 1
 1
-$
+€
 HORIZONTAL
 
 MONITOR
