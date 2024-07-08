@@ -688,7 +688,7 @@ ritmo_cicli
 ritmo_cicli
 2
 50
-8.0
+50.0
 1
 1
 NIL
@@ -1321,40 +1321,40 @@ VIEW
 10
 
 MONITOR
-96
-11
-201
-60
+32
+55
+137
+104
 Guadagno attuale
 NIL
 3
 1
 
 MONITOR
-51
-91
-145
-140
+257
+189
+351
+238
 Costo per unità
 NIL
 3
 1
 
 MONITOR
-279
-13
-370
-62
+358
+14
+449
+63
 Capitale totale
 NIL
 3
 1
 
 SLIDER
-7
-166
-156
-199
+22
+194
+218
+227
 compra_nuove_unità
 compra_nuove_unità
 1.0
@@ -1366,10 +1366,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-23
-10
-80
-59
+292
+15
+349
+64
 Giorno
 NIL
 3
@@ -1386,10 +1386,10 @@ NIL
 1
 
 SLIDER
-4
-234
-203
-267
+22
+237
+221
+270
 contributo_comune_emergenza
 contributo_comune_emergenza
 0.0
@@ -1401,10 +1401,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-5
-271
-204
-304
+23
+274
+222
+307
 riserva_personale
 riserva_personale
 0.0
@@ -1416,11 +1416,21 @@ NIL
 HORIZONTAL
 
 TEXTBOX
+29
 11
-208
-260
-226
-Investire in nuova energia per te o per gli altri
+221
+56
+Qui il tuo guadagno a fine periodo
+12
+0.0
+1
+
+TEXTBOX
+26
+118
+340
+178
+Puoi decidere come reinvestire il tuo guadagno: puoi non fare niente, comprare nuove  unità al loro costo, o investire in nuova energia per te o per un fondo comune in caso di una crisi energetica
 12
 0.0
 1
