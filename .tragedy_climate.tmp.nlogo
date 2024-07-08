@@ -23,7 +23,7 @@ globals
 
   energia-max          ;; energia capacity
   food-max           ;; energia collection capacity
-  bite-size          ;; amount of energia collected at each move
+            ;; amount of energia collected at each move
  ; tax-paid
 ]
 
@@ -188,7 +188,7 @@ to milk-units  ;; farmer procedure
   ask my-units
     [ set food-stored 0 ]
   set revenue-lst (fput current-revenue revenue-lst)
-  set total-assets total-assets + current-revenue
+  set total-assets total-assets + current-revenue  - contributo_emergenza
   send-personal-info
 end
 
@@ -620,7 +620,7 @@ costo/unità
 costo/unità
 1
 2000
-2.0
+1.0
 1
 1
 $
