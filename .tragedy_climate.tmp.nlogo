@@ -90,7 +90,7 @@ to setup-globals
   set grass-max 50
   set food-max 50
   ;; why this particular calculation?
-  set bite-size (round (100 / (ritmo_cicli - 1)))
+  set bite-size (round (100 / (harvest-period - 1)))
 
   set colori      [ white   gray   orange   brown    yellow    turquoise
                     cyan    sky    blue     violet   magenta   pink ]
@@ -132,7 +132,7 @@ to go
     tick
 
     ;; when not milking time
-    ifelse (ticks mod ritmo_cicli) != 0
+    ifelse (ticks mod harvest-period) != 0
     [
       ask plants
         [ graze ]
@@ -689,8 +689,8 @@ SLIDER
 89
 379
 122
-ritmo_cicli
-ritmo_cicli
+harvest-period
+harvest-period
 2
 50
 8.0
