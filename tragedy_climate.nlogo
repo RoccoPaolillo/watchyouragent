@@ -50,9 +50,9 @@ farmers-own
                      ;; to identify each student turtle
   compra_nuove_unità   ;; desired quantity of units to purchase
   revenue-lst        ;; list of each days' revenue collection
-  total-assets       ;; total of past revenue, minus expenses
-  current-revenue    ;; the revenue collected at the end of the last day
-  contributo_emergenza
+  capitale_totale       ;; total of past revenue, minus expenses
+  guadagno_attuale    ;; the revenue collected at the end of the last day
+  contributo_comune_emergenza
   riserva_personale
 
 ]
@@ -80,7 +80,7 @@ to setup
   hubnet-broadcast "unit Seller Says:"
     (word "Everyone starts with " unità_iniziali/gruppo " units.")
   hubnet-broadcast "compra_nuove_unità" 1
-   hubnet-broadcast "contributo_emergenza" 0
+   hubnet-broadcast "contributo_comune_emergenza" 0
   hubnet-broadcast "riserva_personale" 0
   broadcast-system-info
 end
@@ -187,12 +187,12 @@ end
 
 ;; collect milk and sells them at market ($1 = 1 gallon)
 to profit-units  ;; farmer procedure ex milk-plants
-  set current-revenue
+  set guadagno_attuale
     (round-to-place (sum [food-stored] of my-units) 10)
   ask my-units
     [ set food-stored 0 ]
-  set revenue-lst (fput current-revenue revenue-lst)
-  set total-assets total-assets + current-revenue  - contributo_emergenza - (riserva_personale * count my-units)
+  set revenue-lst (fput guadagno_attuale revenue-lst)
+  set capitale_totale capitale_totale + guadagno_attuale  - contributo_comune_emergenza - (riserva_personale * count my-units)
   send-personal-info
 end
 
@@ -207,14 +207,14 @@ to go-to-market
     if compra_nuove_unità = 0
       [ hubnet-send user-id "unit Seller Says:" "You did not buy any unit." ]
     send-personal-info
- ;   set tax-paid contributo_emergenza
+ ;   set tax-paid contributo_comune_emergenza
   ]
 end
 
 ;; farmers buy units at market
 to buy-units [ num-units-desired ]  ;; farmer procedure
   let got-number-desired? true
-  let num-units-afford (int (total-assets / costo/unità))
+  let num-units-afford (int (capitale_totale / costo/unità))
   let num-units-purchase num-units-desired
   if (num-units-afford < num-units-purchase)
   [
@@ -222,7 +222,7 @@ to buy-units [ num-units-desired ]  ;; farmer procedure
     set got-number-desired? false
   ]
   let cost-of-purchase num-units-purchase * costo/unità
-  set total-assets (total-assets - cost-of-purchase)
+  set capitale_totale (capitale_totale - cost-of-purchase)
   hubnet-send user-id "unit Seller Says:"
     (seller-says got-number-desired? num-units-desired num-units-purchase)
 
@@ -305,7 +305,7 @@ end
 
 ;; plots the graph of the system
 to plot-graph
-  plot-value "Average Revenue" avg-revenue
+  plot-value "Guadagno medio" avg-revenue
 end
 
 ;; plot value on the plot called name-of-plot
@@ -319,22 +319,22 @@ end
 ;; Calculation Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-to-report total_current-revenue
+to-report totale_guadagno_attuale
   ;; we can just compute this from revenue, since the price of milk is
   ;; fixed at $1/1 gallon.
-  report sum [ current-revenue ] of farmers
+  report sum [ guadagno_attuale ] of farmers
 end
 
-to-report energia-supply
+to-report totale_riserva-energetica
   report sum [ riserva-energetica ] of patches
 end
 
 to-report energia-growth-rate_emergency
-  report sum [contributo_emergenza] of farmers
+  report sum [contributo_comune_emergenza] of farmers
 end
 
 to-report avg-revenue
-  report mean [ current-revenue ] of farmers
+  report mean [ guadagno_attuale ] of farmers
 end
 
 ;; returns agentset that of units of a particular farmer
@@ -454,10 +454,10 @@ to execute-command [command]
     stop
   ]
 
-  if command = "contributo_emergenza"
+  if command = "contributo_comune_emergenza"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set contributo_emergenza hubnet-message ]
+      [ set contributo_comune_emergenza hubnet-message ]
     stop
   ]
 
@@ -503,10 +503,10 @@ to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
   set compra_nuove_unità 1
-  set contributo_emergenza 0
+  set contributo_comune_emergenza 0
     set riserva_personale 0
-  set total-assets costo/unità
-  set current-revenue 0
+  set capitale_totale costo/unità
+  set guadagno_attuale 0
 
   ;; get rid of existing units
   ask my-units
@@ -522,9 +522,9 @@ end
 ;; sends the appropriate monitor information back to the client
 to send-personal-info  ;; farmer procedure
  ; hubnet-send user-id "My unit Color" (color->string color)
-  hubnet-send user-id "Current Revenue" current-revenue
-  hubnet-send user-id "Total Assets" total-assets
-  hubnet-send user-id "My unit Population" count my-units
+  hubnet-send user-id "Guadagno attuale" guadagno_attuale
+  hubnet-send user-id "Capitale totale" capitale_totale
+;  hubnet-send user-id "My unit Population" count my-units
 end
 
 ;; returns string version of color name
@@ -534,17 +534,17 @@ end
 
 ;; sends the appropriate monitor information back to one client
 to send-system-info  ;; farmer procedure
- ; hubnet-send user-id "Total Current-Revenue" total_current-revenue
-  hubnet-send user-id "Grass Amt" energia-supply
-  hubnet-send user-id "Cost per unit" costo/unità
+ ; hubnet-send user-id "Total guadagno_attuale" totale_guadagno_attuale
+ ; hubnet-send user-id "Grass Amt" totale_riserva-energetica
+  hubnet-send user-id "Costo per unità" costo/unità
   hubnet-send user-id "Giorno" giorno
 end
 
 ;; broadcasts the appropriate monitor information back to all clients
 to broadcast-system-info
-;  hubnet-broadcast "Total Current-Revenue" total_current-revenue
-  hubnet-broadcast "Grass Amt" (int energia-supply)
-  hubnet-broadcast "Cost per unit" costo/unità
+;  hubnet-broadcast "Total guadagno_attuale" totale_guadagno_attuale
+;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
+  hubnet-broadcast "Costo per unità" costo/unità
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -655,7 +655,7 @@ PLOT
 73
 1100
 241
-Average Revenue
+Guadagno medio
 Day
 Revenue
 0.0
@@ -671,10 +671,10 @@ PENS
 MONITOR
 889
 465
-1013
+1024
 510
-Total Current Revenue
-total_current-revenue
+Guadagno attuale (all)
+totale_guadagno_attuale
 0
 1
 11
@@ -715,10 +715,10 @@ HORIZONTAL
 MONITOR
 1020
 465
-1136
+1159
 510
-Riserva energetica
-energia-supply
+Riserva energetica (all)
+totale_riserva-energetica
 0
 1
 11
@@ -839,7 +839,7 @@ crisi_energetica
 crisi_energetica
 0
 5
-5.0
+0.0
 0.1
 1
 NIL
@@ -1339,90 +1339,40 @@ VIEW
 10
 
 MONITOR
-251
-30
-356
-79
-Current Revenue
-NIL
-3
-1
-
-MONITOR
-126
-30
-244
-79
-My unit Population
-NIL
-3
-1
-
-MONITOR
-101
-322
-172
-371
-Grass Amt
-NIL
-0
-1
-
-MONITOR
-9
-322
-99
-371
-Cost per unit
-NIL
-3
-1
-
-MONITOR
-363
-30
-454
-79
-Total Assets
-NIL
-3
-1
-
-MONITOR
-175
-322
-249
-371
-Veggie Amt
-NIL
-3
-1
-
-TEXTBOX
-10
-303
-127
-321
-System Variables:
+96
 11
-0.0
-0
+201
+60
+Guadagno attuale
+NIL
+3
+1
 
-TEXTBOX
-7
-10
-124
-28
-Personal Variables:
-11
-0.0
-0
+MONITOR
+51
+91
+145
+140
+Costo per unità
+NIL
+3
+1
+
+MONITOR
+279
+13
+370
+62
+Capitale totale
+NIL
+3
+1
 
 SLIDER
-8
-95
-157
-128
+7
+166
+156
+199
 compra_nuove_unità
 compra_nuove_unità
 1.0
@@ -1434,42 +1384,32 @@ NIL
 HORIZONTAL
 
 MONITOR
-385
-321
-442
-370
+23
+10
+80
+59
 Giorno
 NIL
 3
 1
 
 MONITOR
-10
-249
-456
-298
+5
+349
+451
+398
 unit Seller Says:
 NIL
 3
 1
 
-TEXTBOX
-163
-98
-441
-130
-Selecting a negative number here will eliminate some of your goats.
-11
-0.0
-0
-
 SLIDER
-8
-137
-158
-170
-contributo_emergenza
-contributo_emergenza
+4
+234
+203
+267
+contributo_comune_emergenza
+contributo_comune_emergenza
 0.0
 6.0
 0
@@ -1479,10 +1419,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-178
-162
-211
+5
+271
+204
+304
 riserva_personale
 riserva_personale
 0.0
@@ -1492,6 +1432,16 @@ riserva_personale
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+11
+208
+260
+226
+Investire in nuova energia per te o per gli altri
+12
+0.0
+1
 
 @#$#@#$#@
 default
