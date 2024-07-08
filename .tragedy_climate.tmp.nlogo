@@ -29,10 +29,10 @@ globals
 
 patches-own
 [
-  special-store
+ ; special-store
   grass-stored       ;; amount of grass currently stored
 ]
-
+u
 breed [ plants plant ]  ;; creation controlled by farmers
 breed [ farmers farmer ] ;; created and controlled by clients
 
@@ -77,7 +77,7 @@ to setup
     [ reset-farmers-vars ]
   hubnet-broadcast "Plant Seller Says:"
     (word "Everyone starts with " unità_iniziali/gruppo " plants.")
-  hubnet-broadcast "invest-new-item" 1
+  hubnet-broadcast "compra_nuove_unità" 1
    hubnet-broadcast "contributo_emergenza" 0
   broadcast-system-info
 end
@@ -464,7 +464,7 @@ to create-new-farmer [ id ]
     setup-farm
     set-unique-color
     reset-farmers-vars
-    hubnet-send id "invest-new-item" invest-new-item
+    hubnet-send id "compra_nuove_unità" invest-new-item
     send-system-info
   ]
 end
@@ -601,14 +601,14 @@ SLIDER
 124
 384
 157
-item_iniziali/gruppo
-item_iniziali/gruppo
+unità_iniziali/gruppo
+unità_iniziali/gruppo
 0
 1
 1.0
 1
 1
-plants
+unità
 HORIZONTAL
 
 SLIDER
