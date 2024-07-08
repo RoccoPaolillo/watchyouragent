@@ -51,7 +51,7 @@ farmers-own
   revenue-lst        ;; list of each days' revenue collection
   total-assets       ;; total of past revenue, minus expenses
   current-revenue    ;; the revenue collected at the end of the last day
-  sustainable-tax
+  contributo_emergenza
 
 ]
 
@@ -78,7 +78,7 @@ to setup
   hubnet-broadcast "Plant Seller Says:"
     (word "Everyone starts with " init-num-plants/farmer " plants.")
   hubnet-broadcast "invest-new-item" 1
-   hubnet-broadcast "sustainable-tax" 0
+   hubnet-broadcast "contributo_emergenza" 0
   broadcast-system-info
 end
 
@@ -184,7 +184,7 @@ end
 ;; collect milk and sells them at market ($1 = 1 gallon)
 to milk-plants  ;; farmer procedure
   set current-revenue
-    (round-to-place (sum [food-stored] of my-plants) 10) - sustainable-tax
+    (round-to-place (sum [food-stored] of my-plants) 10) - contributo_emergenza
   ask my-plants
     [ set food-stored 0 ]
   set revenue-lst (fput current-revenue revenue-lst)
@@ -203,7 +203,7 @@ to go-to-market
     if invest-new-item = 0
       [ hubnet-send user-id "Plant Seller Says:" "You did not buy any plant." ]
     send-personal-info
- ;   set tax-paid sustainable-tax
+ ;   set tax-paid contributo_emergenza
   ]
 end
 
@@ -326,7 +326,7 @@ to-report grass-supply
 end
 
 to-report grass-growth-rate_emergency
-  report sum [sustainable-tax] of farmers
+  report sum [contributo_emergenza] of farmers
 end
 
 to-report avg-revenue
@@ -449,10 +449,10 @@ to execute-command [command]
     stop
   ]
 
-  if command = "sustainable-tax"
+  if command = "contributo_emergenza"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set sustainable-tax hubnet-message ]
+      [ set contributo_emergenza hubnet-message ]
     stop
   ]
 end
@@ -491,7 +491,7 @@ to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
   set invest-new-item 1
-  set sustainable-tax 0
+  set contributo_emergenza 0
   set total-assets costo/item
   set current-revenue 0
 
@@ -1465,8 +1465,8 @@ SLIDER
 137
 158
 170
-sustainable-tax
-sustainable-tax
+contributo_emergenza
+contributo_emergenza
 0.0
 6.0
 0
