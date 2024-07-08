@@ -140,7 +140,7 @@ to go
     [
       set giorno giorno + 1
       ask farmers
-        [ milk-units ]
+        [ profit-units ]
       go-to-market ;; to buy units
       plot-graph
     ]
@@ -182,7 +182,7 @@ to-report get-amt-eaten  ;; goat procedure
 end
 
 ;; collect milk and sells them at market ($1 = 1 gallon)
-to milk-units  ;; farmer procedure
+to profit-units  ;; farmer procedure ex milk-plants
   set current-revenue
     (round-to-place (sum [food-stored] of my-units) 10)
   ask my-units
