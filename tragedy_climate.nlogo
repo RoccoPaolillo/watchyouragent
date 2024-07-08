@@ -280,7 +280,7 @@ to reset-patches
 
   if (grass-stored < grass-max)
   [
-    let new-grass-amt (grass-stored + grass-growth-rate + grass-growth-rate_emergency )
+    let new-grass-amt (grass-stored + rinnovo_energetico + grass-growth-rate_emergency )
     ifelse (new-grass-amt > grass-max)
       [ set grass-stored grass-max ]
       [ set grass-stored new-grass-amt]
@@ -837,8 +837,8 @@ SLIDER
 123
 141
 156
-grass-growth-rate
-grass-growth-rate
+rinnovo_energetico
+rinnovo_energetico
 0
 10
 0.3
