@@ -30,7 +30,7 @@ globals
 patches-own
 [
  ; special-store
-  energia-stored       ;; amount of energia currently stored
+         ;; amount of energia currently stored
 ]
 
 breed [ units unit ]  ;; creation controlled by farmers
@@ -523,15 +523,15 @@ end
 to send-system-info  ;; farmer procedure
   hubnet-send user-id "Total Current-Revenue" total_current-revenue
   hubnet-send user-id "Grass Amt" energia-supply
-  hubnet-send user-id "Cost per unit"
+  hubnet-send user-id "Cost per unit" costo/unità
   hubnet-send user-id "Giorno" giorno
 end
 
 ;; broadcasts the appropriate monitor information back to all clients
 to broadcast-system-info
-  hubnet-broadcast "Total Current-Revenue" total_current-revenue
+;  hubnet-broadcast "Total Current-Revenue" total_current-revenue
   hubnet-broadcast "Grass Amt" (int energia-supply)
-  hubnet-broadcast "Cost per unit" costo/item
+  hubnet-broadcast "Cost per unit" costo/unità
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -627,10 +627,10 @@ $
 HORIZONTAL
 
 MONITOR
-956
-245
-1054
-290
+891
+244
+989
+289
 Avg-Revenue
 avg-revenue
 1
@@ -638,10 +638,10 @@ avg-revenue
 11
 
 PLOT
-950
-74
-1165
-242
+885
+73
+1100
+241
 Average Revenue
 Day
 Revenue
@@ -656,10 +656,10 @@ PENS
 "revenue" 1.0 0 -16777216 true "" ""
 
 MONITOR
-948
-463
-1072
-508
+889
+465
+1013
+510
 Total Current Revenue
 total_current-revenue
 0
@@ -667,10 +667,10 @@ total_current-revenue
 11
 
 PLOT
-950
-295
-1164
-463
+891
+297
+1105
+465
 Veggie Supply
 Day
 Vegetables
@@ -700,10 +700,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1079
-463
-1195
-508
+1020
+465
+1136
+510
 Riserva energetica
 energia-supply
 0

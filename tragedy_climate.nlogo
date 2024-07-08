@@ -30,7 +30,7 @@ globals
 patches-own
 [
  ; special-store
-  energia-stored       ;; amount of energia currently stored
+  riserva-energetica       ;; amount of energia currently stored
 ]
 
 breed [ units unit ]  ;; creation controlled by farmers
@@ -104,7 +104,7 @@ end
 ;; initialize energia supply for each patch
 to setup-patches
   ask patches [
- set energia-stored 50
+ set riserva-energetica 50
     color-patches
   ]
 end
@@ -169,14 +169,14 @@ end
 ;; returns amount of energia eaten at patch and
 ;; sets the patch energia amount accordingly
 to-report get-amt-eaten  ;; goat procedure
-  let reduced-amt (energia-stored - (bite-size * own_consumption))
+  let reduced-amt (riserva-energetica - (bite-size * own_consumption))
   ifelse (reduced-amt < 0)
   [
-    set energia-stored 0
-    report energia-stored
+    set riserva-energetica 0
+    report riserva-energetica
   ]
   [
-    set energia-stored reduced-amt
+    set riserva-energetica reduced-amt
     report bite-size
   ]
 end
@@ -275,15 +275,15 @@ end
 ;; updates patches' color and increase energia supply with growth rate
 to reset-patches
   ask patches [
-    set energia-stored (energia-stored - crisi_energetica)
+    set riserva-energetica (riserva-energetica - crisi_energetica)
 
 
-  if (energia-stored < energia-max)
+  if (riserva-energetica < energia-max)
   [
-    let new-energia-amt (energia-stored + rinnovo_energetico + energia-growth-rate_emergency )
+    let new-energia-amt (riserva-energetica + rinnovo_energetico + energia-growth-rate_emergency )
     ifelse (new-energia-amt > energia-max)
-      [ set energia-stored energia-max ]
-      [ set energia-stored new-energia-amt]
+      [ set riserva-energetica energia-max ]
+      [ set riserva-energetica new-energia-amt]
     color-patches
   ]
   ]
@@ -291,7 +291,7 @@ end
 
 ;; colors patches according to amount of energia on the patch
 to color-patches  ;; patch procedure
-  set pcolor (scale-color green energia-stored -5 (2 * energia-max))
+  set pcolor (scale-color green riserva-energetica -5 (2 * energia-max))
 end
 
 
@@ -322,7 +322,7 @@ to-report total_current-revenue
 end
 
 to-report energia-supply
-  report sum [ energia-stored ] of patches
+  report sum [ riserva-energetica ] of patches
 end
 
 to-report energia-growth-rate_emergency
@@ -627,10 +627,10 @@ $
 HORIZONTAL
 
 MONITOR
-956
-245
-1054
-290
+891
+244
+989
+289
 Avg-Revenue
 avg-revenue
 1
@@ -638,10 +638,10 @@ avg-revenue
 11
 
 PLOT
-950
-74
-1165
-242
+885
+73
+1100
+241
 Average Revenue
 Day
 Revenue
@@ -656,10 +656,10 @@ PENS
 "revenue" 1.0 0 -16777216 true "" ""
 
 MONITOR
-948
-463
-1072
-508
+889
+465
+1013
+510
 Total Current Revenue
 total_current-revenue
 0
@@ -667,10 +667,10 @@ total_current-revenue
 11
 
 PLOT
-950
-295
-1164
-463
+891
+297
+1105
+465
 Veggie Supply
 Day
 Vegetables
@@ -700,10 +700,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1079
-463
-1195
-508
+1020
+465
+1136
+510
 Riserva energetica
 energia-supply
 0
