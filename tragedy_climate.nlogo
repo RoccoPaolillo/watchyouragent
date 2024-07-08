@@ -847,7 +847,7 @@ PLOT
 216
 244
 366
-guadagno attuale
+guadagno giornaliero
 NIL
 NIL
 0.0
