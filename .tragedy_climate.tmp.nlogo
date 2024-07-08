@@ -523,7 +523,7 @@ end
 to send-system-info  ;; farmer procedure
   hubnet-send user-id "Veggie Amt" veggie-supply
   hubnet-send user-id "Grass Amt" grass-supply
-  hubnet-send user-id "Cost per Plant" costo/item
+  hubnet-send user-id "Cost per Plant"
   hubnet-send user-id "Giorno" giorno
 end
 
@@ -531,7 +531,7 @@ end
 to broadcast-system-info
   hubnet-broadcast "Veggie Amt" veggie-supply
   hubnet-broadcast "Grass Amt" (int grass-supply)
-  hubnet-broadcast "Cost per Plant" costo/item
+  hubnet-broadcast "Cost per Plant" cost/plant
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -616,8 +616,8 @@ SLIDER
 46
 303
 79
-costo/item
-costo/item
+cost/plant
+cost/plant
 1
 2000
 1.0
