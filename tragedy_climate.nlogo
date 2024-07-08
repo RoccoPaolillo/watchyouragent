@@ -184,11 +184,11 @@ end
 ;; collect milk and sells them at market ($1 = 1 gallon)
 to milk-units  ;; farmer procedure
   set current-revenue
-    (round-to-place (sum [food-stored] of my-units) 10) - contributo_emergenza
+    (round-to-place (sum [food-stored] of my-units) 10)
   ask my-units
     [ set food-stored 0 ]
   set revenue-lst (fput current-revenue revenue-lst)
-  set total-assets total-assets + current-revenue
+  set total-assets total-assets + current-revenue  - contributo_emergenza
   send-personal-info
 end
 
@@ -620,7 +620,7 @@ costo/unità
 costo/unità
 1
 2000
-2.0
+1.0
 1
 1
 $
@@ -852,7 +852,7 @@ PLOT
 216
 244
 366
-currenr-venue
+current-revenue
 NIL
 NIL
 0.0
@@ -874,7 +874,7 @@ PLOT
 368
 243
 518
-count item
+unità
 NIL
 NIL
 0.0

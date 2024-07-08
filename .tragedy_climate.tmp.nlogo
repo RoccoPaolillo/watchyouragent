@@ -30,7 +30,7 @@ globals
 patches-own
 [
  ; special-store
-         ;; amount of energia currently stored
+  riserva-energetica       ;; amount of energia currently stored
 ]
 
 breed [ units unit ]  ;; creation controlled by farmers
@@ -104,7 +104,7 @@ end
 ;; initialize energia supply for each patch
 to setup-patches
   ask patches [
- set energia-stored 50
+ set riserva-energetica 50
     color-patches
   ]
 end
@@ -169,14 +169,14 @@ end
 ;; returns amount of energia eaten at patch and
 ;; sets the patch energia amount accordingly
 to-report get-amt-eaten  ;; goat procedure
-  let reduced-amt (energia-stored - (bite-size * own_consumption))
+  let reduced-amt (riserva-energetica - (bite-size * own_consumption))
   ifelse (reduced-amt < 0)
   [
-    set energia-stored 0
-    report energia-stored
+    set riserva-energetica 0
+    report riserva-energetica
   ]
   [
-    set energia-stored reduced-amt
+    set riserva-energetica reduced-amt
     report bite-size
   ]
 end
@@ -184,7 +184,7 @@ end
 ;; collect milk and sells them at market ($1 = 1 gallon)
 to milk-units  ;; farmer procedure
   set current-revenue
-    (round-to-place (sum [food-stored] of my-units) 10) - contributo_emergenza
+    (round-to-place (sum [food-stored] of my-units) 10)
   ask my-units
     [ set food-stored 0 ]
   set revenue-lst (fput current-revenue revenue-lst)
@@ -275,15 +275,15 @@ end
 ;; updates patches' color and increase energia supply with growth rate
 to reset-patches
   ask patches [
-    set energia-stored (energia-stored - crisi_energetica)
+    set riserva-energetica (riserva-energetica - crisi_energetica)
 
 
-  if (energia-stored < energia-max)
+  if (riserva-energetica < energia-max)
   [
-    let new-energia-amt (energia-stored + rinnovo_energetico + energia-growth-rate_emergency )
+    let new-energia-amt (riserva-energetica + rinnovo_energetico + energia-growth-rate_emergency )
     ifelse (new-energia-amt > energia-max)
-      [ set energia-stored energia-max ]
-      [ set energia-stored new-energia-amt]
+      [ set riserva-energetica energia-max ]
+      [ set riserva-energetica new-energia-amt]
     color-patches
   ]
   ]
@@ -291,7 +291,7 @@ end
 
 ;; colors patches according to amount of energia on the patch
 to color-patches  ;; patch procedure
-  set pcolor (scale-color green energia-stored -5 (2 * energia-max))
+  set pcolor (scale-color green riserva-energetica -5 (2 * energia-max))
 end
 
 
@@ -322,7 +322,7 @@ to-report total_current-revenue
 end
 
 to-report energia-supply
-  report sum [ energia-stored ] of patches
+  report sum [ riserva-energetica ] of patches
 end
 
 to-report energia-growth-rate_emergency
@@ -852,7 +852,7 @@ PLOT
 216
 244
 366
-currenr-venue
+current-revenue
 NIL
 NIL
 0.0
@@ -874,7 +874,7 @@ PLOT
 368
 243
 518
-count item
+unità
 NIL
 NIL
 0.0
