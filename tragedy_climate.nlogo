@@ -4,7 +4,7 @@
 
 globals
 [
-  day                ;; number of days so far
+  giorno                ;; number of days so far
 
   colors             ;; list that holds the colors used for students' turtles
   color-names        ;; list that holds the names of the colors used for
@@ -85,7 +85,7 @@ end
 ;; initialize global variables
 to setup-globals
   reset-ticks
-  set day 0
+  set giorno 0
 
   set grass-max 50
   set food-max 50
@@ -138,7 +138,7 @@ to go
         [ graze ]
     ]
     [
-      set day day + 1
+      set giorno giorno + 1
       ask farmers
         [ milk-plants ]
       go-to-market ;; to buy plants
@@ -275,7 +275,7 @@ end
 ;; updates patches' color and increase grass supply with growth rate
 to reset-patches
   ask patches [
-    set grass-stored (grass-stored - drought)
+    set grass-stored (grass-stored - crisi_energetica)
 
 
   if (grass-stored < grass-max)
@@ -524,7 +524,7 @@ to send-system-info  ;; farmer procedure
   hubnet-send user-id "Veggie Amt" veggie-supply
   hubnet-send user-id "Grass Amt" grass-supply
   hubnet-send user-id "Cost per Plant" cost/plant
-  hubnet-send user-id "Day" day
+  hubnet-send user-id "Giorno" giorno
 end
 
 ;; broadcasts the appropriate monitor information back to all clients
@@ -532,7 +532,7 @@ to broadcast-system-info
   hubnet-broadcast "Veggie Amt" veggie-supply
   hubnet-broadcast "Grass Amt" (int grass-supply)
   hubnet-broadcast "Cost per Plant" cost/plant
-  hubnet-broadcast "Day" day
+  hubnet-broadcast "Giorno" giorno
 end
 
 ;; delete farmers once client has exited
@@ -728,12 +728,12 @@ NIL
 1
 
 MONITOR
-37
-172
-100
-217
-Day
-day
+15
+167
+78
+212
+Giorno
+giorno
 3
 1
 11
@@ -822,8 +822,8 @@ SLIDER
 88
 141
 121
-drought
-drought
+crisi_energetica
+crisi_energetica
 0
 5
 0.0
@@ -1425,7 +1425,7 @@ MONITOR
 275
 441
 324
-Day
+Giorno
 NIL
 3
 1
