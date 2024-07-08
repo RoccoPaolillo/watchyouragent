@@ -867,7 +867,7 @@ PENS
 "cow" 1.0 0 -6459832 true "" "plot [current-revenue] of one-of farmers with [user-id = \"cow\"]"
 "house" 1.0 0 -2674135 true "" "plot [current-revenue] of one-of farmers with [user-id = \"house\"]"
 "plant" 1.0 0 -11221820 true "" "plot [current-revenue] of one-of farmers with [user-id = \"plant\"]"
-"fish" 1.0 0 -13345367 true "" "plot [current-revenue] of one-of farmers with [user-id = \"chicken\"]"
+"chicken" 1.0 0 -13345367 true "" "plot [current-revenue] of one-of farmers with [user-id = \"chicken\"]"
 
 PLOT
 16
@@ -889,7 +889,7 @@ PENS
 "cow" 1.0 0 -6459832 true "" "plot count plants with [owner# = \"cow\"]"
 "house" 1.0 0 -2674135 true "" "plot count plants with [owner# = \"house\"]"
 "plant" 1.0 0 -11221820 true "" "plot count plants with [owner# = \"plant\"]"
-"fish" 1.0 0 -13345367 true "" "plot count plants with [owner# = \"chicken\"]"
+"chicken" 1.0 0 -13345367 true "" "plot count plants with [owner# = \"chicken\"]"
 
 @#$#@#$#@
 ## WHAT IS IT?
