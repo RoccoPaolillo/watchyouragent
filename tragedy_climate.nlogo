@@ -192,7 +192,7 @@ to profit-units  ;; farmer procedure ex milk-plants
   ask my-units
     [ set food-stored 0 ]
   set revenue-lst (fput current-revenue revenue-lst)
-  set total-assets total-assets + current-revenue  - contributo_emergenza - riserva_personale
+  set total-assets total-assets + current-revenue  - contributo_emergenza - (riserva_personale * count my-units)
   send-personal-info
 end
 
