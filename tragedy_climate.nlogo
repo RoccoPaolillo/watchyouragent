@@ -33,21 +33,21 @@ patches-own
   grass-stored       ;; amount of grass currently stored
 ]
 
-breed [ plants plant ]  ;; creation controlled by farmers
+breed [ units unit ]  ;; creation controlled by farmers
 breed [ farmers farmer ] ;; created and controlled by clients
 
 
-plants-own
+units-own
 [
   food-stored        ;; amount of grass collected from grazing
-  owner#             ;; the user-id of the farmer who owns the plant
+  owner#             ;; the user-id of the farmer who owns the unit
 ]
 
 farmers-own
 [
   user-id            ;; unique user-id, input by the client when they log in,
                      ;; to identify each student turtle
-  invest-new-item   ;; desired quantity of plants to purchase
+  invest-new-item   ;; desired quantity of units to purchase
   revenue-lst        ;; list of each days' revenue collection
   total-assets       ;; total of past revenue, minus expenses
   current-revenue    ;; the revenue collected at the end of the last day
@@ -75,8 +75,8 @@ to setup
   clear-all-plots
   ask farmers
     [ reset-farmers-vars ]
-  hubnet-broadcast "Plant Seller Says:"
-    (word "Everyone starts with " unità_iniziali/gruppo " plants.")
+  hubnet-broadcast "unit Seller Says:"
+    (word "Everyone starts with " unità_iniziali/gruppo " units.")
   hubnet-broadcast "compra_nuove_unità" 1
    hubnet-broadcast "contributo_emergenza" 0
   broadcast-system-info
@@ -134,14 +134,14 @@ to go
     ;; when not milking time
     ifelse (ticks mod ritmo_cicli) != 0
     [
-      ask plants
+      ask units
         [ graze ]
     ]
     [
       set giorno giorno + 1
       ask farmers
-        [ milk-plants ]
-      go-to-market ;; to buy plants
+        [ milk-units ]
+      go-to-market ;; to buy units
       plot-graph
     ]
 
@@ -152,7 +152,7 @@ end
 ;; goat move along the common looking for best patch of grass
 to graze  ;; goat procedure
 
-  if (food-stored != food-max) or (other plants-here = nobody)
+  if (food-stored != food-max) or (other units-here = nobody)
   [
     let new-food-amt (food-stored + get-amt-eaten )
     ifelse (new-food-amt < food-max)
@@ -182,10 +182,10 @@ to-report get-amt-eaten  ;; goat procedure
 end
 
 ;; collect milk and sells them at market ($1 = 1 gallon)
-to milk-plants  ;; farmer procedure
+to milk-units  ;; farmer procedure
   set current-revenue
-    (round-to-place (sum [food-stored] of my-plants) 10) - contributo_emergenza
-  ask my-plants
+    (round-to-place (sum [food-stored] of my-units) 10) - contributo_emergenza
+  ask my-units
     [ set food-stored 0 ]
   set revenue-lst (fput current-revenue revenue-lst)
   set total-assets total-assets + current-revenue
@@ -197,57 +197,57 @@ to go-to-market
   ask farmers
   [
     if invest-new-item > 0
-      [ buy-plants invest-new-item ]
+      [ buy-units invest-new-item ]
     if invest-new-item < 0
-      [ lose-plants (- invest-new-item) ]
+      [ lose-units (- invest-new-item) ]
     if invest-new-item = 0
-      [ hubnet-send user-id "Plant Seller Says:" "You did not buy any plant." ]
+      [ hubnet-send user-id "unit Seller Says:" "You did not buy any unit." ]
     send-personal-info
  ;   set tax-paid contributo_emergenza
   ]
 end
 
-;; farmers buy plants at market
-to buy-plants [ num-plants-desired ]  ;; farmer procedure
+;; farmers buy units at market
+to buy-units [ num-units-desired ]  ;; farmer procedure
   let got-number-desired? true
-  let num-plants-afford (int (total-assets / costo/item))
-  let num-plants-purchase num-plants-desired
-  if (num-plants-afford < num-plants-purchase)
+  let num-units-afford (int (total-assets / costo/item))
+  let num-units-purchase num-units-desired
+  if (num-units-afford < num-units-purchase)
   [
-    set num-plants-purchase num-plants-afford
+    set num-units-purchase num-units-afford
     set got-number-desired? false
   ]
-  let cost-of-purchase num-plants-purchase * costo/item
+  let cost-of-purchase num-units-purchase * costo/item
   set total-assets (total-assets - cost-of-purchase)
-  hubnet-send user-id "Plant Seller Says:"
-    (seller-says got-number-desired? num-plants-desired num-plants-purchase)
+  hubnet-send user-id "unit Seller Says:"
+    (seller-says got-number-desired? num-units-desired num-units-purchase)
 
-  ;; create the plants purchased by the farmer
-  hatch num-plants-purchase
-    [ setup-plants user-id ]
+  ;; create the units purchased by the farmer
+  hatch num-units-purchase
+    [ setup-units user-id ]
 end
 
-;; farmers eliminate some of their plants (with no gain in assets)
-to lose-plants [ num-to-lose ]  ;; farmer procedure
-  if ((count my-plants) < num-to-lose)
-    [ set num-to-lose (count my-plants) ]
-  hubnet-send user-id "Plant Seller Says:"
-    (word "You lost " num-to-lose " plants.")
+;; farmers eliminate some of their units (with no gain in assets)
+to lose-units [ num-to-lose ]  ;; farmer procedure
+  if ((count my-units) < num-to-lose)
+    [ set num-to-lose (count my-units) ]
+  hubnet-send user-id "unit Seller Says:"
+    (word "You lost " num-to-lose " units.")
 
-  ;; eliminate the plants ditched by the farmer
-  ask (n-of num-to-lose my-plants)
+  ;; eliminate the units ditched by the farmer
+  ask (n-of num-to-lose my-units)
     [ die ]
 end
 
-;; reports the appropriate information on the transaction of purchasing plants
+;; reports the appropriate information on the transaction of purchasing units
 to-report seller-says [ success? desired purchased ]
   let seller-message ""
   let cost purchased * costo/item
   ifelse success?
   [
     ifelse (purchased > 1)
-      [ set seller-message (word "Here are your " purchased " plants.  ") ]
-      [ set seller-message "Here is your plant.  " ]
+      [ set seller-message (word "Here are your " purchased " units.  ") ]
+      [ set seller-message "Here is your unit.  " ]
     set seller-message (word seller-message "You have spent $" cost ".")
   ]
   [
@@ -258,8 +258,8 @@ to-report seller-says [ success? desired purchased ]
 end
 
 ;; initializes goat variables
-to setup-plants [ farmer# ]  ;; turtle procedure
-  set breed plants
+to setup-units [ farmer# ]  ;; turtle procedure
+  set breed units
   setxy random-xcor random-ycor
   set owner# farmer#
   if owner# = "plant" [set shape "plant" set color cyan]
@@ -333,9 +333,9 @@ to-report avg-revenue
   report mean [ current-revenue ] of farmers
 end
 
-;; returns agentset that of plants of a particular farmer
-to-report my-plants  ;; farmer procedure
-  report plants with [ owner# = [user-id] of myself ]
+;; returns agentset that of units of a particular farmer
+to-report my-units  ;; farmer procedure
+  report units with [ owner# = [user-id] of myself ]
 end
 
 ;; rounds given number to certain decimal-place
@@ -376,7 +376,7 @@ to setup-quick-start
         "available to them in the monitors, buttons, and sliders."
       "Then press the GO button to start the simulation."
       "Please note that you may adjust the length of time..."
-        "GRAZING-PERIOD, that plants are allowed to graze each day."
+        "GRAZING-PERIOD, that units are allowed to graze each day."
       "For a quicker demonstration, reduce the..."
         "GRASS-GROWTH-RATE slider."
       "To curb buying incentives of the students, increase..."
@@ -495,23 +495,23 @@ to reset-farmers-vars  ;; farmer procedure
   set total-assets costo/item
   set current-revenue 0
 
-  ;; get rid of existing plants
-  ask my-plants
+  ;; get rid of existing units
+  ask my-units
     [ die ]
 
-  ;; create new plants for the farmer
+  ;; create new units for the farmer
   hatch unità_iniziali/gruppo
-    [ setup-plants user-id ]
+    [ setup-units user-id ]
 
   send-personal-info
 end
 
 ;; sends the appropriate monitor information back to the client
 to send-personal-info  ;; farmer procedure
-  hubnet-send user-id "My Plant Color" (color->string color)
+ ; hubnet-send user-id "My unit Color" (color->string color)
   hubnet-send user-id "Current Revenue" current-revenue
   hubnet-send user-id "Total Assets" total-assets
-  hubnet-send user-id "My Plant Population" count my-plants
+  hubnet-send user-id "My unit Population" count my-units
 end
 
 ;; returns string version of color name
@@ -523,7 +523,7 @@ end
 to send-system-info  ;; farmer procedure
   hubnet-send user-id "Veggie Amt" veggie-supply
   hubnet-send user-id "Grass Amt" grass-supply
-  hubnet-send user-id "Cost per Plant" costo/item
+  hubnet-send user-id "Cost per unit" costo/item
   hubnet-send user-id "Giorno" giorno
 end
 
@@ -531,7 +531,7 @@ end
 to broadcast-system-info
   hubnet-broadcast "Veggie Amt" veggie-supply
   hubnet-broadcast "Grass Amt" (int grass-supply)
-  hubnet-broadcast "Cost per Plant" costo/item
+  hubnet-broadcast "Cost per unit" costo/item
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -541,7 +541,7 @@ to remove-farmer [ id ]
   ask farmers with [user-id = id]
   [
     set old-color color
-    ask my-plants
+    ask my-units
       [ die ]
     die
   ]
@@ -1340,7 +1340,7 @@ MONITOR
 30
 244
 79
-My Plant Population
+My unit Population
 NIL
 3
 1
@@ -1356,11 +1356,11 @@ NIL
 1
 
 MONITOR
-7
+8
 276
-97
+98
 325
-Cost per Plant
+Cost per unit
 NIL
 3
 1
@@ -1371,16 +1371,6 @@ MONITOR
 454
 79
 Total Assets
-NIL
-3
-1
-
-MONITOR
-5
-30
-121
-79
-My Plant Color
 NIL
 3
 1
@@ -1445,7 +1435,7 @@ MONITOR
 203
 455
 252
-Plant Seller Says:
+unit Seller Says:
 NIL
 3
 1
