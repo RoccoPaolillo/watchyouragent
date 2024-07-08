@@ -266,7 +266,7 @@ to setup-plants [ farmer# ]  ;; turtle procedure
   if owner# = "car" [set shape "car" set color violet]
   if owner# = "cow" [set shape "cow" set color brown]
   if owner# = "house" [set shape "house" set color red]
-  if owner# = "fish" [set shape "fish" set color blue]
+  if owner# = "chicken" [set shape "chicken" set color blue]
   set food-stored 0
 
   show-turtle
@@ -349,7 +349,7 @@ to-report own_consumption
   if owner# = "car" [report 0.9]
   if owner# = "cow" [report 0.2]
   if owner# = "house" [report 0.5]
-  if owner# = "fish" [report 0.4]
+  if owner# = "chicken" [report 0.4]
 end
 
 
@@ -523,7 +523,7 @@ end
 to send-system-info  ;; farmer procedure
   hubnet-send user-id "Veggie Amt" veggie-supply
   hubnet-send user-id "Grass Amt" grass-supply
-  hubnet-send user-id "Cost per Plant"
+  hubnet-send user-id "Cost per Plant" costo/item
   hubnet-send user-id "Giorno" giorno
 end
 
@@ -531,7 +531,7 @@ end
 to broadcast-system-info
   hubnet-broadcast "Veggie Amt" veggie-supply
   hubnet-broadcast "Grass Amt" (int grass-supply)
-  hubnet-broadcast "Cost per Plant" cost/plant
+  hubnet-broadcast "Cost per Plant" costo/item
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -616,8 +616,8 @@ SLIDER
 46
 303
 79
-cost/plant
-cost/plant
+costo/item
+costo/item
 1
 2000
 1.0
@@ -867,6 +867,7 @@ PENS
 "cow" 1.0 0 -6459832 true "" "plot [current-revenue] of one-of farmers with [user-id = \"cow\"]"
 "house" 1.0 0 -2674135 true "" "plot [current-revenue] of one-of farmers with [user-id = \"house\"]"
 "plant" 1.0 0 -11221820 true "" "plot [current-revenue] of one-of farmers with [user-id = \"plant\"]"
+"chicken" 1.0 0 -13345367 true "" "plot [current-revenue] of one-of farmers with [user-id = \"chicken\"]"
 
 PLOT
 16
@@ -888,6 +889,7 @@ PENS
 "cow" 1.0 0 -6459832 true "" "plot count plants with [owner# = \"cow\"]"
 "house" 1.0 0 -2674135 true "" "plot count plants with [owner# = \"house\"]"
 "plant" 1.0 0 -11221820 true "" "plot count plants with [owner# = \"plant\"]"
+"chicken" 1.0 0 -13345367 true "" "plot count plants with [owner# = \"chicken\"]"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1040,6 +1042,14 @@ Circle -16777216 true false 30 180 90
 Polygon -16777216 true false 162 80 132 78 134 135 209 135 194 105 189 96 180 89
 Circle -7500403 true true 47 195 58
 Circle -7500403 true true 195 195 58
+
+chicken
+false
+0
+Circle -7500403 true true 62 92 178
+Circle -7500403 true true 45 15 120
+Polygon -7500403 true true 45 60 75 105 0 105
+Polygon -7500403 true true 75 225 135 300 165 210 165 225 165 300 225 225 135 150 165 150 165 150 180 165
 
 circle
 false
