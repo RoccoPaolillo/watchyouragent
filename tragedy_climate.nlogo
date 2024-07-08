@@ -51,7 +51,7 @@ farmers-own
   compra_nuove_unità   ;; desired quantity of units to purchase
   revenue-lst        ;; list of each days' revenue collection
   capitale_totale       ;; total of past revenue, minus expenses
-  guadagno_attuale    ;; the revenue collected at the end of the last day
+  guadagno_giornaliero    ;; the revenue collected at the end of the last day
   contributo_comune_emergenza
   riserva_personale
 
@@ -187,12 +187,12 @@ end
 
 ;; collect milk and sells them at market ($1 = 1 gallon)
 to profit-units  ;; farmer procedure ex milk-plants
-  set guadagno_attuale
+  set guadagno_giornaliero
     (round-to-place (sum [energia_acquisita] of my-units) 10)
   ask my-units
     [ set energia_acquisita 0 ]
-  set revenue-lst (fput guadagno_attuale revenue-lst)
-  set capitale_totale capitale_totale + guadagno_attuale  - contributo_comune_emergenza - (riserva_personale * count my-units)
+  set revenue-lst (fput guadagno_giornaliero revenue-lst)
+  set capitale_totale capitale_totale + guadagno_giornaliero  - contributo_comune_emergenza - (riserva_personale * count my-units)
   send-personal-info
 end
 
@@ -305,7 +305,7 @@ end
 
 ;; plots the graph of the system
 to plot-graph
-  plot-value "Guadagno medio" avg-revenue
+  plot-value "Guadagno medio" guadagno_medio
 end
 
 ;; plot value on the plot called name-of-plot
@@ -319,10 +319,10 @@ end
 ;; Calculation Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-to-report totale_guadagno_attuale
+to-report totale_guadagno_giornaliero
   ;; we can just compute this from revenue, since the price of milk is
   ;; fixed at $1/1 gallon.
-  report sum [ guadagno_attuale ] of farmers
+  report sum [ guadagno_giornaliero ] of farmers
 end
 
 to-report totale_riserva-energetica
@@ -333,8 +333,8 @@ to-report energia-growth-rate_emergency
   report sum [contributo_comune_emergenza] of farmers
 end
 
-to-report avg-revenue
-  report mean [ guadagno_attuale ] of farmers
+to-report guadagno_medio
+  report mean [ guadagno_giornaliero ] of farmers
 end
 
 ;; returns agentset that of units of a particular farmer
@@ -506,7 +506,7 @@ to reset-farmers-vars  ;; farmer procedure
   set contributo_comune_emergenza 0
     set riserva_personale 0
   set capitale_totale costo/unità
-  set guadagno_attuale 0
+  set guadagno_giornaliero 0
 
   ;; get rid of existing units
   ask my-units
@@ -522,7 +522,7 @@ end
 ;; sends the appropriate monitor information back to the client
 to send-personal-info  ;; farmer procedure
  ; hubnet-send user-id "My unit Color" (color->string color)
-  hubnet-send user-id "Guadagno attuale" guadagno_attuale
+  hubnet-send user-id "Guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "Capitale totale" capitale_totale
 ;  hubnet-send user-id "My unit Population" count my-units
 end
@@ -534,7 +534,7 @@ end
 
 ;; sends the appropriate monitor information back to one client
 to send-system-info  ;; farmer procedure
- ; hubnet-send user-id "Total guadagno_attuale" totale_guadagno_attuale
+ ; hubnet-send user-id "Total guadagno_giornaliero" totale_guadagno_giornaliero
  ; hubnet-send user-id "Grass Amt" totale_riserva-energetica
   hubnet-send user-id "Costo per unità" costo/unità
   hubnet-send user-id "Giorno" giorno
@@ -542,7 +542,7 @@ end
 
 ;; broadcasts the appropriate monitor information back to all clients
 to broadcast-system-info
-;  hubnet-broadcast "Total guadagno_attuale" totale_guadagno_attuale
+;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
 ;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
   hubnet-broadcast "Costo per unità" costo/unità
   hubnet-broadcast "Giorno" giorno
@@ -633,7 +633,7 @@ costo/unità
 costo/unità
 1
 2000
-1.0
+6.0
 1
 1
 $
@@ -645,16 +645,16 @@ MONITOR
 989
 289
 Avg-Revenue
-avg-revenue
+guadagno_medio
 1
 1
 11
 
 PLOT
-885
-73
-1100
-241
+888
+66
+1103
+234
 Guadagno medio
 Day
 Revenue
@@ -666,7 +666,7 @@ true
 false
 "" ""
 PENS
-"revenue" 1.0 0 -16777216 true "" ""
+"" 1.0 0 -16777216 true "" ""
 
 MONITOR
 892
@@ -674,21 +674,21 @@ MONITOR
 1027
 356
 Guadagno attuale (all)
-totale_guadagno_attuale
+totale_guadagno_giornaliero
 0
 1
 11
 
 SLIDER
-210
-89
-379
-122
+211
+90
+380
+123
 ritmo_cicli
 ritmo_cicli
 2
 50
-50.0
+20.0
 1
 1
 NIL
@@ -836,7 +836,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.0
+0.3
 0.1
 1
 NIL
@@ -858,11 +858,11 @@ true
 true
 "" ""
 PENS
-"car" 1.0 0 -8630108 true "" "plot [guadagno_attuale] of one-of farmers with [user-id = \"car\"]"
-"cow" 1.0 0 -6459832 true "" "plot [guadagno_attuale] of one-of farmers with [user-id = \"cow\"]"
-"house" 1.0 0 -2674135 true "" "plot [guadagno_attuale] of one-of farmers with [user-id = \"house\"]"
-"plant" 1.0 0 -11221820 true "" "plot [guadagno_attuale] of one-of farmers with [user-id = \"plant\"]"
-"chicken" 1.0 0 -13345367 true "" "plot [guadagno_attuale] of one-of farmers with [user-id = \"chicken\"]"
+"car" 1.0 0 -8630108 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"car\"]"
+"cow" 1.0 0 -6459832 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"cow\"]"
+"house" 1.0 0 -2674135 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"house\"]"
+"plant" 1.0 0 -11221820 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"plant\"]"
+"chicken" 1.0 0 -13345367 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"chicken\"]"
 
 PLOT
 16
@@ -1323,9 +1323,9 @@ VIEW
 MONITOR
 32
 55
-137
+158
 104
-Guadagno attuale
+Guadagno giornaliero
 NIL
 3
 1
