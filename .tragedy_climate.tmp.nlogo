@@ -1321,10 +1321,10 @@ VIEW
 10
 
 MONITOR
-31
-45
-157
-94
+32
+55
+158
+104
 Guadagno giornaliero
 NIL
 3
@@ -1420,7 +1420,7 @@ TEXTBOX
 11
 221
 56
-Qui il tuo guadagno giornaliero
+Qui il tuo guadagno a fine periodo
 12
 0.0
 1
