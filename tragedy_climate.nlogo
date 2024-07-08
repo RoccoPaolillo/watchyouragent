@@ -76,7 +76,7 @@ to setup
   ask farmers
     [ reset-farmers-vars ]
   hubnet-broadcast "Plant Seller Says:"
-    (word "Everyone starts with " init-num-plants/farmer " plants.")
+    (word "Everyone starts with " item_iniziali/gruppo " plants.")
   hubnet-broadcast "invest-new-item" 1
    hubnet-broadcast "contributo_emergenza" 0
   broadcast-system-info
@@ -500,7 +500,7 @@ to reset-farmers-vars  ;; farmer procedure
     [ die ]
 
   ;; create new plants for the farmer
-  hatch init-num-plants/farmer
+  hatch item_iniziali/gruppo
     [ setup-plants user-id ]
 
   send-personal-info
@@ -599,10 +599,10 @@ NIL
 SLIDER
 210
 124
-378
+384
 157
-init-num-plants/farmer
-init-num-plants/farmer
+item_iniziali/gruppo
+item_iniziali/gruppo
 0
 1
 1.0
