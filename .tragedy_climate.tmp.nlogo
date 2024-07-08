@@ -523,15 +523,15 @@ end
 to send-system-info  ;; farmer procedure
   hubnet-send user-id "Total Current-Revenue" total_current-revenue
   hubnet-send user-id "Grass Amt" energia-supply
-  hubnet-send user-id "Cost per unit" costo/unità
+  hubnet-send user-id "Cost per unit"
   hubnet-send user-id "Giorno" giorno
 end
 
 ;; broadcasts the appropriate monitor information back to all clients
 to broadcast-system-info
-;  hubnet-broadcast "Total Current-Revenue" total_current-revenue
+  hubnet-broadcast "Total Current-Revenue" total_current-revenue
   hubnet-broadcast "Grass Amt" (int energia-supply)
-  hubnet-broadcast "Cost per unit" costo/unità
+  hubnet-broadcast "Cost per unit" costo/item
   hubnet-broadcast "Giorno" giorno
 end
 
