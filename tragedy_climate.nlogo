@@ -52,6 +52,7 @@ farmers-own
   total-assets       ;; total of past revenue, minus expenses
   current-revenue    ;; the revenue collected at the end of the last day
   contributo_emergenza
+  riserva_personale
 
 ]
 
@@ -79,6 +80,7 @@ to setup
     (word "Everyone starts with " unità_iniziali/gruppo " units.")
   hubnet-broadcast "compra_nuove_unità" 1
    hubnet-broadcast "contributo_emergenza" 0
+  hubnet-broadcast "riserva_personale" 0
   broadcast-system-info
 end
 
@@ -162,7 +164,7 @@ to graze  ;; goat procedure
  ; rt (random-float 90)
  ; lt (random-float 90)
  ; fd 1
-   if food-stored = 0 [die]
+   if (food-stored + riserva_personale) = 0 [die]
 end
 
 
@@ -188,7 +190,7 @@ to profit-units  ;; farmer procedure ex milk-plants
   ask my-units
     [ set food-stored 0 ]
   set revenue-lst (fput current-revenue revenue-lst)
-  set total-assets total-assets + current-revenue  - contributo_emergenza
+  set total-assets total-assets + current-revenue  - contributo_emergenza - riserva_personale
   send-personal-info
 end
 
@@ -455,6 +457,13 @@ to execute-command [command]
       [ set contributo_emergenza hubnet-message ]
     stop
   ]
+
+   if command = "riserva_personale"
+  [
+    ask farmers with [user-id = hubnet-message-source]
+      [ set contributo_emergenza hubnet-message ]
+    stop
+  ]
 end
 
 to create-new-farmer [ id ]
@@ -492,6 +501,7 @@ to reset-farmers-vars  ;; farmer procedure
   set revenue-lst []
   set compra_nuove_unità 1
   set contributo_emergenza 0
+    set riserva_personale 0
   set total-assets costo/unità
   set current-revenue 0
 
@@ -1346,20 +1356,20 @@ NIL
 1
 
 MONITOR
-100
-276
-171
-325
+101
+322
+172
+371
 Grass Amt
 NIL
 0
 1
 
 MONITOR
-8
-276
-98
-325
+9
+322
+99
+371
 Cost per unit
 NIL
 3
@@ -1376,20 +1386,20 @@ NIL
 1
 
 MONITOR
-174
-276
-248
-325
+175
+322
+249
+371
 Veggie Amt
 NIL
 3
 1
 
 TEXTBOX
-9
-257
-126
-275
+10
+303
+127
+321
 System Variables:
 11
 0.0
@@ -1421,20 +1431,20 @@ NIL
 HORIZONTAL
 
 MONITOR
-384
-275
-441
-324
+385
+321
+442
+370
 Giorno
 NIL
 3
 1
 
 MONITOR
-9
-203
-455
-252
+10
+249
+456
+298
 unit Seller Says:
 NIL
 3
@@ -1461,6 +1471,21 @@ contributo_emergenza
 6.0
 0
 0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+8
+178
+162
+211
+riserva_personale
+riserva_personale
+0.0
+10.0
+0
+0.1
 1
 NIL
 HORIZONTAL
