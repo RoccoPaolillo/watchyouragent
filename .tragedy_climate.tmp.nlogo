@@ -349,7 +349,7 @@ to-report own_consumption
   if owner# = "car" [report 0.9]
   if owner# = "cow" [report 0.2]
   if owner# = "house" [report 0.5]
-  if owner# = "fish" [report 0.4]
+  if owner# = "fish" [report 0.3]
 end
 
 
