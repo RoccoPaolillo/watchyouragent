@@ -145,6 +145,7 @@ to go
       ask farmers
         [ profit-units ]
       go-to-market ;; to buy units
+      investment
       plot-graph
     ]
 
@@ -157,16 +158,17 @@ to graze  ;; goat procedure
 
   if (energia_acquisita != food-max) or (other units-here = nobody)
   [
-    let new-food-amt (energia_acquisita + get-amt-eaten )
-    ifelse (new-food-amt < food-max)
+    let new-food-amt (energia_acquisita + get-amt-eaten ); + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
+    if (new-food-amt < food-max)
       [ set energia_acquisita new-food-amt ]
-      [ set energia_acquisita food-max ]
+     ; [ set energia_acquisita food-max ]
   ]
  ; rt (random-float 90)
  ; lt (random-float 90)
  ; fd 1
   set riserve_unità (energia_acquisita + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
   if riserve_unità = 0 [die]
+;  if energia_acquisita = 0 [die]
 end
 
 
@@ -192,7 +194,7 @@ to profit-units  ;; farmer procedure ex milk-plants
   ask my-units
     [ set energia_acquisita 0 ]
   set revenue-lst (fput guadagno_giornaliero revenue-lst)
-  set capitale_totale capitale_totale + guadagno_giornaliero  - contributo_comune_emergenza - (riserva_personale * count my-units)
+  set capitale_totale capitale_totale + guadagno_giornaliero ; (capitale_totale + guadagno_giornaliero  - contributo_comune_emergenza - (riserva_personale * count my-units))
   send-personal-info
 end
 
@@ -208,7 +210,13 @@ to go-to-market
       [ hubnet-send user-id "unit Seller Says:" "You did not buy any unit." ]
     send-personal-info
  ;   set tax-paid contributo_comune_emergenza
+ ;   set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))
   ]
+end
+
+to investment
+  ask farmers
+  [set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))]
 end
 
 ;; farmers buy units at market
@@ -688,7 +696,7 @@ ritmo_cicli
 ritmo_cicli
 2
 50
-20.0
+10.0
 1
 1
 NIL
