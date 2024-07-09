@@ -31,3 +31,7 @@ This is the main difference with the original Tragedy of the common model:
   + they have an initial unequal amount of stored grass to count on
   + competition: how much plants they want to buy ```num-plants-to-buy```. The more plants, the more grass will be consumed
   + cooperation: ```sustainable-tax``` how much they want to contribute to renew grass (soil) for everyone
+
+## How total asset is computed
+
+(energia_acquisita * giorno) - (costo_per_unità - (giorno - 1))
