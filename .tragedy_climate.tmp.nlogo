@@ -163,6 +163,7 @@ to graze  ;; goat procedure
       [ set energia_acquisita new-food-amt ]
      ; [ set energia_acquisita food-max ]
   ]
+
   rt (random-float 90)
   lt (random-float 90)
   fd 1
