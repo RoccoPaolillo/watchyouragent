@@ -842,7 +842,7 @@ crisi_energetica
 crisi_energetica
 0
 5
-0.7
+0.0
 0.1
 1
 NIL
@@ -914,7 +914,7 @@ SWITCH
 84
 is_crisi_energetica
 is_crisi_energetica
-0
+1
 1
 -1000
 
