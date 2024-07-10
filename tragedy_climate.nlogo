@@ -145,7 +145,7 @@ to go
       ask farmers
         [ profit-units ]
       go-to-market ;; to buy units
-      investment
+  ;     investment
       plot-graph
     ]
 
@@ -211,13 +211,14 @@ to go-to-market
     send-personal-info
  ;   set tax-paid contributo_comune_emergenza
  ;   set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))
+    set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))
   ]
 end
 
-to investment
-  ask farmers
-  [set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))]
-end
+; to investment
+;   ask farmers
+;   [set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))]
+; end
 
 ;; farmers buy units at market
 to buy-units [ num-units-desired ]  ;; farmer procedure
@@ -641,7 +642,7 @@ costo/unità
 costo/unità
 1
 2000
-6.0
+7.0
 1
 1
 €
