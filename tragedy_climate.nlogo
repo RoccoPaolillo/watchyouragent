@@ -163,12 +163,20 @@ to graze  ;; goat procedure
       [ set energia_acquisita new-food-amt ]
      ; [ set energia_acquisita food-max ]
   ]
+; bloccare prossime tre linee se non si vogliono far muovere gli agenti
+ifelse muovi_unità [
   rt (random-float 90)
   lt (random-float 90)
   fd 1
+  ][]
+
+  ifelse is_crisi_energetica [
   set riserve_unità (energia_acquisita + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
-  if riserve_unità = 0 [die]
-;  if energia_acquisita = 0 [die]
+  ]
+  [
+      set riserve_unità (energia_acquisita)
+  ]
+    if riserve_unità = 0 [die]
 end
 
 
@@ -223,14 +231,14 @@ end
 ;; farmers buy units at market
 to buy-units [ num-units-desired ]  ;; farmer procedure
   let got-number-desired? true
-  let num-units-afford (int (capitale_totale / costo/unità))
+  let num-units-afford (int (capitale_totale / costo/nuove_unità))
   let num-units-purchase num-units-desired
   if (num-units-afford < num-units-purchase)
   [
     set num-units-purchase num-units-afford
     set got-number-desired? false
   ]
-  let cost-of-purchase num-units-purchase * costo/unità
+  let cost-of-purchase num-units-purchase * costo/nuove_unità
   set capitale_totale (capitale_totale - cost-of-purchase)
   hubnet-send user-id "unit Seller Says:"
     (seller-says got-number-desired? num-units-desired num-units-purchase)
@@ -255,7 +263,7 @@ end
 ;; reports the appropriate information on the transaction of purchasing units
 to-report seller-says [ success? desired purchased ]
   let seller-message ""
-  let cost purchased * costo/unità
+  let cost purchased * costo/nuove_unità
   ifelse success?
   [
     ifelse (purchased > 1)
@@ -528,7 +536,7 @@ to reset-farmers-vars  ;; farmer procedure
   set compra_nuove_unità 1
   set contributo_comune_emergenza 0
     set riserva_personale 0
-  set capitale_totale costo/unità
+  set capitale_totale costo/nuove_unità
   set guadagno_giornaliero 0
 
   ;; get rid of existing units
@@ -559,7 +567,7 @@ end
 to send-system-info  ;; farmer procedure
  ; hubnet-send user-id "Total guadagno_giornaliero" totale_guadagno_giornaliero
  ; hubnet-send user-id "Grass Amt" totale_riserva-energetica
-  hubnet-send user-id "Costo per unità" costo/unità
+  hubnet-send user-id "Costo nuove unità" costo/nuove_unità
   hubnet-send user-id "Giorno" giorno
 end
 
@@ -567,7 +575,7 @@ end
 to broadcast-system-info
 ;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
 ;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
-  hubnet-broadcast "Costo per unità" costo/unità
+  hubnet-broadcast "Costo nuove unità" costo/nuove_unità
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -589,10 +597,10 @@ end
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-439
-86
-830
-478
+484
+78
+875
+470
 -1
 -1
 18.24
@@ -633,10 +641,10 @@ NIL
 1
 
 SLIDER
-210
-124
-384
-157
+11
+140
+185
+173
 unità_iniziali/gruppo
 unità_iniziali/gruppo
 0
@@ -648,12 +656,12 @@ unità
 HORIZONTAL
 
 SLIDER
-188
-46
-358
-79
-costo/unità
-costo/unità
+11
+175
+186
+208
+costo/nuove_unità
+costo/nuove_unità
 1
 2000
 7.0
@@ -703,10 +711,10 @@ totale_guadagno_giornaliero
 11
 
 SLIDER
-211
-90
-380
-123
+12
+102
+137
+135
 ritmo_cicli
 ritmo_cicli
 2
@@ -746,10 +754,10 @@ NIL
 1
 
 MONITOR
-15
-167
-78
-212
+13
+238
+76
+283
 Giorno
 giorno
 3
@@ -836,10 +844,10 @@ NIL
 1
 
 SLIDER
-17
-88
-141
-121
+303
+86
+440
+119
 crisi_energetica
 crisi_energetica
 0
@@ -851,10 +859,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-17
-123
-141
-156
+146
+52
+270
+85
 rinnovo_energetico
 rinnovo_energetico
 0
@@ -866,10 +874,10 @@ NIL
 HORIZONTAL
 
 PLOT
-15
-216
-244
-366
+5
+287
+234
+437
 guadagno giornaliero
 NIL
 NIL
@@ -888,10 +896,10 @@ PENS
 "chicken" 1.0 0 -13345367 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"chicken\"]"
 
 PLOT
-16
-368
-243
-518
+245
+284
+472
+434
 unità
 NIL
 NIL
@@ -910,22 +918,31 @@ PENS
 "chicken" 1.0 0 -13345367 true "" "plot count units with [owner# = \"chicken\"]"
 
 SWITCH
-15
-49
-153
-82
+301
+51
+439
+84
 is_crisi_energetica
 is_crisi_energetica
-0
+1
+1
+-1000
+
+SWITCH
+16
+52
+141
+85
+muovi_unità
+muovi_unità
+1
 1
 -1000
 
 @#$#@#$#@
 ## WHAT IS IT?
 
-Adaptation of Tragedy of the commons. Each region leads an agriculture investment.
-Exploitation of grass (soil) for each plant. The amount of grass for growing plants depends on the initial stored grass of each region imputed by modeler, and a dynamic component depending on renewable resources. This component depends on the tax that each region is willing to pay.
-
+Adaptation of Tragedy of the commons. Each group
 ## ISSUE
 
 Plot of grass-stored of first line gives random peaks, tested also changing first line report, to solve
@@ -1367,9 +1384,9 @@ NIL
 MONITOR
 257
 189
-351
+365
 238
-Costo per unità
+Costo nuove unità
 NIL
 3
 1
