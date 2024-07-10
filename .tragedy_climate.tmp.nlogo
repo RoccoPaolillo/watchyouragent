@@ -719,7 +719,7 @@ ritmo_cicli
 ritmo_cicli
 2
 50
-10.0
+9.0
 1
 1
 NIL
@@ -852,7 +852,7 @@ crisi_energetica
 crisi_energetica
 0
 5
-0.0
+0.5
 0.1
 1
 NIL
@@ -924,7 +924,7 @@ SWITCH
 84
 is_crisi_energetica
 is_crisi_energetica
-1
+0
 1
 -1000
 
@@ -955,74 +955,42 @@ Il guadagno giornaliero di ogni gruppo è calcolato a fine di ogni singolo giorn
 
 Ogni gruppo può decidere se comprare nuove unità del proprio gruppo, ad un costo imposto per ogni unità, o investire in un contributo_comune_emergenza o in una riserva_personale moltiplicata per ogni unità del proprio gruppo sopravvissuta al momento. Il costo di questi tre elementi è sottratto a fine giornata dal capitale totale. 
 
-Il modeller può attivare esternamente una crisi_energetica che sottrae un totale deciso dal modeller dalla riserva_energetica di ogni singola cella. In caso di crisi energetica, l'effetto di riserva_personale e contributo_comune_emergenza si attivano. Riserva_personale aggiunge il totale di riserva_personale investito dal gruppo all'energia archiviata da ogni singola unità, perchè non sia uguale a zero, così che l'unità può sopravvivere artificialmente. Per il contributo_comune_emergenza, l'investimento di ogni singolo gruppo viene sommato, e si aggiunge alla capacità di rinnovo energetico di ogni cella .
+Il modeller può attivare esternamente una crisi_energetica che sottrae un totale deciso dal modeller dalla riserva_energetica di ogni singola cella (il massimo è energia-max: 50). In caso di crisi energetica, l'effetto di riserva_personale e contributo_comune_emergenza si attivano. Riserva_personale aggiunge il totale di riserva_personale investito dal gruppo all'energia archiviata da ogni singola unità, perchè non sia uguale a zero, così che l'unità può sopravvivere artificialmente. Per il contributo_comune_emergenza, l'investimento di ogni singolo gruppo viene sommato, e si aggiunge alla capacità di rinnovo energetico di ogni cella, rinforzando quindi le risorse comuni.
 
+## PARAMETRI, CONDIZIONI, MONITORS
 
+Globali: solo il modeller al nodo centrale può visualizzarli e manipolarli
 
- che saranno attivate in caso di una crisi_energetica che consiste in un totale di energia che può essere imposta esternamente dal modeller, che decide quanto grave la crisi_energetica sarà. 
+* muovi_unità: per lasciar le unità muoversi e cercare nuova energia sul territorio, consigliato
+* rinnovo_energetico: il totale di energia rinnovata naturalmente, senza interventi esterni, per ogni cella, ogni decimo di secondo (every 0.1)
+* is_crisi_energetica: attiva la crisi energetica se su on
+* crisi_energetica: il totale di risorse energetiche sottratte dalle risorse comuni ad ogni decimo di secondo (every 0.1)
+* ritmo_cicli: quanti steps compongono un giorno (significando quanta energia è raccolta, quante nuove unità ci saranno in meno o più tempo o velocità di costi/guadagni)
+* unità_iniziali/gruppo: con quante unità ogni gruppo inizia (di fatto  non c'è costo per questi)
+* costi/nuove_unità: il costo per ogni unità successive al giorno 1
 
-## ISSUE
+Locali: appaiono solo al gruppo sul loro monitor e loro possono modificarli per il proprio gruppo (sono indipendenti dalle scelte degli altri gruppi):
 
-Plot of grass-stored of first line gives random peaks, tested also changing first line report, to solve
+* compra_nuove_unità: nuove unità che si vogliono comprare dal giorno 1
+* contributo_comune_emergenza: quanto si vuole investire sulle risorse comuni da attivarsi in caso di crisi energetica. Rappresenta 
+* riserva_personale: quanto si vuole investire sulle risorse per ogni singola unità del proprio gruppo in caso di crisi energetica
+* Guadagno giornaliero: il totale dell'energia delle unità del proprio gruppo sopravvissute
+* Capitale totale: il proprio capitale accumulatosi nel tempo (consiste di guadagni e costi sottratti)
 
-## TO ADD
-* Resources used to grow plants should take from shared resources of all of the population, now it dependends on the single spot (therefore on the geographic area)
-* The tax to be paid should become a cost to the bearer, now it is not
-* The return from the social investment should not be equal for all, but proportional to how much you have paid
-* Visualizations etc
+## COMPUTAZIONI (distribuito in diversi steps di azioni (blocchi del codice)
 
-## HOW IT WORKS
-
-The students act as the farmers.  They own INIT-NUM-GOATS/FARMER when they join the simulation.
-
-The goats move around the screen for a time span of GRAZING-PERIOD to graze and feed themselves.  The amount of grass they eat is equivalent to how much milk they can produce (and ultimately, the amount of profit they produce for the farmer).
-
-After the GRAZING-PERIOD, the farmers may choose to buy more goats to increase their own wealth.
-
-Initially, the abundance of GRASS-SUPPLY of the patches can sustain the goats and their grazing and leads to increasing milk-supply and increasing revenue.  But suppose, then, that due to the farmers' own incentive to increase their own wealth and each farmer's indifference to the other farmers' decision to purchase goats, each farmer continues to buy more goats.  With the increase of the GOAT-POPULATION, GRASS-SUPPLY gradually decreases.  Ultimately, the common grazing area does not contain enough grass to sustain the overcrowding of goats, and the milk-supply as well as the farmers' revenues decline.  This is the "tragedy of the commons".
-
-## HOW TO USE IT
-
-The student-groups participate as geographic areas (they represent one node linked to the central server), they need to enter in the server as: 
- * north-west
- * north-east
- * south-east
- * south-west
-
-
-Resources:
-  * unqueal for each group (grass-stored): each geographic area (one group) has an initial reservation of grass-stored their cultivation can count on
-  * shared (grass-growth-rate): the speed to how fast soil regenerates, it is shared equally by all geographic area and depends on the ```sustainable tax``` they are willing to pay
-
-
-Scenario (cost/profit mechanisms to check, but it is the same as Tragedy of common, I did not touch it):
-  * every country has an initial ```init-num-plants\farmer``` which is the same for all
-  * after every ```harvest-period```, every geographic area makes profit from their agriculture: the more plants they based, the more profit they have that can spend
-  * They can spend to reinvest in more plants in their area at ```cost\plant```
-  * They can also spend for a ```sustainable-tax``` that affects how much the renewal of the shared grass-growth-rate will be (see below). This is the common resource
-
-
-In the front-end of each individual group (a geographic area):
-  * they have an initial unequal amount of stored grass to count on
-  * competition: how much plants they want to buy ```num-plants-to-buy```. The more plants, the more grass will be consumed
-  * cooperation: ```sustainable-tax``` how much they want to contribute to renew grass (soil) for everyone
+*  profit-units (guadagno dalle proprie unità): per ogni gruppo
+my-units: unità di quel gruppo
+guadagno_giornaliero: (sum of [energia_acquisita] of my-units)
+capitale_totale: capitale_totale + guadagno_giornaliero
+capitale_totale per ogni singolo gruppo: capitale_totale + guadagno_giornaliero (blocco profit-units)
 
 
 
 
-Client Information [FROM TRAGEDY OF COMMONS, TO REVIEW]
 
-After logging in, the client interface will appear for the students, and if GO is pressed in NetLogo, they will be assigned a farmer which will be described by the color in the MY GOAT COLOR monitor.  The MY GOAT POPULATION monitor will display the number of goats each student owns.  Their revenue for the last day will be displayed in the CURRENT REVENUE monitor and their total assets in the TOTAL ASSETS monitor.
 
-The global Cost per Goat can be viewed in the COST PER GOAT monitor.  The performance of the society, measured by the amount of grass available for food and the amount of milk produced can be measured from the GRASS AMT and MILK AMT monitors, respectively.  The current day, a day being defined as one grazing period followed by a milking session, is displayed in the DAY monitor.
 
-The student manages his/her goat population.  During the course of each grazing period, the student must decide what action to take for the day, whether to buy or to discard some goats.  To buy or to discard goats, the student must adjust NUM-GOATS-TO-BUY slider to his/her desired quantity.  At the end of the day, the specified transaction will be executed automatically.  The transaction of the purchase will be described in the GOAT SELLER SAYS: monitor, which will inform the client of the action taken and how many goats were purchased, if any.
-
-The progress of the community's welfare as measured by the grass available for grazing, average revenue of farmers, and milk supply is plotted in the GRASS SUPPLY, AVERAGE REVENUE, and MILK SUPPLY plots (if present), which are each identical to the plot of the same name in NetLogo.
-
-## EXTENDING THE MODEL
-
-Is there other information about the state of the simulation that the farmers might want access to? Do you think this would change the outcome of the simulation? From what other phenomena (e.g. prisoner's dilemma or free-rider problem) would the student's behavior to not sell the goats arise (if it arises)?
 
 ## HOW TO CITE
 
