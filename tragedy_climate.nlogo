@@ -144,8 +144,7 @@ to go
       set giorno giorno + 1
       ask farmers
         [ profit-units ]
-      go-to-market ;; to buy units
-  ;     investment
+      invest_capital ;; to buy units
       plot-graph
     ]
 
@@ -207,7 +206,7 @@ to profit-units  ;; farmer procedure ex milk-plants
 end
 
 ;; the goat market setup
-to go-to-market
+to invest_capital
   ask farmers
   [
     if compra_nuove_unità > 0

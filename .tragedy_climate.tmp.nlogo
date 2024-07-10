@@ -207,7 +207,7 @@ to profit-units  ;; farmer procedure ex milk-plants
 end
 
 ;; the goat market setup
-to go-to-market
+to
   ask farmers
   [
     if compra_nuove_unità > 0
@@ -983,7 +983,8 @@ Locali: appaiono solo al gruppo sul loro monitor e loro possono modificarli per 
 my-units: unità di quel gruppo
 guadagno_giornaliero: (sum of [energia_acquisita] of my-units)
 capitale_totale: capitale_totale + guadagno_giornaliero
-capitale_totale per ogni singolo gruppo: capitale_totale + guadagno_giornaliero (blocco profit-units)
+capitale_totale per ogni singolo gruppo: capitale_totale + guadagno_giornaliero
+
 
 
 
