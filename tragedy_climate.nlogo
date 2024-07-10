@@ -157,7 +157,7 @@ to graze  ;; goat procedure
 
   if (energia_acquisita != food-max) or (other units-here = nobody)
   [
-    let new-food-amt (energia_acquisita + get-amt-eaten ); + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
+    let new-food-amt (energia_acquisita + get-amt-eaten );
     if (new-food-amt < food-max)
       [ set energia_acquisita new-food-amt ]
      ; [ set energia_acquisita food-max ]
@@ -201,7 +201,7 @@ to profit-units  ;; farmer procedure ex milk-plants
   ask my-units
     [ set energia_acquisita 0 ]
   set revenue-lst (fput guadagno_giornaliero revenue-lst)
-  set capitale_totale capitale_totale + guadagno_giornaliero ; (capitale_totale + guadagno_giornaliero  - contributo_comune_emergenza - (riserva_personale * count my-units))
+  set capitale_totale capitale_totale + guadagno_giornaliero
   send-personal-info
 end
 
@@ -216,16 +216,9 @@ to invest_capital
     if compra_nuove_unità = 0
       [ hubnet-send user-id "unit Seller Says:" "You did not buy any unit." ]
     send-personal-info
- ;   set tax-paid contributo_comune_emergenza
- ;   set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))
     set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))
   ]
 end
-
-; to investment
-;   ask farmers
-;   [set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))]
-; end
 
 ;; farmers buy units at market
 to buy-units [ num-units-desired ]  ;; farmer procedure
@@ -350,8 +343,6 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to-report totale_guadagno_giornaliero
-  ;; we can just compute this from revenue, since the price of milk is
-  ;; fixed at $1/1 gallon.
   report sum [ guadagno_giornaliero ] of farmers
 end
 
@@ -851,7 +842,7 @@ crisi_energetica
 crisi_energetica
 0
 5
-5.0
+0.7
 0.1
 1
 NIL
