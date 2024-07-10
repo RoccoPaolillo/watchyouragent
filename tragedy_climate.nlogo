@@ -4,13 +4,13 @@
 
 globals
 [
-  day                ;; number of days so far
+  giorno                ;; number of days so far
 
-  colors             ;; list that holds the colors used for students' turtles
-  color-names        ;; list that holds the names of the colors used for
+  colori             ;; list that holds the colors used for students' turtles
+  nomi-colori        ;; list that holds the names of the colors used for
                      ;; students' turtles
-  num-colors         ;; number of colors in the color list
-  used-colors        ;; list that holds the shape-color pairs that are
+  numero-colori         ;; number of colors in the color list
+  colori-usati        ;; list that holds the shape-color pairs that are
                      ;; already being used
 
   n/a                ;; unset variable indicator
@@ -21,37 +21,39 @@ globals
   qs-item            ;; index of the current quickstart instruction
   qs-items           ;; list of quickstart instructions
 
-  grass-max          ;; grass capacity
-  food-max           ;; grass collection capacity
-  bite-size          ;; amount of grass collected at each move
+  energia-max          ;; energia capacity
+  food-max           ;; energia collection capacity
+  energia_richiesta          ;; amount of energia collected at each move
  ; tax-paid
 ]
 
 patches-own
 [
-  special-store
-  grass-stored       ;; amount of grass currently stored
+ ; special-store
+  riserva-energetica       ;; amount of energia currently stored
 ]
 
-breed [ plants plant ]  ;; creation controlled by farmers
+breed [ units unit ]  ;; creation controlled by farmers
 breed [ farmers farmer ] ;; created and controlled by clients
 
 
-plants-own
+units-own
 [
-  food-stored        ;; amount of grass collected from grazing
-  owner#             ;; the user-id of the farmer who owns the plant
+  energia_acquisita        ;; amount of energia collected from grazing
+  owner#             ;; the user-id of the farmer who owns the unit
+  riserve_unità
 ]
 
 farmers-own
 [
   user-id            ;; unique user-id, input by the client when they log in,
                      ;; to identify each student turtle
-  invest-new-item   ;; desired quantity of plants to purchase
+  compra_nuove_unità   ;; desired quantity of units to purchase
   revenue-lst        ;; list of each days' revenue collection
-  total-assets       ;; total of past revenue, minus expenses
-  current-revenue    ;; the revenue collected at the end of the last day
-  sustainable-tax
+  capitale_totale       ;; total of past revenue, minus expenses
+  guadagno_giornaliero    ;; the revenue collected at the end of the last day
+  contributo_comune_emergenza
+  riserva_personale
 
 ]
 
@@ -75,36 +77,37 @@ to setup
   clear-all-plots
   ask farmers
     [ reset-farmers-vars ]
-  hubnet-broadcast "Plant Seller Says:"
-    (word "Everyone starts with " init-num-plants/farmer " plants.")
-  hubnet-broadcast "invest-new-item" 1
-   hubnet-broadcast "sustainable-tax" 0
+  hubnet-broadcast "unit Seller Says:"
+    (word "Everyone starts with " unità_iniziali/gruppo " units.")
+  hubnet-broadcast "compra_nuove_unità" 1
+   hubnet-broadcast "contributo_comune_emergenza" 0
+  hubnet-broadcast "riserva_personale" 0
   broadcast-system-info
 end
 
 ;; initialize global variables
 to setup-globals
   reset-ticks
-  set day 0
+  set giorno 0
 
-  set grass-max 50
+  set energia-max 50
   set food-max 50
   ;; why this particular calculation?
-  set bite-size (round (100 / (harvest-period - 1)))
+  set energia_richiesta (round (100 / (ritmo_cicli - 1)))
 
-  set colors      [ white   gray   orange   brown    yellow    turquoise
+  set colori      [ white   gray   orange   brown    yellow    turquoise
                     cyan    sky    blue     violet   magenta   pink ]
-  set color-names ["white" "gray" "orange" "brown"  "yellow"  "turquoise"
+  set nomi-colori ["white" "gray" "orange" "brown"  "yellow"  "turquoise"
                    "cyan"  "sky"  "blue"   "violet" "magenta" "pink"]
-  set used-colors []
-  set num-colors length colors
+  set colori-usati []
+  set numero-colori length colori
   set n/a "n/a"
 end
 
-;; initialize grass supply for each patch
+;; initialize energia supply for each patch
 to setup-patches
   ask patches [
- set grass-stored 50
+ set riserva-energetica 50
     color-patches
   ]
 end
@@ -132,16 +135,16 @@ to go
     tick
 
     ;; when not milking time
-    ifelse (ticks mod harvest-period) != 0
+    ifelse (ticks mod ritmo_cicli) != 0
     [
-      ask plants
+      ask units
         [ graze ]
     ]
     [
-      set day day + 1
+      set giorno giorno + 1
       ask farmers
-        [ milk-plants ]
-      go-to-market ;; to buy plants
+        [ profit-units ]
+      invest_capital ;; to buy units
       plot-graph
     ]
 
@@ -149,117 +152,134 @@ to go
   ]
 end
 
-;; goat move along the common looking for best patch of grass
+;; goat move along the common looking for best patch of energia
 to graze  ;; goat procedure
 
-  if (food-stored != food-max) or (other plants-here = nobody)
+  if (energia_acquisita != food-max) or (other units-here = nobody)
   [
-    let new-food-amt (food-stored + get-amt-eaten )
-    ifelse (new-food-amt < food-max)
-      [ set food-stored new-food-amt ]
-      [ set food-stored food-max ]
+    let new-food-amt (energia_acquisita + get-amt-eaten ); + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
+    if (new-food-amt < food-max)
+      [ set energia_acquisita new-food-amt ]
+     ; [ set energia_acquisita food-max ]
   ]
- ; rt (random-float 90)
- ; lt (random-float 90)
- ; fd 1
-   if food-stored = 0 [die]
+; bloccare prossime tre linee se non si vogliono far muovere gli agenti
+ifelse muovi_unità [
+  rt (random-float 90)
+  lt (random-float 90)
+  fd 1
+  ][]
+
+  ifelse is_crisi_energetica [
+  set riserve_unità (energia_acquisita + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
+  ]
+  [
+      set riserve_unità (energia_acquisita)
+  ]
+    if riserve_unità = 0 [die]
 end
 
 
-;; returns amount of grass eaten at patch and
-;; sets the patch grass amount accordingly
+;; returns amount of energia eaten at patch and
+;; sets the patch energia amount accordingly
 to-report get-amt-eaten  ;; goat procedure
-  let reduced-amt (grass-stored - (bite-size * own_consumption))
+  let reduced-amt (riserva-energetica - (energia_richiesta * consumo_individuale))
   ifelse (reduced-amt < 0)
   [
-    set grass-stored 0
-    report grass-stored
+    set riserva-energetica 0
+    report riserva-energetica
   ]
   [
-    set grass-stored reduced-amt
-    report bite-size
+    set riserva-energetica reduced-amt
+    report energia_richiesta
   ]
 end
 
 ;; collect milk and sells them at market ($1 = 1 gallon)
-to milk-plants  ;; farmer procedure
-  set current-revenue
-    (round-to-place (sum [food-stored] of my-plants) 10) - sustainable-tax
-  ask my-plants
-    [ set food-stored 0 ]
-  set revenue-lst (fput current-revenue revenue-lst)
-  set total-assets total-assets + current-revenue
+to profit-units  ;; farmer procedure ex milk-plants
+  set guadagno_giornaliero
+    (round-to-place (sum [energia_acquisita] of my-units) 10)
+  ask my-units
+    [ set energia_acquisita 0 ]
+  set revenue-lst (fput guadagno_giornaliero revenue-lst)
+  set capitale_totale capitale_totale + guadagno_giornaliero ; (capitale_totale + guadagno_giornaliero  - contributo_comune_emergenza - (riserva_personale * count my-units))
   send-personal-info
 end
 
 ;; the goat market setup
-to go-to-market
+to invest_capital
   ask farmers
   [
-    if invest-new-item > 0
-      [ buy-plants invest-new-item ]
-    if invest-new-item < 0
-      [ lose-plants (- invest-new-item) ]
-    if invest-new-item = 0
-      [ hubnet-send user-id "Plant Seller Says:" "You did not buy any plant." ]
+    if compra_nuove_unità > 0
+      [ buy-units compra_nuove_unità ]
+    if compra_nuove_unità < 0
+      [ lose-units (- compra_nuove_unità) ]
+    if compra_nuove_unità = 0
+      [ hubnet-send user-id "unit Seller Says:" "You did not buy any unit." ]
     send-personal-info
- ;   set tax-paid sustainable-tax
+ ;   set tax-paid contributo_comune_emergenza
+ ;   set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))
+    set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))
   ]
 end
 
-;; farmers buy plants at market
-to buy-plants [ num-plants-desired ]  ;; farmer procedure
+; to investment
+;   ask farmers
+;   [set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))]
+; end
+
+;; farmers buy units at market
+to buy-units [ num-units-desired ]  ;; farmer procedure
   let got-number-desired? true
-  let num-plants-afford (int (total-assets / cost/plant))
-  let num-plants-purchase num-plants-desired
-  if (num-plants-afford < num-plants-purchase)
+  let num-units-afford (int (capitale_totale / costo/nuove_unità))
+  let num-units-purchase num-units-desired
+  if (num-units-afford < num-units-purchase)
   [
-    set num-plants-purchase num-plants-afford
+    set num-units-purchase num-units-afford
     set got-number-desired? false
   ]
-  let cost-of-purchase num-plants-purchase * cost/plant
-  set total-assets (total-assets - cost-of-purchase)
-  hubnet-send user-id "Plant Seller Says:"
-    (seller-says got-number-desired? num-plants-desired num-plants-purchase)
+  let cost-of-purchase num-units-purchase * costo/nuove_unità
+  set capitale_totale (capitale_totale - cost-of-purchase)
+  hubnet-send user-id "unit Seller Says:"
+    (seller-says got-number-desired? num-units-desired num-units-purchase)
 
-  ;; create the plants purchased by the farmer
-  hatch num-plants-purchase
-    [ setup-plants user-id ]
+  ;; create the units purchased by the farmer
+  hatch num-units-purchase
+    [ setup-units user-id ]
 end
 
-;; farmers eliminate some of their plants (with no gain in assets)
-to lose-plants [ num-to-lose ]  ;; farmer procedure
-  if ((count my-plants) < num-to-lose)
-    [ set num-to-lose (count my-plants) ]
-  hubnet-send user-id "Plant Seller Says:"
-    (word "You lost " num-to-lose " plants.")
+;; farmers eliminate some of their units (with no gain in assets)
+to lose-units [ num-to-lose ]  ;; farmer procedure
+  if ((count my-units) < num-to-lose)
+    [ set num-to-lose (count my-units) ]
+  hubnet-send user-id "unit Seller Says:"
+    (word "You lost " num-to-lose " units.")
 
-  ;; eliminate the plants ditched by the farmer
-  ask (n-of num-to-lose my-plants)
+  ;; eliminate the units ditched by the farmer
+  ask (n-of num-to-lose my-units)
     [ die ]
 end
 
-;; reports the appropriate information on the transaction of purchasing plants
+;; reports the appropriate information on the transaction of purchasing units
 to-report seller-says [ success? desired purchased ]
   let seller-message ""
-  let cost purchased * cost/plant
+  let cost purchased * costo/nuove_unità
   ifelse success?
   [
     ifelse (purchased > 1)
-      [ set seller-message (word "Here are your " purchased " plants.  ") ]
-      [ set seller-message "Here is your plant.  " ]
-    set seller-message (word seller-message "You have spent $" cost ".")
+      [ set seller-message (word "Here are your " purchased " units.  ") ]
+      [ set seller-message "Here is your unit.  " ]
+    set seller-message (word seller-message "You have spent €" cost ".")
   ]
   [
     set seller-message (word "You do not have enough to buy " desired ".  "
-      "You can afford " purchased " for $" cost ".")
+      "You can afford " purchased " for €" cost ".")
   ]
   report seller-message
 end
 
 ;; initializes goat variables
-to setup-plants [ farmer# ]  ;; turtle procedure
-  set breed plants
+to setup-units [ farmer# ]  ;; turtle procedure
+  set breed units
   setxy random-xcor random-ycor
   set owner# farmer#
   if owner# = "plant" [set shape "plant" set color cyan]
@@ -267,31 +287,45 @@ to setup-plants [ farmer# ]  ;; turtle procedure
   if owner# = "cow" [set shape "cow" set color brown]
   if owner# = "house" [set shape "house" set color red]
   if owner# = "chicken" [set shape "chicken" set color blue]
-  set food-stored 0
-
+  set energia_acquisita 0
+  set riserve_unità 0
   show-turtle
 end
 
-;; updates patches' color and increase grass supply with growth rate
+;; updates patches' color and increase energia supply with growth rate
 to reset-patches
   ask patches [
-    set grass-stored (grass-stored - drought)
-
-
-  if (grass-stored < grass-max)
-  [
-    let new-grass-amt (grass-stored + grass-growth-rate + grass-growth-rate_emergency )
-    ifelse (new-grass-amt > grass-max)
-      [ set grass-stored grass-max ]
-      [ set grass-stored new-grass-amt]
+    ifelse is_crisi_energetica
+    [
+    set riserva-energetica (riserva-energetica - crisi_energetica)
+      if (riserva-energetica < energia-max)
+      [
+        let new-energia-amt (riserva-energetica + rinnovo_energetico + energia-growth-rate_emergency )
+        ifelse (new-energia-amt > energia-max)
+      [ set riserva-energetica energia-max ]
+      [ set riserva-energetica new-energia-amt]
     color-patches
-  ]
-  ]
+      ]
+    ]
+
+    [
+    set riserva-energetica (riserva-energetica)
+
+  if (riserva-energetica < energia-max)
+  [
+        let new-energia-amt (riserva-energetica + rinnovo_energetico)
+        ifelse (new-energia-amt > energia-max)
+      [ set riserva-energetica energia-max ]
+      [ set riserva-energetica new-energia-amt]
+    color-patches
+      ]
+    ]
+ ]
 end
 
-;; colors patches according to amount of grass on the patch
+;; colors patches according to amount of energia on the patch
 to color-patches  ;; patch procedure
-  set pcolor (scale-color green grass-stored -5 (2 * grass-max))
+  set pcolor (scale-color green riserva-energetica -5 (2 * energia-max))
 end
 
 
@@ -301,7 +335,7 @@ end
 
 ;; plots the graph of the system
 to plot-graph
-  plot-value "Average Revenue" avg-revenue
+  plot-value "Guadagno medio" guadagno_medio
 end
 
 ;; plot value on the plot called name-of-plot
@@ -315,27 +349,27 @@ end
 ;; Calculation Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-to-report veggie-supply
+to-report totale_guadagno_giornaliero
   ;; we can just compute this from revenue, since the price of milk is
   ;; fixed at $1/1 gallon.
-  report sum [ current-revenue ] of farmers
+  report sum [ guadagno_giornaliero ] of farmers
 end
 
-to-report grass-supply
-  report sum [ grass-stored ] of patches
+to-report totale_riserva-energetica
+  report sum [ riserva-energetica ] of patches
 end
 
-to-report grass-growth-rate_emergency
-  report sum [sustainable-tax] of farmers
+to-report energia-growth-rate_emergency
+  report sum [contributo_comune_emergenza] of farmers
 end
 
-to-report avg-revenue
-  report mean [ current-revenue ] of farmers
+to-report guadagno_medio
+  report mean [ guadagno_giornaliero ] of farmers
 end
 
-;; returns agentset that of plants of a particular farmer
-to-report my-plants  ;; farmer procedure
-  report plants with [ owner# = [user-id] of myself ]
+;; returns agentset that of units of a particular farmer
+to-report my-units  ;; farmer procedure
+  report units with [ owner# = [user-id] of myself ]
 end
 
 ;; rounds given number to certain decimal-place
@@ -343,7 +377,7 @@ to-report round-to-place [ num decimal-place ]
   report (round (num * decimal-place)) / decimal-place
 end
 
-to-report own_consumption
+to-report consumo_individuale
 
   if owner# = "plant" [report 0.1]
   if owner# = "car" [report 0.9]
@@ -351,6 +385,7 @@ to-report own_consumption
   if owner# = "house" [report 0.5]
   if owner# = "chicken" [report 0.4]
 end
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -376,13 +411,13 @@ to setup-quick-start
         "available to them in the monitors, buttons, and sliders."
       "Then press the GO button to start the simulation."
       "Please note that you may adjust the length of time..."
-        "GRAZING-PERIOD, that plants are allowed to graze each day."
+        "GRAZING-PERIOD, that units are allowed to graze each day."
       "For a quicker demonstration, reduce the..."
         "GRASS-GROWTH-RATE slider."
       "To curb buying incentives of the students, increase..."
-        "the COST/PLANT slider."
+        "the COSTO/ITEM slider."
       "Any of the above mentioned parameters - ..."
-        "GRAZING-PERIOD, GRASS-GROWTH-RATE, and COST/PLANT -..."
+        "GRAZING-PERIOD, GRASS-GROWTH-RATE, and COSTO/ITEM -..."
         "may be altered without stopping the simulation."
 
     "Teacher: To run the activity again with the same group,..."
@@ -440,19 +475,26 @@ end
 
 ;; NetLogo knows what each student turtle is supposed to be
 ;; doing based on the tag sent by the node:
-;; invest-new-item - determine quantity of student's desired purchase
+;; compra_nuove_unità - determine quantity of student's desired purchase
 to execute-command [command]
-  if command = "invest-new-item"
+  if command = "compra_nuove_unità"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set invest-new-item hubnet-message ]
+      [ set compra_nuove_unità hubnet-message ]
     stop
   ]
 
-  if command = "sustainable-tax"
+  if command = "contributo_comune_emergenza"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set sustainable-tax hubnet-message ]
+      [ set contributo_comune_emergenza hubnet-message ]
+    stop
+  ]
+
+   if command = "riserva_personale"
+  [
+    ask farmers with [user-id = hubnet-message-source]
+      [ set riserva_personale hubnet-message ]
     stop
   ]
 end
@@ -464,7 +506,7 @@ to create-new-farmer [ id ]
     setup-farm
     set-unique-color
     reset-farmers-vars
-    hubnet-send id "invest-new-item" invest-new-item
+    hubnet-send id "compra_nuove_unità" compra_nuove_unità
     send-system-info
   ]
 end
@@ -476,13 +518,13 @@ to setup-farm  ;; farmer procedure
   hide-turtle
 end
 
-;; pick a color for the turtle
+;; pick a color for the turtle ;; RP we don't need anymore
 to set-unique-color  ;; turtle procedure
-  let code random num-colors
-  while [member? code used-colors and count farmers < num-colors]
-   [ set code random num-colors ]
-  set used-colors (lput code used-colors)
-  set color item code colors
+  let code random numero-colori
+  while [member? code colori-usati and count farmers < numero-colori]
+   [ set code random numero-colori ]
+  set colori-usati (lput code colori-usati)
+  set color item code colori
 
 end
 
@@ -490,49 +532,50 @@ end
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
-  set invest-new-item 1
-  set sustainable-tax 0
-  set total-assets cost/plant
-  set current-revenue 0
+  set compra_nuove_unità 1
+  set contributo_comune_emergenza 0
+    set riserva_personale 0
+  set capitale_totale costo/nuove_unità
+  set guadagno_giornaliero 0
 
-  ;; get rid of existing plants
-  ask my-plants
+  ;; get rid of existing units
+  ask my-units
     [ die ]
 
-  ;; create new plants for the farmer
-  hatch init-num-plants/farmer
-    [ setup-plants user-id ]
+  ;; create new units for the farmer
+  hatch unità_iniziali/gruppo
+    [ setup-units user-id ]
 
   send-personal-info
 end
 
 ;; sends the appropriate monitor information back to the client
 to send-personal-info  ;; farmer procedure
-  hubnet-send user-id "My Plant Color" (color->string color)
-  hubnet-send user-id "Current Revenue" current-revenue
-  hubnet-send user-id "Total Assets" total-assets
-  hubnet-send user-id "My Plant Population" count my-plants
+ ; hubnet-send user-id "My unit Color" (color->string color)
+  hubnet-send user-id "Guadagno giornaliero" guadagno_giornaliero
+  hubnet-send user-id "Capitale totale" capitale_totale
+;  hubnet-send user-id "My unit Population" count my-units
 end
 
 ;; returns string version of color name
 to-report color->string [ color-value ]
-  report item (position color-value colors) color-names
+  report item (position color-value colori) nomi-colori
 end
 
 ;; sends the appropriate monitor information back to one client
 to send-system-info  ;; farmer procedure
-  hubnet-send user-id "Veggie Amt" veggie-supply
-  hubnet-send user-id "Grass Amt" grass-supply
-  hubnet-send user-id "Cost per Plant" cost/plant
-  hubnet-send user-id "Day" day
+ ; hubnet-send user-id "Total guadagno_giornaliero" totale_guadagno_giornaliero
+ ; hubnet-send user-id "Grass Amt" totale_riserva-energetica
+  hubnet-send user-id "Costo nuove unità" costo/nuove_unità
+  hubnet-send user-id "Giorno" giorno
 end
 
 ;; broadcasts the appropriate monitor information back to all clients
 to broadcast-system-info
-  hubnet-broadcast "Veggie Amt" veggie-supply
-  hubnet-broadcast "Grass Amt" (int grass-supply)
-  hubnet-broadcast "Cost per Plant" cost/plant
-  hubnet-broadcast "Day" day
+;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
+;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
+  hubnet-broadcast "Costo nuove unità" costo/nuove_unità
+  hubnet-broadcast "Giorno" giorno
 end
 
 ;; delete farmers once client has exited
@@ -541,22 +584,22 @@ to remove-farmer [ id ]
   ask farmers with [user-id = id]
   [
     set old-color color
-    ask my-plants
+    ask my-units
       [ die ]
     die
   ]
   if not any? farmers with [color = old-color]
-    [ set used-colors remove (position old-color colors) used-colors ]
+    [ set colori-usati remove (position old-color colori) colori-usati ]
 end
 
 ; Copyright 2002 Uri Wilensky.
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-439
-86
-830
-478
+484
+78
+875
+470
 -1
 -1
 18.24
@@ -597,52 +640,52 @@ NIL
 1
 
 SLIDER
-210
-124
-378
-157
-init-num-plants/farmer
-init-num-plants/farmer
+11
+140
+185
+173
+unità_iniziali/gruppo
+unità_iniziali/gruppo
 0
 1
 1.0
 1
 1
-plants
+unità
 HORIZONTAL
 
 SLIDER
-133
-46
-303
-79
-cost/plant
-cost/plant
+11
+175
+186
+208
+costo/nuove_unità
+costo/nuove_unità
 1
 2000
-1.0
+7.0
 1
 1
-$
+€
 HORIZONTAL
 
 MONITOR
-956
-245
-1054
-290
+891
+244
+989
+289
 Avg-Revenue
-avg-revenue
+guadagno_medio
 1
 1
 11
 
 PLOT
-950
-74
-1165
-242
-Average Revenue
+888
+66
+1103
+234
+Guadagno medio
 Day
 Revenue
 0.0
@@ -653,59 +696,41 @@ true
 false
 "" ""
 PENS
-"revenue" 1.0 0 -16777216 true "" ""
+"" 1.0 0 -16777216 true "" ""
 
 MONITOR
-977
-466
-1053
-511
-Milk Supply
-veggie-supply
+892
+311
+1027
+356
+Guadagno attuale (all)
+totale_guadagno_giornaliero
 0
 1
 11
 
-PLOT
-950
-295
-1164
-463
-Veggie Supply
-Day
-Vegetables
-0.0
-20.0
-0.0
-100.0
-true
-false
-"" ""
-PENS
-"milk-amt" 1.0 0 -16777216 true "" ""
-
 SLIDER
-210
-89
-379
-122
-harvest-period
-harvest-period
+12
+102
+137
+135
+ritmo_cicli
+ritmo_cicli
 2
 50
-8.0
+9.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1056
-466
-1142
-511
-Grass Supply
-grass-supply
+892
+362
+1031
+407
+Riserva energetica (all)
+totale_riserva-energetica
 0
 1
 11
@@ -728,12 +753,12 @@ NIL
 1
 
 MONITOR
-37
-172
-100
-217
-Day
-day
+13
+238
+76
+283
+Giorno
+giorno
 3
 1
 11
@@ -818,27 +843,27 @@ NIL
 1
 
 SLIDER
-17
-88
-141
-121
-drought
-drought
+303
+86
+440
+119
+crisi_energetica
+crisi_energetica
 0
 5
-0.0
+5.0
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-17
-123
-141
-156
-grass-growth-rate
-grass-growth-rate
+146
+52
+270
+85
+rinnovo_energetico
+rinnovo_energetico
 0
 10
 0.3
@@ -848,11 +873,11 @@ NIL
 HORIZONTAL
 
 PLOT
-15
-216
-244
-366
-currenr-venue
+5
+287
+234
+437
+guadagno giornaliero
 NIL
 NIL
 0.0
@@ -863,18 +888,18 @@ true
 true
 "" ""
 PENS
-"car" 1.0 0 -8630108 true "" "plot [current-revenue] of one-of farmers with [user-id = \"car\"]"
-"cow" 1.0 0 -6459832 true "" "plot [current-revenue] of one-of farmers with [user-id = \"cow\"]"
-"house" 1.0 0 -2674135 true "" "plot [current-revenue] of one-of farmers with [user-id = \"house\"]"
-"plant" 1.0 0 -11221820 true "" "plot [current-revenue] of one-of farmers with [user-id = \"plant\"]"
-"chicken" 1.0 0 -13345367 true "" "plot [current-revenue] of one-of farmers with [user-id = \"chicken\"]"
+"car" 1.0 0 -8630108 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"car\"]"
+"cow" 1.0 0 -6459832 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"cow\"]"
+"house" 1.0 0 -2674135 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"house\"]"
+"plant" 1.0 0 -11221820 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"plant\"]"
+"chicken" 1.0 0 -13345367 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"chicken\"]"
 
 PLOT
-16
-368
-243
-518
-count item
+245
+284
+472
+434
+unità
 NIL
 NIL
 0.0
@@ -885,80 +910,96 @@ true
 true
 "" ""
 PENS
-"car" 1.0 0 -8630108 true "" "plot count plants with [owner# = \"car\"]"
-"cow" 1.0 0 -6459832 true "" "plot count plants with [owner# = \"cow\"]"
-"house" 1.0 0 -2674135 true "" "plot count plants with [owner# = \"house\"]"
-"plant" 1.0 0 -11221820 true "" "plot count plants with [owner# = \"plant\"]"
-"chicken" 1.0 0 -13345367 true "" "plot count plants with [owner# = \"chicken\"]"
+"car" 1.0 0 -8630108 true "" "plot count units with [owner# = \"car\"]"
+"cow" 1.0 0 -6459832 true "" "plot count units with [owner# = \"cow\"]"
+"house" 1.0 0 -2674135 true "" "plot count units with [owner# = \"house\"]"
+"plant" 1.0 0 -11221820 true "" "plot count units with [owner# = \"plant\"]"
+"chicken" 1.0 0 -13345367 true "" "plot count units with [owner# = \"chicken\"]"
+
+SWITCH
+301
+51
+439
+84
+is_crisi_energetica
+is_crisi_energetica
+0
+1
+-1000
+
+SWITCH
+16
+52
+141
+85
+muovi_unità
+muovi_unità
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
 
-Adaptation of Tragedy of the commons. Each region leads an agriculture investment.
-Exploitation of grass (soil) for each plant. The amount of grass for growing plants depends on the initial stored grass of each region imputed by modeler, and a dynamic component depending on renewable resources. This component depends on the tax that each region is willing to pay.
+Adattamento della tragedia dei beni comuni. Ogni gruppo al proprio computer (farmer) rappresenta un settore economico/sociale che si nutre di energia e compete per sopravvivere. I gruppi sono:
 
-## ISSUE
+plant = agricoltura
+house = edilizia
+car = automotiv
+cow = allevamento bovino
+chicken = allevamento pollame
 
-Plot of grass-stored of first line gives random peaks, tested also changing first line report, to solve
+I gruppi vivono nello spazio comune e le loro unità rappresentate dagli oggetti nella simulazione che richiamano il loro nome e proprio colore prendono energia dalla cella in cui si trovano, mentre vagano nel mondo. Quindi l'energia utilizzabile è un bene comune che può esaurirsi. Una costante di rinnovo energia esiste per assicurarsi che l'energia non si consumi immediatamente. Il totale dell'energia comune consumata dipende da quanto consumano le unità dei diversi gruppi e da quante ce ne sono.
+Il guadagno giornaliero di ogni gruppo è calcolato a fine di ogni singolo giorno, e consiste nel totale dell'energia immagazzinata dalle singola unità di quel gruppo. Il capitale totale è l'insieme dei guadagni giornalieri sommati. 
 
-## TO ADD
-* Resources used to grow plants should take from shared resources of all of the population, now it dependends on the single spot (therefore on the geographic area)
-* The tax to be paid should become a cost to the bearer, now it is not
-* The return from the social investment should not be equal for all, but proportional to how much you have paid
-* Visualizations etc
+Ogni gruppo può decidere se comprare nuove unità del proprio gruppo, ad un costo imposto per ogni unità, o investire in un contributo_comune_emergenza o in una riserva_personale moltiplicata per ogni unità del proprio gruppo sopravvissuta al momento. Il costo di questi tre elementi è sottratto a fine giornata dal capitale totale. 
 
-## HOW IT WORKS
+Il modeller può attivare esternamente una crisi_energetica che sottrae un totale deciso dal modeller dalla riserva_energetica di ogni singola cella (il massimo è energia-max: 50). In caso di crisi energetica, l'effetto di riserva_personale e contributo_comune_emergenza si attivano. Riserva_personale aggiunge il totale di riserva_personale investito dal gruppo all'energia archiviata da ogni singola unità, perchè non sia uguale a zero, così che l'unità può sopravvivere artificialmente. Per il contributo_comune_emergenza, l'investimento di ogni singolo gruppo viene sommato, e si aggiunge alla capacità di rinnovo energetico di ogni cella, rinforzando quindi le risorse comuni.
 
-The students act as the farmers.  They own INIT-NUM-GOATS/FARMER when they join the simulation.
+## PARAMETRI, CONDIZIONI, MONITORS
 
-The goats move around the screen for a time span of GRAZING-PERIOD to graze and feed themselves.  The amount of grass they eat is equivalent to how much milk they can produce (and ultimately, the amount of profit they produce for the farmer).
+Globali: solo il modeller al nodo centrale può visualizzarli e manipolarli
 
-After the GRAZING-PERIOD, the farmers may choose to buy more goats to increase their own wealth.
+* muovi_unità: per lasciar le unità muoversi e cercare nuova energia sul territorio, consigliato
+* rinnovo_energetico: il totale di energia rinnovata naturalmente, senza interventi esterni, per ogni cella, ogni decimo di secondo (every 0.1)
+* is_crisi_energetica: attiva la crisi energetica se su on
+* crisi_energetica: il totale di risorse energetiche sottratte dalle risorse comuni ad ogni decimo di secondo (every 0.1)
+* ritmo_cicli: quanti steps compongono un giorno (significando quanta energia è raccolta, quante nuove unità ci saranno in meno o più tempo o velocità di costi/guadagni)
+* unità_iniziali/gruppo: con quante unità ogni gruppo inizia (di fatto  non c'è costo per questi)
+* costi/nuove_unità: il costo per ogni unità successive al giorno 1
 
-Initially, the abundance of GRASS-SUPPLY of the patches can sustain the goats and their grazing and leads to increasing milk-supply and increasing revenue.  But suppose, then, that due to the farmers' own incentive to increase their own wealth and each farmer's indifference to the other farmers' decision to purchase goats, each farmer continues to buy more goats.  With the increase of the GOAT-POPULATION, GRASS-SUPPLY gradually decreases.  Ultimately, the common grazing area does not contain enough grass to sustain the overcrowding of goats, and the milk-supply as well as the farmers' revenues decline.  This is the "tragedy of the commons".
+Locali: appaiono solo al gruppo sul loro monitor e loro possono modificarli per il proprio gruppo (sono indipendenti dalle scelte degli altri gruppi):
 
-## HOW TO USE IT
+* compra_nuove_unità: nuove unità che si vogliono comprare dal giorno 1
+* contributo_comune_emergenza: quanto si vuole investire sulle risorse comuni da attivarsi in caso di crisi energetica. Rappresenta 
+* riserva_personale: quanto si vuole investire sulle risorse per ogni singola unità del proprio gruppo in caso di crisi energetica
+* Guadagno giornaliero: il totale dell'energia delle unità del proprio gruppo sopravvissute
+* Capitale totale: il proprio capitale accumulatosi nel tempo (consiste di guadagni e costi sottratti)
 
-The student-groups participate as geographic areas (they represent one node linked to the central server), they need to enter in the server as: 
- * north-west
- * north-east
- * south-east
- * south-west
+## COMPUTAZIONI (semplificato citando gli steps dove avvengono)
 
+* reset-patches (energia disponibile in ogni singola cella):
+riserva-energeticsa iniziale = 50
+new-energia-amt = (riserva-energetica + rinnovo_energetico)
+energia-growth-rate_emergency = somma [contributo_comune_emergenza] di tutti i gruppi
+se is_crisi_energetica attivato:
+riserva-energetica (riserva-energetica - crisi_energetica)
+new-energia-amt = riserva-energetica + rinnovo_energetico + energia-growth-rate_emergency
 
-Resources:
-  * unqueal for each group (grass-stored): each geographic area (one group) has an initial reservation of grass-stored their cultivation can count on
-  * shared (grass-growth-rate): the speed to how fast soil regenerates, it is shared equally by all geographic area and depends on the ```sustainable tax``` they are willing to pay
+*  profit-units (guadagno dalle proprie unità per ogni gruppo
+my-units: unità di quel gruppo
+guadagno_giornaliero: (sum of [energia_acquisita] of my-units)
+capitale_totale: capitale_totale + guadagno_giornaliero
+capitale_totale per ogni singolo gruppo: capitale_totale + guadagno_giornaliero
 
-
-Scenario (cost/profit mechanisms to check, but it is the same as Tragedy of common, I did not touch it):
-  * every country has an initial ```init-num-plants\farmer``` which is the same for all
-  * after every ```harvest-period```, every geographic area makes profit from their agriculture: the more plants they based, the more profit they have that can spend
-  * They can spend to reinvest in more plants in their area at ```cost\plant```
-  * They can also spend for a ```sustainable-tax``` that affects how much the renewal of the shared grass-growth-rate will be (see below). This is the common resource
-
-
-In the front-end of each individual group (a geographic area):
-  * they have an initial unequal amount of stored grass to count on
-  * competition: how much plants they want to buy ```num-plants-to-buy```. The more plants, the more grass will be consumed
-  * cooperation: ```sustainable-tax``` how much they want to contribute to renew grass (soil) for everyone
-
+* invest_capital (investimento del capitale guadagnato per ogni gruppo):
+capitale_totale = capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units)
 
 
+* graze (accumulo energia per unità di ogni gruppo)
+energia_acquisita = ( riserva-energetica della cella - (energia_richiesta * consumo_individuale)), report get-amt-eaten
+se is_crisi_energetica attivato: riserve_unità (energia_acquisita + [riserva_personale] del mio gruppo (farmer)
 
-Client Information [FROM TRAGEDY OF COMMONS, TO REVIEW]
-
-After logging in, the client interface will appear for the students, and if GO is pressed in NetLogo, they will be assigned a farmer which will be described by the color in the MY GOAT COLOR monitor.  The MY GOAT POPULATION monitor will display the number of goats each student owns.  Their revenue for the last day will be displayed in the CURRENT REVENUE monitor and their total assets in the TOTAL ASSETS monitor.
-
-The global Cost per Goat can be viewed in the COST PER GOAT monitor.  The performance of the society, measured by the amount of grass available for food and the amount of milk produced can be measured from the GRASS AMT and MILK AMT monitors, respectively.  The current day, a day being defined as one grazing period followed by a milking session, is displayed in the DAY monitor.
-
-The student manages his/her goat population.  During the course of each grazing period, the student must decide what action to take for the day, whether to buy or to discard some goats.  To buy or to discard goats, the student must adjust NUM-GOATS-TO-BUY slider to his/her desired quantity.  At the end of the day, the specified transaction will be executed automatically.  The transaction of the purchase will be described in the GOAT SELLER SAYS: monitor, which will inform the client of the action taken and how many goats were purchased, if any.
-
-The progress of the community's welfare as measured by the grass available for grazing, average revenue of farmers, and milk supply is plotted in the GRASS SUPPLY, AVERAGE REVENUE, and MILK SUPPLY plots (if present), which are each identical to the plot of the same name in NetLogo.
-
-## EXTENDING THE MODEL
-
-Is there other information about the state of the simulation that the farmers might want access to? Do you think this would change the outcome of the simulation? From what other phenomena (e.g. prisoner's dilemma or free-rider problem) would the student's behavior to not sell the goats arise (if it arises)?
 
 ## HOW TO CITE
 
@@ -1326,102 +1367,42 @@ VIEW
 10
 
 MONITOR
-251
-30
-356
-79
-Current Revenue
+31
+45
+157
+94
+Guadagno giornaliero
 NIL
 3
 1
 
 MONITOR
-126
-30
-244
-79
-My Plant Population
-NIL
-3
-1
-
-MONITOR
-100
-276
-171
-325
-Grass Amt
-NIL
-0
-1
-
-MONITOR
-7
-276
-97
-325
-Cost per Plant
-NIL
-3
-1
-
-MONITOR
-363
-30
-454
-79
-Total Assets
-NIL
-3
-1
-
-MONITOR
-5
-30
-121
-79
-My Plant Color
-NIL
-3
-1
-
-MONITOR
-174
-276
-248
-325
-Veggie Amt
-NIL
-3
-1
-
-TEXTBOX
-9
 257
-126
-275
-System Variables:
-11
-0.0
-0
+189
+365
+238
+Costo nuove unità
+NIL
+3
+1
 
-TEXTBOX
-7
-10
-124
-28
-Personal Variables:
-11
-0.0
-0
+MONITOR
+358
+14
+449
+63
+Capitale totale
+NIL
+3
+1
 
 SLIDER
-8
-95
-157
-128
-invest-new-item
-invest-new-item
+22
+194
+218
+227
+compra_nuove_unità
+compra_nuove_unità
 1.0
 10.0
 0
@@ -1431,42 +1412,32 @@ NIL
 HORIZONTAL
 
 MONITOR
-384
-275
-441
-324
-Day
+292
+15
+349
+64
+Giorno
 NIL
 3
 1
 
 MONITOR
-9
-203
-455
-252
-Plant Seller Says:
+5
+349
+451
+398
+unit Seller Says:
 NIL
 3
 1
 
-TEXTBOX
-163
-98
-441
-130
-Selecting a negative number here will eliminate some of your goats.
-11
-0.0
-0
-
 SLIDER
-8
-137
-158
-170
-sustainable-tax
-sustainable-tax
+22
+237
+221
+270
+contributo_comune_emergenza
+contributo_comune_emergenza
 0.0
 6.0
 0
@@ -1474,6 +1445,41 @@ sustainable-tax
 1
 NIL
 HORIZONTAL
+
+SLIDER
+23
+274
+222
+307
+riserva_personale
+riserva_personale
+0.0
+10.0
+0
+0.1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+29
+11
+221
+56
+Qui il tuo guadagno giornaliero
+12
+0.0
+1
+
+TEXTBOX
+26
+118
+340
+178
+Puoi decidere come reinvestire il tuo guadagno: puoi non fare niente, comprare nuove  unità al loro costo, o investire in nuova energia per te o per un fondo comune in caso di una crisi energetica
+12
+0.0
+1
 
 @#$#@#$#@
 default
