@@ -288,18 +288,32 @@ end
 ;; updates patches' color and increase energia supply with growth rate
 to reset-patches
   ask patches [
+    ifelse is_crisi_energetica
+    [
     set riserva-energetica (riserva-energetica - crisi_energetica)
-
-
-  if (riserva-energetica < energia-max)
-  [
-    let new-energia-amt (riserva-energetica + rinnovo_energetico + energia-growth-rate_emergency )
-    ifelse (new-energia-amt > energia-max)
+      if (riserva-energetica < energia-max)
+      [
+        let new-energia-amt (riserva-energetica + rinnovo_energetico + energia-growth-rate_emergency )
+        ifelse (new-energia-amt > energia-max)
       [ set riserva-energetica energia-max ]
       [ set riserva-energetica new-energia-amt]
     color-patches
-  ]
-  ]
+      ]
+    ]
+
+    [
+    set riserva-energetica (riserva-energetica)
+
+  if (riserva-energetica < energia-max)
+  [
+        let new-energia-amt (riserva-energetica + rinnovo_energetico)
+        ifelse (new-energia-amt > energia-max)
+      [ set riserva-energetica energia-max ]
+      [ set riserva-energetica new-energia-amt]
+    color-patches
+      ]
+    ]
+ ]
 end
 
 ;; colors patches according to amount of energia on the patch
@@ -634,9 +648,9 @@ unità
 HORIZONTAL
 
 SLIDER
-133
+188
 46
-303
+358
 79
 costo/unità
 costo/unità
@@ -894,6 +908,17 @@ PENS
 "house" 1.0 0 -2674135 true "" "plot count units with [owner# = \"house\"]"
 "plant" 1.0 0 -11221820 true "" "plot count units with [owner# = \"plant\"]"
 "chicken" 1.0 0 -13345367 true "" "plot count units with [owner# = \"chicken\"]"
+
+SWITCH
+15
+49
+153
+82
+is_crisi_energetica
+is_crisi_energetica
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
