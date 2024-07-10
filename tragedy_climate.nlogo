@@ -851,7 +851,7 @@ crisi_energetica
 crisi_energetica
 0
 5
-0.5
+5.0
 0.1
 1
 NIL
@@ -976,20 +976,29 @@ Locali: appaiono solo al gruppo sul loro monitor e loro possono modificarli per 
 * Guadagno giornaliero: il totale dell'energia delle unità del proprio gruppo sopravvissute
 * Capitale totale: il proprio capitale accumulatosi nel tempo (consiste di guadagni e costi sottratti)
 
-## COMPUTAZIONI (distribuito in diversi steps di azioni (blocchi del codice)
+## COMPUTAZIONI (semplificato citando gli steps dove avvengono)
 
-*  profit-units (guadagno dalle proprie unità): per ogni gruppo
+* reset-patches (energia disponibile in ogni singola cella):
+riserva-energeticsa iniziale = 50
+new-energia-amt = (riserva-energetica + rinnovo_energetico)
+energia-growth-rate_emergency = somma [contributo_comune_emergenza] di tutti i gruppi
+se is_crisi_energetica attivato:
+riserva-energetica (riserva-energetica - crisi_energetica)
+new-energia-amt = riserva-energetica + rinnovo_energetico + energia-growth-rate_emergency
+
+*  profit-units (guadagno dalle proprie unità per ogni gruppo
 my-units: unità di quel gruppo
 guadagno_giornaliero: (sum of [energia_acquisita] of my-units)
 capitale_totale: capitale_totale + guadagno_giornaliero
 capitale_totale per ogni singolo gruppo: capitale_totale + guadagno_giornaliero
 
+* invest_capital (investimento del capitale guadagnato per ogni gruppo):
+capitale_totale = capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units)
 
 
-
-
-
-
+* graze (accumulo energia per unità di ogni gruppo)
+energia_acquisita = ( riserva-energetica della cella - (energia_richiesta * consumo_individuale)), report get-amt-eaten
+se is_crisi_energetica attivato: riserve_unità (energia_acquisita + [riserva_personale] del mio gruppo (farmer)
 
 
 ## HOW TO CITE
