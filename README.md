@@ -39,12 +39,8 @@ Locali: appaiono solo al gruppo sul loro monitor e loro possono modificarli per 
 
 * [energia disponibile per ogni singola cella (reset-patches)](https://github.com/RoccoPaolillo/tragedyclimate/blob/960cc0641d421343a1ebe9e7df625c3034d48ac1/tragedy_climate.nlogo#L289-L317)
 
-*  [guadagno dalle proprie unità (profit units) ](https://github.com/RoccoPaolillo/tragedyclimate/blob/960cc0641d421343a1ebe9e7df625c3034d48ac1/tragedy_climate.nlogo#L198-L206)
+* [guadagno dalle proprie unità (profit units) ](https://github.com/RoccoPaolillo/tragedyclimate/blob/960cc0641d421343a1ebe9e7df625c3034d48ac1/tragedy_climate.nlogo#L198-L206)
 
-* invest_capital (investimento del capitale guadagnato per ogni gruppo):
-capitale_totale = capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units)
+* [investimento del capitale (invest_capital)](https://github.com/RoccoPaolillo/tragedyclimate/blob/960cc0641d421343a1ebe9e7df625c3034d48ac1/tragedy_climate.nlogo#L209-L221)
 
-
-* graze (accumulo energia per unità di ogni gruppo)
-energia_acquisita = ( riserva-energetica della cella - (energia_richiesta * consumo_individuale)), report get-amt-eaten
-se is_crisi_energetica attivato: riserve_unità (energia_acquisita + [riserva_personale] del mio gruppo (farmer)
+* [acquisizione energia (graze)](https://github.com/RoccoPaolillo/tragedyclimate/blob/fc333669a83c8f98889848c1668658340261c668/tragedy_climate.nlogo#L156-L179)
