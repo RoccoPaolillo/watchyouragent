@@ -3,9 +3,13 @@
 Adattamento della tragedia dei beni comuni. Ogni gruppo al proprio computer (farmer) rappresenta un settore economico/sociale che si nutre di energia e compete per sopravvivere. I gruppi sono:
 
 plant = agricoltura
+
 house = edilizia
+
 car = automotiv
+
 cow = allevamento bovino
+
 chicken = allevamento pollame
 
 I gruppi vivono nello spazio comune e le loro unità rappresentate dagli oggetti nella simulazione che richiamano il loro nome e proprio colore prendono energia dalla cella in cui si trovano, mentre vagano nel mondo. Quindi l'energia utilizzabile è un bene comune che può esaurirsi. Una costante di rinnovo energia esiste per assicurarsi che l'energia non si consumi immediatamente. Il totale dell'energia comune consumata dipende da quanto consumano le unità dei diversi gruppi e da quante ce ne sono.
