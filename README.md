@@ -8,7 +8,7 @@ car = automotiv\
 cow = allevamento bovino\
 chicken = allevamento pollame
 
-I gruppi vivono nello spazio comune e le loro unità rappresentate dagli oggetti nella simulazione che richiamano il loro nome e proprio colore prendono energia dalla cella in cui si trovano, mentre vagano nel mondo. Quindi l'energia utilizzabile è un bene comune che può esaurirsi. Una costante di rinnovo energia esiste per assicurarsi che l'energia non si consumi immediatamente. Il totale dell'energia comune consumata dipende da quanto consumano le unità dei diversi gruppi e da quante ce ne sono.
+I gruppi vivono nello spazio comune e le loro unità (con la forma del loro nome) prendono energia dalla cella in cui si trovano, mentre si espandono nel mondo. Quindi l'energia utilizzabile è un bene comune che può esaurirsi. Una costante di ‘‘‘rinnovo energia‘‘‘ esiste per assicurarsi che l'energia non si consumi immediatamente. Il totale dell'energia comune consumata dipende da quanto consumano le unità dei diversi gruppi e da quante ce ne sono.
 Il guadagno giornaliero di ogni gruppo è calcolato a fine di ogni singolo giorno, e consiste nel totale dell'energia immagazzinata dalle singola unità di quel gruppo. Il capitale totale è l'insieme dei guadagni giornalieri sommati. 
 
 Ogni gruppo può decidere se comprare nuove unità del proprio gruppo, ad un costo imposto per ogni unità, o investire in un contributo_comune_emergenza o in una riserva_personale moltiplicata per ogni unità del proprio gruppo sopravvissuta al momento. Il costo di questi tre elementi è sottratto a fine giornata dal capitale totale. 
