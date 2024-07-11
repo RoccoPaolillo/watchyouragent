@@ -47,14 +47,14 @@ Locali: appaiono solo al gruppo sul loro monitor e loro possono modificarli per 
 
 ## TRADUZIONI dei parametri
 
-drought > crisi_energetica
-cost/plant > costo/item
-grass-growth-rate > rinnovo_energetico
-sustainable-tax > contributo_emergenza
-harvest-period > ritmo_cicli: marks end of the day
-init-num-plants/farmer > unità_iniziali/gruppo
-bite-size > energia richiesta
-energy-supply > riserva-energetica
-current-revenue > guadagno_attuale (fine del ciclo)
-food-stored > energia_acquisita
+drought > crisi_energetica\
+cost/plant > costo/item\
+grass-growth-rate > rinnovo_energetico\
+sustainable-tax > contributo_emergenza\
+harvest-period > ritmo_cicli: marks end of the day\
+init-num-plants/farmer > unità_iniziali/gruppo\
+bite-size > energia richiesta\
+energy-supply > riserva-energetica\
+current-revenue > guadagno_attuale (fine del ciclo)\
+food-stored > energia_acquisita\
 bite-size > energia_richiesta
