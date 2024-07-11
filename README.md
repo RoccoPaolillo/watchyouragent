@@ -44,3 +44,17 @@ Locali: appaiono solo al gruppo sul loro monitor e loro possono modificarli per 
 * [investimento del capitale (invest_capital)](https://github.com/RoccoPaolillo/tragedyclimate/blob/960cc0641d421343a1ebe9e7df625c3034d48ac1/tragedy_climate.nlogo#L209-L221)
 
 * [acquisizione energia (graze)](https://github.com/RoccoPaolillo/tragedyclimate/blob/fc333669a83c8f98889848c1668658340261c668/tragedy_climate.nlogo#L156-L179)
+
+## TRADUZIONI dei parametri
+
+drought > crisi_energetica
+cost/plant > costo/item
+grass-growth-rate > rinnovo_energetico
+sustainable-tax > contributo_emergenza
+harvest-period > ritmo_cicli: marks end of the day
+init-num-plants/farmer > unità_iniziali/gruppo
+bite-size > energia richiesta
+energy-supply > riserva-energetica
+current-revenue > guadagno_attuale (fine del ciclo)
+food-stored > energia_acquisita
+bite-size > energia_richiesta
