@@ -1,4 +1,4 @@
-## WHAT IS IT?
+## DESCRIZIONE
 
 Adattamento della tragedia dei beni comuni per uno scenario di cooperazione/competizione in sostenibilità ambientale. Ogni gruppo al proprio computer (farmer) rappresenta un settore economico/sociale che si nutre di energia e compete per sopravvivere. I gruppi sono:
 
