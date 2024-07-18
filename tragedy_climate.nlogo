@@ -77,8 +77,8 @@ to setup
   clear-all-plots
   ask farmers
     [ reset-farmers-vars ]
-  hubnet-broadcast "unit Seller Says:"
-    (word "Everyone starts with " unità_iniziali/gruppo " units.")
+;  hubnet-broadcast "Aspetta per la tua nuova mossa ..."
+;    (word "Everyone starts with " unità_iniziali/gruppo " units.")
   hubnet-broadcast "compra_nuove_unità" 1
    hubnet-broadcast "contributo_comune_emergenza" 0
   hubnet-broadcast "riserva_personale" 0
@@ -214,7 +214,7 @@ to invest_capital
     if compra_nuove_unità < 0
       [ lose-units (- compra_nuove_unità) ]
     if compra_nuove_unità = 0
-      [ hubnet-send user-id "unit Seller Says:" "You did not buy any unit." ]
+      [ hubnet-send user-id "Aspetta per la tua nuova mossa ..." " " ]
     send-personal-info
     set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))
   ]
@@ -232,8 +232,8 @@ to buy-units [ num-units-desired ]  ;; farmer procedure
   ]
   let cost-of-purchase num-units-purchase * costo/nuove_unità
   set capitale_totale (capitale_totale - cost-of-purchase)
-  hubnet-send user-id "unit Seller Says:"
-    (seller-says got-number-desired? num-units-desired num-units-purchase)
+ ; hubnet-send user-id "Aspetta per la tua nuova mossa ..."
+ ;   (seller-says got-number-desired? num-units-desired num-units-purchase)
 
   ;; create the units purchased by the farmer
   hatch num-units-purchase
@@ -244,8 +244,8 @@ end
 to lose-units [ num-to-lose ]  ;; farmer procedure
   if ((count my-units) < num-to-lose)
     [ set num-to-lose (count my-units) ]
-  hubnet-send user-id "unit Seller Says:"
-    (word "You lost " num-to-lose " units.")
+;  hubnet-send user-id "Aspetta per la tua nuova mossa ..."
+;    (word "You lost " num-to-lose " units.")
 
   ;; eliminate the units ditched by the farmer
   ask (n-of num-to-lose my-units)
@@ -929,6 +929,23 @@ muovi_unità
 1
 -1000
 
+BUTTON
+324
+144
+418
+177
+show_cost
+hubnet-broadcast \"Aspetta per la tua nuova mossa ...\"\n    (word \"Adesso puoi decidere come investire il tuo capitale\")\nask farmers [hubnet-send user-id \"Questo è quanto spenderai:\" (compra_nuove_unità * costo/nuove_unità) + contributo_comune_emergenza + riserva_personale]
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -1368,10 +1385,10 @@ NIL
 1
 
 MONITOR
-257
-189
-365
-238
+273
+262
+381
+311
 Costo nuove unità
 NIL
 3
@@ -1388,10 +1405,10 @@ NIL
 1
 
 SLIDER
-22
-194
-218
-227
+38
+267
+238
+300
 compra_nuove_unità
 compra_nuove_unità
 1.0
@@ -1413,24 +1430,24 @@ NIL
 1
 
 MONITOR
-5
-349
-451
-398
-unit Seller Says:
+39
+192
+441
+241
+Aspetta per la tua nuova mossa ...
 NIL
 3
 1
 
 SLIDER
-22
+38
+310
 237
-221
-270
+343
 contributo_comune_emergenza
 contributo_comune_emergenza
 0.0
-6.0
+2.0
 0
 0.01
 1
@@ -1438,10 +1455,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-23
-274
-222
-307
+39
+347
+238
+380
 riserva_personale
 riserva_personale
 0.0
@@ -1463,13 +1480,23 @@ Qui il tuo guadagno giornaliero
 1
 
 TEXTBOX
-26
-118
-340
-178
-Puoi decidere come reinvestire il tuo guadagno: puoi non fare niente, comprare nuove  unità al loro costo, o investire in nuova energia per te o per un fondo comune in caso di una crisi energetica
+38
+106
+440
+181
+Quando te lo diremo, puoi \n- non fare niente\n- comprare nuove  unità al loro costo\n- investire in nuova energia per te o per un fondo comune in caso di una crisi energetica
 12
 0.0
+1
+
+MONITOR
+261
+335
+420
+384
+Questo è quanto spenderai:
+NIL
+3
 1
 
 @#$#@#$#@
