@@ -71,6 +71,7 @@ end
 ;; initializes the display
 ;; but does not clear already created farmers
 to setup
+  if any? turtles with [shape = "gameover"] [ask turtles with [shape = "gameover"][die]]
   setup-globals
   setup-patches
   clear-output
@@ -151,7 +152,7 @@ to go
     reset-patches
   ]
   ; ask farmers [if not any? my-units [die]]
-  if not any? units [stop]
+ if not any? units [create-turtles 1 [set shape "gameover" set size 20] stop ]
 end
 
 ;; goat move along the common looking for best patch of energia
@@ -929,7 +930,7 @@ SWITCH
 159
 is_crisi_energetica
 is_crisi_energetica
-0
+1
 1
 -1000
 
@@ -1159,14 +1160,6 @@ Circle -16777216 true false 60 75 60
 Circle -16777216 true false 180 75 60
 Rectangle -16777216 true false 60 195 240 225
 
-face sad
-false
-0
-Circle -7500403 true true 8 8 285
-Circle -16777216 true false 60 75 60
-Circle -16777216 true false 180 75 60
-Polygon -16777216 true false 150 168 90 184 62 210 47 232 67 244 90 220 109 205 150 198 192 205 210 220 227 242 251 229 236 206 212 183
-
 fish
 false
 0
@@ -1200,6 +1193,25 @@ Circle -7500403 true true 96 51 108
 Circle -16777216 true false 113 68 74
 Polygon -10899396 true false 189 233 219 188 249 173 279 188 234 218
 Polygon -10899396 true false 180 255 150 210 105 210 75 240 135 240
+
+gameover
+false
+0
+Circle -955883 true false 105 15 92
+Circle -16777216 true false 120 30 30
+Circle -16777216 true false 150 30 30
+Polygon -2674135 true false 15 225 75 225 75 300 15 300 15 225 15 240 60 240 60 285 30 285
+Polygon -2674135 true false 75 225 105 300 135 225 120 225 105 270 90 225 75 225
+Polygon -2674135 true false 135 225 135 300 195 300 180 300 180 285 150 285 150 270 180 270 180 255 150 255 150 240 180 240 180 225 135 225
+Polygon -2674135 true false 195 225 195 300 210 300 210 270 210 255 225 300 240 300 225 255 240 255 240 225 195 225 210 240 225 240 225 240 225 255 210 255
+Polygon -2674135 true false 15 120 75 120 75 135 30 135 30 165 30 180 60 180 60 165 45 165 45 150 75 150 90 150 90 165 75 165 75 195 15 195
+Polygon -2674135 true false 105 195 105 120 150 120 150 195 135 195 135 135 120 135 120 195 105 195
+Polygon -2674135 true false 120 150 135 150 135 165 120 165
+Polygon -2674135 true false 165 120 165 195 180 195 180 150 195 165 210 150 210 195 225 195 225 120 195 135
+Polygon -2674135 true false 240 120 300 120 285 135 255 135 255 150 285 150 285 165 255 165 255 180 285 180 285 195 240 195
+Circle -16777216 true false 270 285 0
+Polygon -2674135 true false 255 210 255 270 270 270 270 210
+Rectangle -2674135 true false 255 285 270 300
 
 goat
 false
