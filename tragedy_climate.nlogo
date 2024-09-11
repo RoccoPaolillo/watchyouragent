@@ -850,15 +850,15 @@ NIL
 1
 
 SLIDER
-305
-161
-442
-194
+304
+219
+441
+252
 crisi_energetica
 crisi_energetica
 0
 5
-5.0
+0.0
 0.1
 1
 NIL
@@ -873,7 +873,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.3
+0.1
 0.1
 1
 NIL
@@ -924,13 +924,13 @@ PENS
 "chicken" 1.0 0 -13345367 true "" "plot count units with [owner# = \"chicken\"]"
 
 SWITCH
-303
-126
-441
-159
+304
+182
+442
+215
 is_crisi_energetica
 is_crisi_energetica
-1
+0
 1
 -1000
 
@@ -953,6 +953,23 @@ BUTTON
 show_cost
 hubnet-broadcast \"Aspetta per la tua nuova mossa ...\"\n    (word \"Adesso puoi decidere come investire il tuo capitale\")\nask farmers [hubnet-send user-id \"Questo è quanto spenderai:\" (compra_nuove_unità * costo/nuove_unità) + contributo_comune_emergenza + riserva_personale]
 T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+321
+145
+424
+178
+crisi_once
+ask patches [set riserva-energetica riserva-energetica - 20]
+NIL
 1
 T
 OBSERVER
@@ -1469,12 +1486,12 @@ NIL
 SLIDER
 38
 310
-237
+240
 343
 contributo_comune_emergenza
 contributo_comune_emergenza
 0.0
-2.0
+100.0
 0
 0.01
 1
@@ -1489,7 +1506,7 @@ SLIDER
 riserva_personale
 riserva_personale
 0.0
-10.0
+100.0
 0
 0.1
 1
