@@ -150,6 +150,8 @@ to go
 
     reset-patches
   ]
+  ; ask farmers [if not any? my-units [die]]
+  if not any? units [stop]
 end
 
 ;; goat move along the common looking for best patch of energia
@@ -855,7 +857,7 @@ crisi_energetica
 crisi_energetica
 0
 5
-0.8
+5.0
 0.1
 1
 NIL
@@ -927,7 +929,7 @@ SWITCH
 159
 is_crisi_energetica
 is_crisi_energetica
-1
+0
 1
 -1000
 
