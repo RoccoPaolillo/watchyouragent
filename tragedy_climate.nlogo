@@ -170,12 +170,15 @@ ifelse muovi_unità [
   ][]
 
   ifelse is_crisi_energetica [
-  set riserve_unità (energia_acquisita + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
+  ; set riserve_unità (energia_acquisita + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
+  ; ask patch-here [set ]
+    set riserve_unità [riserva_personale] of one-of farmers with [user-id = [owner#] of myself]
   ]
   [
-      set riserve_unità (energia_acquisita)
+      set riserve_unità 0
   ]
-    if riserve_unità = 0 [die]
+   ; if riserve_unità = 0 [die]
+  if energia_acquisita = 0 [die]
 end
 
 
@@ -294,10 +297,19 @@ to reset-patches
     set riserva-energetica (riserva-energetica - crisi_energetica)
       if (riserva-energetica < energia-max)
       [
-        let new-energia-amt (riserva-energetica + rinnovo_energetico + (energia-growth-rate_emergency / crisis_patches) )
+      ifelse any? units-here [
+        let new-energia-amt (riserva-energetica + rinnovo_energetico + (energia-growth-rate_emergency / crisis_patches) + sum [riserve_unità] of units-here)
         ifelse (new-energia-amt > energia-max)
       [ set riserva-energetica energia-max ]
       [ set riserva-energetica new-energia-amt]
+        ]
+        [
+        let new-energia-amt (riserva-energetica + rinnovo_energetico + (energia-growth-rate_emergency / crisis_patches))
+        ifelse (new-energia-amt > energia-max)
+      [ set riserva-energetica energia-max ]
+      [ set riserva-energetica new-energia-amt]
+        ]
+
     color-patches
       ]
     ]
@@ -655,7 +667,7 @@ costo/nuove_unità
 costo/nuove_unità
 1
 2000
-7.0
+10.0
 1
 1
 €
@@ -843,7 +855,7 @@ crisi_energetica
 crisi_energetica
 0
 5
-0.2
+0.8
 0.1
 1
 NIL
@@ -915,7 +927,7 @@ SWITCH
 159
 is_crisi_energetica
 is_crisi_energetica
-0
+1
 1
 -1000
 
