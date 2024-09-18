@@ -1041,7 +1041,7 @@ capitale_totale = capitale_totale - contributo_comune_emergenza - (riserva_perso
 * guadagno_giornaliero = sum(energia_acquisita) delle units
 energia_acquisita = ( riserva-energetica della cella - (energia_richiesta * consumo_individuale)), from report get-amt-eaten
 
-* guadagno totale = (guadagno giornaliero * giorno - (costo_unità * (giorno - 1))), perchè al giorno 1 viene regalato o sarebbero in capitale negativo
+* guadagno totale = (guadagno giornaliero * giorno - (costo_unità * (giorno - 1))
 
 ## HOW TO CITE
 
