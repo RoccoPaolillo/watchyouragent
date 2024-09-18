@@ -6,11 +6,11 @@ globals
 [
   giorno                ;; number of days so far
 
-  colori             ;; list that holds the colors used for students' turtles
-  nomi-colori        ;; list that holds the names of the colors used for
+;  colori             ;; list that holds the colors used for students' turtles
+;  nomi-colori        ;; list that holds the names of the colors used for
                      ;; students' turtles
-  numero-colori         ;; number of colors in the color list
-  colori-usati        ;; list that holds the shape-color pairs that are
+;  numero-colori         ;; number of colors in the color list
+;  colori-usati        ;; list that holds the shape-color pairs that are
                      ;; already being used
 
   n/a                ;; unset variable indicator
@@ -96,12 +96,12 @@ to setup-globals
   ;; why this particular calculation?
   set energia_richiesta (round (100 / (ritmo_cicli - 1)))
 
-  set colori      [ white   gray   orange   brown    yellow    turquoise
-                    cyan    sky    blue     violet   magenta   pink ]
-  set nomi-colori ["white" "gray" "orange" "brown"  "yellow"  "turquoise"
-                   "cyan"  "sky"  "blue"   "violet" "magenta" "pink"]
-  set colori-usati []
-  set numero-colori length colori
+;  set colori      [ white   gray   orange   brown    yellow    turquoise
+;                    cyan    sky    blue     violet   magenta   pink ]
+;  set nomi-colori ["white" "gray" "orange" "brown"  "yellow"  "turquoise"
+;                   "cyan"  "sky"  "blue"   "violet" "magenta" "pink"]
+;  set colori-usati []
+;  set numero-colori length colori
   set n/a "n/a"
 end
 
@@ -512,7 +512,7 @@ to create-new-farmer [ id ]
   [
     set user-id id
     setup-farm
-    set-unique-color
+  ;  set-unique-color
     reset-farmers-vars
     hubnet-send id "compra_nuove_unità" compra_nuove_unità
     send-system-info
@@ -527,14 +527,14 @@ to setup-farm  ;; farmer procedure
 end
 
 ;; pick a color for the turtle ;; RP we don't need anymore
-to set-unique-color  ;; turtle procedure
-  let code random numero-colori
-  while [member? code colori-usati and count farmers < numero-colori]
-   [ set code random numero-colori ]
-  set colori-usati (lput code colori-usati)
-  set color item code colori
+; to set-unique-color  ;; turtle procedure
+;  let code random numero-colori
+; while [member? code colori-usati and count farmers < numero-colori]
+;   [ set code random numero-colori ]
+;  set colori-usati (lput code colori-usati)
+;  set color item code colori
 
-end
+;end
 
 ;; set farmer variables to initial values
 to reset-farmers-vars  ;; farmer procedure
@@ -566,9 +566,9 @@ to send-personal-info  ;; farmer procedure
 end
 
 ;; returns string version of color name
-to-report color->string [ color-value ]
-  report item (position color-value colori) nomi-colori
-end
+;to-report color->string [ color-value ]
+;  report item (position color-value colori) nomi-colori
+;end
 
 ;; sends the appropriate monitor information back to one client
 to send-system-info  ;; farmer procedure
@@ -596,8 +596,8 @@ to remove-farmer [ id ]
       [ die ]
     die
   ]
-  if not any? farmers with [color = old-color]
-    [ set colori-usati remove (position old-color colori) colori-usati ]
+;  if not any? farmers with [color = old-color]
+;    [ set colori-usati remove (position old-color colori) colori-usati ]
 end
 
 ; Copyright 2002 Uri Wilensky.
@@ -1456,7 +1456,7 @@ SLIDER
 300
 compra_nuove_unità
 compra_nuove_unità
-1.0
+0.0
 10.0
 0
 1.0
