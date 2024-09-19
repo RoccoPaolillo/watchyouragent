@@ -53,7 +53,7 @@ farmers-own
   revenue-lst        ;; list of each days' revenue collection
   capitale_totale       ;; total of past revenue, minus expenses
   guadagno_giornaliero    ;; the revenue collected at the end of the last day
-  contributo_comune_emergenza
+  contributo_comune
   riserva_personale
 
 ]
@@ -83,7 +83,7 @@ to setup
 ;  hubnet-broadcast "Aspetta per la tua nuova mossa ..."
 ;    (word "Everyone starts with " unità_iniziali/gruppo " units.")
   hubnet-broadcast "compra_nuove_unità" 1
-   hubnet-broadcast "contributo_comune_emergenza" 0
+   hubnet-broadcast "contributo_comune" 0
   hubnet-broadcast "riserva_personale" 0
   broadcast-system-info
 end
@@ -228,7 +228,7 @@ to invest_capital
     if compra_nuove_unità = 0
       [ hubnet-send user-id "Aspetta per la tua nuova mossa ..." " " ]
     send-personal-info
-    set capitale_totale (capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units))
+    set capitale_totale (capitale_totale - contributo_comune - (riserva_personale * count my-units))
   ]
 end
 
@@ -373,7 +373,7 @@ to-report totale_riserva-energetica
 end
 
 to-report energia-growth-rate_emergency
-  report sum [contributo_comune_emergenza] of farmers
+  report sum [contributo_comune] of farmers
 end
 
 to-report guadagno_medio
@@ -497,10 +497,10 @@ to execute-command [command]
     stop
   ]
 
-  if command = "contributo_comune_emergenza"
+  if command = "contributo_comune"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set contributo_comune_emergenza hubnet-message ]
+      [ set contributo_comune hubnet-message ]
     stop
   ]
 
@@ -546,7 +546,7 @@ to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
   set compra_nuove_unità 1
-  set contributo_comune_emergenza 0
+  set contributo_comune 0
     set riserva_personale 0
   set capitale_totale costo/nuove_unità
   set guadagno_giornaliero 0
@@ -567,7 +567,7 @@ to send-personal-info  ;; farmer procedure
  ; hubnet-send user-id "My unit Color" (color->string color)
   hubnet-send user-id "Voi siete il gruppo:" user-id
   hubnet-send user-id "Guadagno giornaliero" guadagno_giornaliero
-  hubnet-send user-id "Capitale totale" capitale_totale
+  hubnet-send user-id "Guadagno totale, Euro:" capitale_totale
 ;  hubnet-send user-id "My unit Population" count my-units
 end
 
@@ -580,7 +580,7 @@ end
 to send-system-info  ;; farmer procedure
  ; hubnet-send user-id "Total guadagno_giornaliero" totale_guadagno_giornaliero
  ; hubnet-send user-id "Grass Amt" totale_riserva-energetica
-  hubnet-send user-id "Costo nuove unità" costo/nuove_unità
+  hubnet-send user-id "Costo nuove unità, Euro:" costo/nuove_unità
   hubnet-send user-id "Giorno" giorno
 end
 
@@ -589,7 +589,7 @@ to broadcast-system-info
 ;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
 ;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
 ;  hubnet-broadcast "Istruzioni" round (((count patches * 50) - totale_riserva-energetica) / 5)
-  hubnet-broadcast "Costo nuove unità" costo/nuove_unità
+  hubnet-broadcast "Costo nuove unità, Euro:" costo/nuove_unità
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -685,9 +685,9 @@ costo/nuove_unità
 HORIZONTAL
 
 MONITOR
-1143
+1308
 230
-1241
+1406
 275
 Avg-Revenue
 guadagno_medio
@@ -696,9 +696,9 @@ guadagno_medio
 11
 
 PLOT
-1140
+1305
 52
-1355
+1520
 220
 Guadagno medio
 Day
@@ -714,9 +714,9 @@ PENS
 "" 1.0 0 -16777216 true "" ""
 
 MONITOR
-1144
+1309
 297
-1279
+1444
 342
 Guadagno attuale (all)
 totale_guadagno_giornaliero
@@ -768,9 +768,9 @@ giorno
 11
 
 BUTTON
-1126
+1291
 10
-1244
+1409
 43
 Reset Instructions
 setup-quick-start
@@ -785,9 +785,9 @@ NIL
 1
 
 BUTTON
-1328
+1493
 10
-1412
+1577
 43
 NEXT >>>
 view-next
@@ -802,9 +802,9 @@ NIL
 1
 
 BUTTON
-1250
+1415
 10
-1328
+1493
 43
 <<< PREV
 view-prev
@@ -819,9 +819,9 @@ NIL
 1
 
 MONITOR
-1146
+1311
 353
-1566
+1731
 398
 Quick Start Instructions- More in Info Window
 quick-start
@@ -847,9 +847,9 @@ NIL
 1
 
 SLIDER
-1368
+1533
 207
-1505
+1670
 240
 crisi_energetica
 crisi_energetica
@@ -921,9 +921,9 @@ PENS
 "chicken" 1.0 0 -13345367 true "" "plot count units with [owner# = \"chicken\"]"
 
 SWITCH
-1368
+1533
 170
-1506
+1671
 203
 is_crisi_energetica
 is_crisi_energetica
@@ -932,9 +932,9 @@ is_crisi_energetica
 -1000
 
 SWITCH
-1273
+1438
 251
-1398
+1563
 284
 muovi_unità
 muovi_unità
@@ -943,12 +943,12 @@ muovi_unità
 -1000
 
 BUTTON
-1383
+1548
 66
-1477
+1642
 99
 show_cost
-hubnet-broadcast \"Aspetta per la tua nuova mossa ...\"\n    (word \"Adesso puoi decidere come investire il tuo capitale\")\nask farmers [hubnet-send user-id \"Questo è quanto spenderai:\" (compra_nuove_unità * costo/nuove_unità) + contributo_comune_emergenza + riserva_personale]
+hubnet-broadcast \"Aspetta per la tua nuova mossa ...\"\n    (word \"Adesso puoi decidere come investire il tuo capitale\")\nask farmers [hubnet-send user-id \"Questo è quanto spenderai:\" (compra_nuove_unità * costo/nuove_unità) + contributo_comune + riserva_personale]
 T
 1
 T
@@ -960,9 +960,9 @@ NIL
 1
 
 BUTTON
-1385
+1550
 133
-1488
+1653
 166
 crisi_once
 ask patches [set riserva-energetica riserva-energetica - 20]
@@ -977,12 +977,12 @@ NIL
 1
 
 BUTTON
-979
-296
-1068
-329
+989
+360
+1078
+393
 rinnovo_risorse
-ask farmers [\nset capitale_totale capitale_totale - contributo_comune_emergenza\nhubnet-send user-id \"Capitale totale\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_emergenza] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\nhubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
+ask farmers [\nset capitale_totale capitale_totale - contributo_comune\nhubnet-send user-id \"Guadagno totale, Euro:\" capitale_totale\n]\n\nset refilling (sum [contributo_comune] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\nhubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
 1
 T
@@ -994,10 +994,10 @@ NIL
 1
 
 PLOT
-35
-308
-299
-458
+19
+309
+279
+459
 Risorse Ambientali
 NIL
 NIL
@@ -1009,13 +1009,13 @@ true
 true
 "" ""
 PENS
-"Risorse totali" 1.0 0 -16777216 true "" "plot totale_riserva-energetica"
+"Risorse totali " 1.0 0 -16777216 true "" "plot totale_riserva-energetica"
 
 BUTTON
-936
-89
-1065
-122
+930
+161
+1019
+194
 step: nuove unità
  hubnet-broadcast \"Istruzioni\" \"Ora che avete capito il gioco, potete decidere se comprare nuove unità\"
 NIL
@@ -1029,10 +1029,10 @@ NIL
 1
 
 BUTTON
-935
-16
-1066
-49
+952
+15
+1083
+48
 cleanup-istructions
  hubnet-broadcast \"Istruzioni\" \"\"
 NIL
@@ -1046,10 +1046,10 @@ NIL
 1
 
 BUTTON
-936
-52
-1064
-85
+929
+54
+1006
+87
 step: explore
  hubnet-broadcast \"Istruzioni\" \"Benvenuti! Prima vediamo come funziona il gioco!\"\n 
 NIL
@@ -1063,10 +1063,10 @@ NIL
 1
 
 BUTTON
-938
-165
-1069
-198
+927
+238
+1048
+271
 step: environment crisis
  hubnet-broadcast \"Istruzioni\" \"OK, ma stiamo consumando le risorse dell'ambiente! Vogliamo riparare?\"
 NIL
@@ -1080,12 +1080,12 @@ NIL
 1
 
 BUTTON
-940
-202
-1069
-235
+1052
+239
+1181
+272
 step: contributo comune
- hubnet-broadcast \"Istruzioni\" \"Potete decidere se investire a vostre tramite contributo_comune\"
+ hubnet-broadcast \"Istruzioni\" \"Potete decidere se investire a vostre spese con contributo_comune, quanto o niente\"
 NIL
 1
 T
@@ -1097,12 +1097,12 @@ NIL
 1
 
 BUTTON
-942
-241
-1097
-274
+1018
+275
+1173
+308
 step: contributo comune calc
- hubnet-broadcast \"Istruzioni\" (word \"Potremmo salvare l'ambiente se ogni gruppo investisse \"  round (((count patches * 50) - totale_riserva-energetica) / 5)\" , a voi la scelta!\")
+ hubnet-broadcast \"Istruzioni\" (word \"Potremmo salvare l'ambiente se ogni gruppo investisse \"  round (((count patches * 50) - totale_riserva-energetica) / 5)\" Euro , a voi la scelta!\")
 NIL
 1
 T
@@ -1125,12 +1125,12 @@ totale_riserva-energetica
 11
 
 BUTTON
-935
-127
-1066
+1053
 160
+1140
+193
 come comprare
- hubnet-broadcast \"Istruzioni\" \"Per comprare: compra_nuove_unità, con relativo costo\"
+ hubnet-broadcast \"Istruzioni\" \"Per comprare: compra_nuove_unità, con relativo costo. Potete decidere ora!\"
 NIL
 1
 T
@@ -1142,23 +1142,131 @@ NIL
 1
 
 TEXTBOX
-941
-296
-975
-321
+951
+360
+985
+385
 >>
 20
 0.0
 1
 
 TEXTBOX
-1075
-298
-1118
-323
+1085
+362
+1128
+387
 <<
 20
 0.0
+1
+
+BUTTON
+1023
+98
+1115
+131
+explore: capital
+ hubnet-broadcast \"Istruzioni\" \"... a fine giornata, il vostro guadagno totale viene calcolato\"\n 
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1011
+54
+1132
+87
+instruction: energy cons
+ hubnet-broadcast \"Istruzioni\" \"Le unità del vostro gruppo sopravvivono assumendo risorse dal territorio dove sono...\"\n 
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+931
+97
+1017
+130
+energy: money
+ hubnet-broadcast \"Istruzioni\" \"... le risorse consumate si trasformano nel vostro guadagno...\"\n 
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+TEXTBOX
+939
+139
+1089
+157
+show run stop 7
+10
+0.0
+1
+
+TEXTBOX
+1022
+169
+1048
+187
+setup
+10
+0.0
+1
+
+TEXTBOX
+946
+208
+1043
+226
+decide, go, stop 7
+10
+0.0
+1
+
+TEXTBOX
+973
+333
+1123
+351
+decide, go, stop 14
+10
+0.0
+1
+
+BUTTON
+936
+276
+1007
+309
+division
+ hubnet-broadcast \"Istruzioni\" \"I singoli contributi comuni sono sommati e divisi tra i territori esauriti\" 
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 @#$#@#$#@
@@ -1604,40 +1712,40 @@ VIEW
 10
 
 MONITOR
-208
-19
-334
-68
+95
+129
+221
+178
 Guadagno giornaliero
 NIL
 3
 1
 
 MONITOR
-273
-262
-381
-311
-Costo nuove unità
+243
+205
+386
+254
+Costo nuove unità, Euro:
 NIL
 3
 1
 
 MONITOR
-351
-14
-442
-63
-Capitale totale
+230
+129
+365
+178
+Guadagno totale, Euro:
 NIL
 3
 1
 
 SLIDER
-30
-189
-230
-222
+33
+213
+233
+246
 compra_nuove_unità
 compra_nuove_unità
 0.0
@@ -1649,45 +1757,45 @@ NIL
 HORIZONTAL
 
 MONITOR
-132
-20
-189
-69
+380
+10
+437
+59
 Giorno
 NIL
 3
 1
 
 MONITOR
-27
-89
-449
-138
+6
+77
+454
+126
 Istruzioni
 NIL
 3
 1
 
 SLIDER
-38
-310
-240
-343
-contributo_comune_emergenza
-contributo_comune_emergenza
+34
+294
+249
+327
+contributo_comune
+contributo_comune
 0.0
 100.0
 0
-0.01
+1.0
 1
 NIL
 HORIZONTAL
 
 SLIDER
-39
-347
-238
-380
+48
+406
+172
+439
 riserva_personale
 riserva_personale
 0.0
@@ -1699,23 +1807,23 @@ NIL
 HORIZONTAL
 
 MONITOR
-261
-335
-420
-384
-Questo è quanto spenderai:
+8
+10
+120
+59
+Voi siete il gruppo:
 NIL
 3
 1
 
-MONITOR
-14
-19
-126
-68
-Voi siete il gruppo:
-NIL
-3
+TEXTBOX
+175
+414
+244
+432
+da eliminare
+10
+0.0
 1
 
 @#$#@#$#@
