@@ -1452,10 +1452,10 @@ VIEW
 10
 
 MONITOR
-31
-45
-157
-94
+90
+15
+216
+64
 Guadagno giornaliero
 NIL
 3
@@ -1472,9 +1472,9 @@ NIL
 1
 
 MONITOR
-358
+351
 14
-449
+442
 63
 Capitale totale
 NIL
@@ -1489,7 +1489,7 @@ SLIDER
 compra_nuove_unità
 compra_nuove_unità
 0.0
-10.0
+4.0
 0
 1.0
 1
@@ -1497,10 +1497,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-292
-15
-349
-64
+14
+16
+71
+65
 Giorno
 NIL
 3
@@ -1545,26 +1545,6 @@ riserva_personale
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-29
-11
-221
-56
-Qui il tuo guadagno giornaliero
-12
-0.0
-1
-
-TEXTBOX
-38
-106
-440
-181
-Quando te lo diremo, puoi \n- non fare niente\n- comprare nuove  unità al loro costo\n- investire in nuova energia per te o per un fondo comune in caso di una crisi energetica
-12
-0.0
-1
 
 MONITOR
 261

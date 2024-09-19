@@ -975,11 +975,11 @@ NIL
 1
 
 BUTTON
-267
-105
-330
-138
-refill
+335
+77
+447
+110
+rinnovo_risorse
 ask farmers [\nset capitale_totale capitale_totale - contributo_comune_emergenza\nhubnet-send user-id \"Capitale totale\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_emergenza] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\n\nwrite \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
 1
@@ -1452,10 +1452,10 @@ VIEW
 10
 
 MONITOR
-31
-45
-157
-94
+90
+15
+216
+64
 Guadagno giornaliero
 NIL
 3
@@ -1472,9 +1472,9 @@ NIL
 1
 
 MONITOR
-358
+351
 14
-449
+442
 63
 Capitale totale
 NIL
@@ -1497,10 +1497,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-292
-15
-349
-64
+14
+16
+71
+65
 Giorno
 NIL
 3
@@ -1545,26 +1545,6 @@ riserva_personale
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-29
-11
-221
-56
-Qui il tuo guadagno giornaliero
-12
-0.0
-1
-
-TEXTBOX
-38
-106
-440
-181
-Quando te lo diremo, puoi \n- non fare niente\n- comprare nuove  unità al loro costo\n- investire in nuova energia per te o per un fondo comune in caso di una crisi energetica
-12
-0.0
-1
 
 MONITOR
 261
