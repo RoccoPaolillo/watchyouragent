@@ -975,11 +975,11 @@ NIL
 1
 
 BUTTON
-335
-77
-447
-110
-rinnovo_risorse
+267
+105
+330
+138
+refill
 ask farmers [\nset capitale_totale capitale_totale - contributo_comune_emergenza\nhubnet-send user-id \"Capitale totale\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_emergenza] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\n\nwrite \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
 1
