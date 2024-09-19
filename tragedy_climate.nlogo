@@ -24,7 +24,7 @@ globals
   energia-max          ;; energia capacity
   food-max           ;; energia collection capacity
   energia_richiesta          ;; amount of energia collected at each move
-  ; refilling
+  refilling
  ; tax-paid
 ]
 
@@ -991,7 +991,7 @@ BUTTON
 242
 256
 refill
-; set refilling (((((count patches * 50) - totale_riserva-energetica) / 5) * 5 ) / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling ; (((((count patches * 50) - totale_riserva-energetica) / 5) * 5 ) / count patches with [riserva-energetica < 50])\ncolor-patches\nprint refilling\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\n
+ask farmers [\nset capitale_totale capitale_totale - contributo_comune_emergenza\nhubnet-send user-id \"Capitale totale\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_emergenza] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nprint refilling\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\n
 NIL
 1
 T
