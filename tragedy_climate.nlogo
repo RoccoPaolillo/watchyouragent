@@ -6,11 +6,11 @@ globals
 [
   giorno                ;; number of days so far
 
-  colori             ;; list that holds the colors used for students' turtles
-  nomi-colori        ;; list that holds the names of the colors used for
+;  colori             ;; list that holds the colors used for students' turtles
+;  nomi-colori        ;; list that holds the names of the colors used for
                      ;; students' turtles
-  numero-colori         ;; number of colors in the color list
-  colori-usati        ;; list that holds the shape-color pairs that are
+;  numero-colori         ;; number of colors in the color list
+;  colori-usati        ;; list that holds the shape-color pairs that are
                      ;; already being used
 
   n/a                ;; unset variable indicator
@@ -96,12 +96,12 @@ to setup-globals
   ;; why this particular calculation?
   set energia_richiesta (round (100 / (ritmo_cicli - 1)))
 
-  set colori      [ white   gray   orange   brown    yellow    turquoise
-                    cyan    sky    blue     violet   magenta   pink ]
-  set nomi-colori ["white" "gray" "orange" "brown"  "yellow"  "turquoise"
-                   "cyan"  "sky"  "blue"   "violet" "magenta" "pink"]
-  set colori-usati []
-  set numero-colori length colori
+;  set colori      [ white   gray   orange   brown    yellow    turquoise
+;                    cyan    sky    blue     violet   magenta   pink ]
+;  set nomi-colori ["white" "gray" "orange" "brown"  "yellow"  "turquoise"
+;                   "cyan"  "sky"  "blue"   "violet" "magenta" "pink"]
+;  set colori-usati []
+;  set numero-colori length colori
   set n/a "n/a"
 end
 
@@ -145,7 +145,7 @@ to go
       set giorno giorno + 1
       ask farmers
         [ profit-units ]
-      invest_capital ;; to buy units
+      invest_capital ;; toene buy units
       plot-graph
     ]
 
@@ -154,6 +154,8 @@ to go
   ; ask farmers [if not any? my-units [die]]
  if not any? units [create-turtles 1 [set shape "gameover" set size 20] stop ]
  ask farmers [if capitale_totale <= 0 [die]]
+
+  if giorno = 7 [stop]
 end
 
 ;; goat move along the common looking for best patch of energia
@@ -512,7 +514,7 @@ to create-new-farmer [ id ]
   [
     set user-id id
     setup-farm
-    set-unique-color
+  ;  set-unique-color
     reset-farmers-vars
     hubnet-send id "compra_nuove_unità" compra_nuove_unità
     send-system-info
@@ -527,14 +529,14 @@ to setup-farm  ;; farmer procedure
 end
 
 ;; pick a color for the turtle ;; RP we don't need anymore
-to set-unique-color  ;; turtle procedure
-  let code random numero-colori
-  while [member? code colori-usati and count farmers < numero-colori]
-   [ set code random numero-colori ]
-  set colori-usati (lput code colori-usati)
-  set color item code colori
+; to set-unique-color  ;; turtle procedure
+;  let code random numero-colori
+; while [member? code colori-usati and count farmers < numero-colori]
+;   [ set code random numero-colori ]
+;  set colori-usati (lput code colori-usati)
+;  set color item code colori
 
-end
+;end
 
 ;; set farmer variables to initial values
 to reset-farmers-vars  ;; farmer procedure
@@ -566,9 +568,9 @@ to send-personal-info  ;; farmer procedure
 end
 
 ;; returns string version of color name
-to-report color->string [ color-value ]
-  report item (position color-value colori) nomi-colori
-end
+;to-report color->string [ color-value ]
+;  report item (position color-value colori) nomi-colori
+;end
 
 ;; sends the appropriate monitor information back to one client
 to send-system-info  ;; farmer procedure
@@ -583,7 +585,7 @@ to broadcast-system-info
 ;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
 ;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
   hubnet-broadcast "Costo nuove unità" costo/nuove_unità
-  hubnet-broadcast "Giorno" giorno
+  hubnet-broadcast "Giorno" giorno + 1
 end
 
 ;; delete farmers once client has exited
@@ -596,8 +598,8 @@ to remove-farmer [ id ]
       [ die ]
     die
   ]
-  if not any? farmers with [color = old-color]
-    [ set colori-usati remove (position old-color colori) colori-usati ]
+;  if not any? farmers with [color = old-color]
+;    [ set colori-usati remove (position old-color colori) colori-usati ]
 end
 
 ; Copyright 2002 Uri Wilensky.
@@ -726,7 +728,7 @@ ritmo_cicli
 ritmo_cicli
 2
 50
-9.0
+11.0
 1
 1
 NIL
@@ -868,7 +870,7 @@ HORIZONTAL
 SLIDER
 146
 52
-270
+280
 85
 rinnovo_energetico
 rinnovo_energetico
@@ -1038,10 +1040,13 @@ capitale_totale per ogni singolo gruppo: capitale_totale + guadagno_giornaliero
 capitale_totale = capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units)
 
 
-* graze (accumulo energia per unità di ogni gruppo)
-energia_acquisita = ( riserva-energetica della cella - (energia_richiesta * consumo_individuale)), report get-amt-eaten
-se is_crisi_energetica attivato: riserve_unità (energia_acquisita + [riserva_personale] del mio gruppo (farmer)
+* guadagno_giornaliero = sum(energia_acquisita) delle units
+energia_acquisita = ( riserva-energetica della cella - (energia_richiesta * consumo_individuale)), from report get-amt-eaten
 
+* guadagno totale = (guadagno giornaliero * giorno - (costo_unità * (giorno - 1))), perchè al giorno 1 viene regalato o sarebbero in capitale negativo. Ci deve essere almeno 1 unità per ciclo come nuova unità.
+
+* energia_richiesta = (round (100 / (ritmo_cicli - 1))). Con ritmo_cicli = 9: 13
+* riserva_energetica at step 1 = (riserva_energetica (50) -  energia_richiesta (13) + rinnovo_energetico = (0.1)) = 37.1 --> step 2 =  (riserva_energetica (27.1) -  energia_richiesta (13) + rinnovo_energetico = (0.1))
 
 ## HOW TO CITE
 
@@ -1456,7 +1461,7 @@ SLIDER
 300
 compra_nuove_unità
 compra_nuove_unità
-1.0
+0.0
 10.0
 0
 1.0
