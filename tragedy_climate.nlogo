@@ -586,7 +586,7 @@ end
 to broadcast-system-info
 ;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
 ;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
-  hubnet-broadcast "Potremmo salvare l'ambiente se ognuno investisse" round (((count patches * 50) - totale_riserva-energetica) / 5)
+;  hubnet-broadcast "Istruzioni" round (((count patches * 50) - totale_riserva-energetica) / 5)
   hubnet-broadcast "Costo nuove unità" costo/nuove_unità
   hubnet-broadcast "Giorno" giorno
 end
@@ -975,10 +975,10 @@ NIL
 1
 
 BUTTON
-335
-77
-447
-110
+351
+75
+463
+108
 rinnovo_risorse
 ask farmers [\nset capitale_totale capitale_totale - contributo_comune_emergenza\nhubnet-send user-id \"Capitale totale\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_emergenza] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\n\nwrite \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
@@ -1008,6 +1008,57 @@ true
 "" ""
 PENS
 "Risorse totali" 1.0 0 -16777216 true "" "plot totale_riserva-energetica"
+
+BUTTON
+210
+135
+339
+168
+step: nuove unità
+ hubnet-broadcast \"Istruzioni\" \"Ora che avete visto come funziona il gioco, potete decidere se comprare nuove unità\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+205
+52
+336
+85
+cleanup-istructions
+ hubnet-broadcast \"Istruzioni\" \"\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+212
+101
+340
+134
+step: explore
+ hubnet-broadcast \"Istruzioni\" \"Benvenuti! Prima vediamo come funziona il gioco!\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1482,10 +1533,10 @@ NIL
 1
 
 SLIDER
-38
-267
-238
-300
+33
+144
+233
+177
 compra_nuove_unità
 compra_nuove_unità
 0.0
@@ -1507,11 +1558,11 @@ NIL
 1
 
 MONITOR
-39
-192
-441
-241
-Potremmo salvare l'ambiente se ognuno investisse
+32
+89
+434
+138
+Istruzioni
 NIL
 3
 1
