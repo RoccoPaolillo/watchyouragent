@@ -72,6 +72,7 @@ end
 ;; initializes the display
 ;; but does not clear already created farmers
 to setup
+  ; hubnet-broadcast "Istruzioni" ""
   if any? turtles with [shape = "gameover"] [ask turtles with [shape = "gameover"][die]]
   setup-globals
   setup-patches
@@ -564,6 +565,7 @@ end
 ;; sends the appropriate monitor information back to the client
 to send-personal-info  ;; farmer procedure
  ; hubnet-send user-id "My unit Color" (color->string color)
+  hubnet-send user-id "Voi siete il gruppo:" user-id
   hubnet-send user-id "Guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "Capitale totale" capitale_totale
 ;  hubnet-send user-id "My unit Population" count my-units
@@ -668,10 +670,10 @@ unità
 HORIZONTAL
 
 SLIDER
-13
-131
-188
-164
+198
+61
+373
+94
 costo/nuove_unità
 costo/nuove_unità
 1
@@ -738,9 +740,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-149
+145
 10
-238
+243
 43
 NIL
 setup
@@ -860,10 +862,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-14
-167
-189
-200
+199
+97
+374
+130
 rinnovo_energetico
 rinnovo_energetico
 0
@@ -876,9 +878,9 @@ HORIZONTAL
 
 PLOT
 6
-233
+157
 235
-383
+307
 Capitale Totale
 NIL
 NIL
@@ -898,9 +900,9 @@ PENS
 
 PLOT
 244
-233
+157
 471
-383
+307
 Unità
 NIL
 NIL
@@ -975,12 +977,12 @@ NIL
 1
 
 BUTTON
-351
-75
-463
-108
+979
+296
+1068
+329
 rinnovo_risorse
-ask farmers [\nset capitale_totale capitale_totale - contributo_comune_emergenza\nhubnet-send user-id \"Capitale totale\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_emergenza] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\n\nwrite \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
+ask farmers [\nset capitale_totale capitale_totale - contributo_comune_emergenza\nhubnet-send user-id \"Capitale totale\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_emergenza] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\nhubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
 1
 T
@@ -992,10 +994,10 @@ NIL
 1
 
 PLOT
-115
-386
-379
-536
+35
+308
+299
+458
 Risorse Ambientali
 NIL
 NIL
@@ -1010,12 +1012,12 @@ PENS
 "Risorse totali" 1.0 0 -16777216 true "" "plot totale_riserva-energetica"
 
 BUTTON
-210
-135
-339
-168
+936
+89
+1065
+122
 step: nuove unità
- hubnet-broadcast \"Istruzioni\" \"Ora che avete visto come funziona il gioco, potete decidere se comprare nuove unità\"
+ hubnet-broadcast \"Istruzioni\" \"Ora che avete capito il gioco, potete decidere se comprare nuove unità\"
 NIL
 1
 T
@@ -1027,10 +1029,10 @@ NIL
 1
 
 BUTTON
-205
-52
-336
-85
+935
+16
+1066
+49
 cleanup-istructions
  hubnet-broadcast \"Istruzioni\" \"\"
 NIL
@@ -1044,12 +1046,12 @@ NIL
 1
 
 BUTTON
-212
-101
-340
-134
+936
+52
+1064
+85
 step: explore
- hubnet-broadcast \"Istruzioni\" \"Benvenuti! Prima vediamo come funziona il gioco!\"
+ hubnet-broadcast \"Istruzioni\" \"Benvenuti! Prima vediamo come funziona il gioco!\"\n 
 NIL
 1
 T
@@ -1058,6 +1060,105 @@ NIL
 NIL
 NIL
 NIL
+1
+
+BUTTON
+938
+165
+1069
+198
+step: environment crisis
+ hubnet-broadcast \"Istruzioni\" \"OK, ma stiamo consumando le risorse dell'ambiente! Vogliamo riparare?\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+940
+202
+1069
+235
+step: contributo comune
+ hubnet-broadcast \"Istruzioni\" \"Potete decidere se investire a vostre tramite contributo_comune\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+942
+241
+1097
+274
+step: contributo comune calc
+ hubnet-broadcast \"Istruzioni\" (word \"Potremmo salvare l'ambiente se ogni gruppo investisse \"  round (((count patches * 50) - totale_riserva-energetica) / 5)\" , a voi la scelta!\")
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+MONITOR
+312
+325
+420
+370
+risorse ambientali
+totale_riserva-energetica
+2
+1
+11
+
+BUTTON
+935
+127
+1066
+160
+come comprare
+ hubnet-broadcast \"Istruzioni\" \"Per comprare: compra_nuove_unità, con relativo costo\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+TEXTBOX
+941
+296
+975
+321
+>>
+20
+0.0
+1
+
+TEXTBOX
+1075
+298
+1118
+323
+<<
+20
+0.0
 1
 
 @#$#@#$#@
@@ -1503,10 +1604,10 @@ VIEW
 10
 
 MONITOR
-90
-15
-216
-64
+208
+19
+334
+68
 Guadagno giornaliero
 NIL
 3
@@ -1533,10 +1634,10 @@ NIL
 1
 
 SLIDER
-33
-144
-233
-177
+30
+189
+230
+222
 compra_nuove_unità
 compra_nuove_unità
 0.0
@@ -1548,19 +1649,19 @@ NIL
 HORIZONTAL
 
 MONITOR
-14
-16
-71
-65
+132
+20
+189
+69
 Giorno
 NIL
 3
 1
 
 MONITOR
-32
+27
 89
-434
+449
 138
 Istruzioni
 NIL
@@ -1603,6 +1704,16 @@ MONITOR
 420
 384
 Questo è quanto spenderai:
+NIL
+3
+1
+
+MONITOR
+14
+19
+126
+68
+Voi siete il gruppo:
 NIL
 3
 1
