@@ -908,10 +908,10 @@ PENS
 "chicken" 1.0 0 -13345367 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"chicken\"]"
 
 PLOT
-245
-284
-472
-434
+243
+287
+470
+437
 unità
 NIL
 NIL
@@ -991,7 +991,7 @@ BUTTON
 242
 256
 refill
-ask farmers [\nset capitale_totale capitale_totale - contributo_comune_emergenza\nhubnet-send user-id \"Capitale totale\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_emergenza] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nprint refilling\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\n
+ask farmers [\nset capitale_totale capitale_totale - contributo_comune_emergenza\nhubnet-send user-id \"Capitale totale\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_emergenza] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\n\nwrite \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
 1
 T
