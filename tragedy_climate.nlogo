@@ -890,29 +890,29 @@ PLOT
 287
 234
 437
-guadagno giornaliero
+Capitale Totale
 NIL
 NIL
 0.0
 10.0
 -10.0
-10.0
+400.0
 true
 true
 "" ""
 PENS
-"car" 1.0 0 -8630108 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"car\"]"
-"cow" 1.0 0 -6459832 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"cow\"]"
-"house" 1.0 0 -2674135 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"house\"]"
-"plant" 1.0 0 -11221820 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"plant\"]"
-"chicken" 1.0 0 -13345367 true "" "plot [guadagno_giornaliero] of one-of farmers with [user-id = \"chicken\"]"
+"car" 1.0 0 -8630108 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"car\"]"
+"cow" 1.0 0 -6459832 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"cow\"]"
+"house" 1.0 0 -2674135 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"house\"]"
+"plant" 1.0 0 -11221820 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"plant\"]"
+"chicken" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"chicken\"]"
 
 PLOT
 243
 287
 470
 437
-unità
+Unità
 NIL
 NIL
 0.0
