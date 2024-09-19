@@ -145,7 +145,7 @@ to go
       set giorno giorno + 1
       ask farmers
         [ profit-units ]
-      invest_capital ;; to buy units
+      invest_capital ;; toene buy units
       plot-graph
     ]
 
@@ -154,6 +154,8 @@ to go
   ; ask farmers [if not any? my-units [die]]
  if not any? units [create-turtles 1 [set shape "gameover" set size 20] stop ]
  ask farmers [if capitale_totale <= 0 [die]]
+
+  if giorno = 7 [stop]
 end
 
 ;; goat move along the common looking for best patch of energia
@@ -387,11 +389,11 @@ end
 
 to-report consumo_individuale
 
-  if owner# = "plant" [report 0.1]
-  if owner# = "car" [report 0.9]
-  if owner# = "cow" [report 0.2]
-  if owner# = "house" [report 0.5]
-  if owner# = "chicken" [report 0.4]
+  if owner# = "plant" [report 1]
+  if owner# = "car" [report 1]
+  if owner# = "cow" [report 1]
+  if owner# = "house" [report 1]
+  if owner# = "chicken" [report 1]
 end
 
 
@@ -583,7 +585,7 @@ to broadcast-system-info
 ;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
 ;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
   hubnet-broadcast "Costo nuove unità" costo/nuove_unità
-  hubnet-broadcast "Giorno" giorno
+  hubnet-broadcast "Giorno" giorno + 1
 end
 
 ;; delete farmers once client has exited
@@ -726,7 +728,7 @@ ritmo_cicli
 ritmo_cicli
 2
 50
-9.0
+11.0
 1
 1
 NIL
@@ -868,7 +870,7 @@ HORIZONTAL
 SLIDER
 146
 52
-270
+280
 85
 rinnovo_energetico
 rinnovo_energetico
@@ -1041,7 +1043,10 @@ capitale_totale = capitale_totale - contributo_comune_emergenza - (riserva_perso
 * guadagno_giornaliero = sum(energia_acquisita) delle units
 energia_acquisita = ( riserva-energetica della cella - (energia_richiesta * consumo_individuale)), from report get-amt-eaten
 
-* guadagno totale = (guadagno giornaliero * giorno - (costo_unità * (giorno - 1))), perchè al giorno 1 viene regalato o sarebbero in capitale negativo
+* guadagno totale = (guadagno giornaliero * giorno - (costo_unità * (giorno - 1))), perchè al giorno 1 viene regalato o sarebbero in capitale negativo. Ci deve essere almeno 1 unità per ciclo come nuova unità.
+
+* energia_richiesta = (round (100 / (ritmo_cicli - 1))). Con ritmo_cicli = 9: 13
+* riserva_energetica at step 1 = (riserva_energetica (50) -  energia_richiesta (13) + rinnovo_energetico = (0.1)) = 37.1 --> step 2 =  (riserva_energetica (27.1) -  energia_richiesta (13) + rinnovo_energetico = (0.1))
 
 ## HOW TO CITE
 
