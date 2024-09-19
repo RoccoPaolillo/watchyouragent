@@ -387,11 +387,11 @@ end
 
 to-report consumo_individuale
 
-  if owner# = "plant" [report 0.1]
-  if owner# = "car" [report 0.9]
-  if owner# = "cow" [report 0.2]
-  if owner# = "house" [report 0.5]
-  if owner# = "chicken" [report 0.4]
+  if owner# = "plant" [report 1]
+  if owner# = "car" [report 1]
+  if owner# = "cow" [report 1]
+  if owner# = "house" [report 1]
+  if owner# = "chicken" [report 1]
 end
 
 
