@@ -24,6 +24,7 @@ globals
   energia-max          ;; energia capacity
   food-max           ;; energia collection capacity
   energia_richiesta          ;; amount of energia collected at each move
+  ; refilling
  ; tax-paid
 ]
 
@@ -123,8 +124,9 @@ to go
 
   every .1
   [
-    every .5
-      [ broadcast-system-info ]
+  ;  every .5
+  ;   [ broadcast-system-info ]
+
 
     if not any? farmers
     [
@@ -154,8 +156,8 @@ to go
   ; ask farmers [if not any? my-units [die]]
  if not any? units [create-turtles 1 [set shape "gameover" set size 20] stop ]
  ask farmers [if capitale_totale <= 0 [die]]
-
-  if giorno = 7 [stop]
+ broadcast-system-info
+;  if giorno = 7 [stop]
 end
 
 ;; goat move along the common looking for best patch of energia
@@ -584,8 +586,9 @@ end
 to broadcast-system-info
 ;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
 ;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
+  hubnet-broadcast "Potremmo salvare l'ambiente se ognuno investisse" round (((count patches * 50) - totale_riserva-energetica) / 5)
   hubnet-broadcast "Costo nuove unità" costo/nuove_unità
-  hubnet-broadcast "Giorno" giorno + 1
+  hubnet-broadcast "Giorno" giorno
 end
 
 ;; delete farmers once client has exited
@@ -933,7 +936,7 @@ SWITCH
 215
 is_crisi_energetica
 is_crisi_energetica
-0
+1
 1
 -1000
 
@@ -972,6 +975,23 @@ BUTTON
 178
 crisi_once
 ask patches [set riserva-energetica riserva-energetica - 20]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+179
+223
+242
+256
+refill
+; set refilling (((((count patches * 50) - totale_riserva-energetica) / 5) * 5 ) / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling ; (((((count patches * 50) - totale_riserva-energetica) / 5) * 5 ) / count patches with [riserva-energetica < 50])\ncolor-patches\nprint refilling\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\n
 NIL
 1
 T
@@ -1484,7 +1504,7 @@ MONITOR
 192
 441
 241
-Aspetta per la tua nuova mossa ...
+Potremmo salvare l'ambiente se ognuno investisse
 NIL
 3
 1
