@@ -1270,70 +1270,30 @@ NIL
 1
 
 @#$#@#$#@
-## WHAT IS IT?
+## Calculations and strategy
 
-Adattamento della tragedia dei beni comuni. Ogni gruppo al proprio computer (farmer) rappresenta un settore economico/sociale che si nutre di energia e compete per sopravvivere. I gruppi sono:
+* giorno = ticks mod ritmo_cicli, scatta quando ticks è multiplo di ritmo_cicli, ogni tick in un giorno, stando le condizioni sottostanti, permette il calcolo di guadagno_giornaliero
+* energia_richiesta = (round (100 / (ritmo_cicli - 1))). Con ritmo_cicli = 11: 10, sottratta alla riserva_energetica del patch, at time 0 = 50
+* guadagno_giornaliero = riserva_energetica patch-here - energia_richiesta + rinnovo_energetico. Con rinnovo_energetico = 0.1 e ritmo_cicli 11:
+(50 - 10 + 1) = (40.1 - 10 + 0.1) = (30.2 - 10 + 0.1) = (20.3 - 10 + 0.1) = (10.40 - 10 + 0.1) = sono 4 ticks in cui sottrae 10 unità = guadagno giornaliero 40
+* guadagno totale = (guadagno giornaliero * 1) + ((guadagno giornaliero * units) * (day-1)) - ((costo_unità * units) * (day-1)) - (costo_unità * (units - 1)), perchè il primo giorno c'è solo un'unità e il costo è annullato (capitale = costo unità) by default.
 
-plant = agricoltura
-house = edilizia
-car = automotiv
-cow = allevamento bovino
-chicken = allevamento pollame
+Con 1 unità e 7 giorni con ritmo_cicli 11 e rinnovo_energetico 0.1, costo unità 10:
+(40 + ((40 * 1) * 6)) - ((1 * 10) * 6) - (10 * (1 - 1))) = 220
+Con 4 unità e 7 giorni con ritmo_cicli 11 e rinnovo_energetico 0.1, costo unità 10:
+(40 + ((40 * 4) * 6)) - ((4 * 10) * 6) - (10 * (4 - 1)) = 730
 
-I gruppi vivono nello spazio comune e le loro unità rappresentate dagli oggetti nella simulazione che richiamano il loro nome e proprio colore prendono energia dalla cella in cui si trovano, mentre vagano nel mondo. Quindi l'energia utilizzabile è un bene comune che può esaurirsi. Una costante di rinnovo energia esiste per assicurarsi che l'energia non si consumi immediatamente. Il totale dell'energia comune consumata dipende da quanto consumano le unità dei diversi gruppi e da quante ce ne sono.
-Il guadagno giornaliero di ogni gruppo è calcolato a fine di ogni singolo giorno, e consiste nel totale dell'energia immagazzinata dalle singola unità di quel gruppo. Il capitale totale è l'insieme dei guadagni giornalieri sommati. 
+Da considerarsi che le nuove unità si collocano random nello spazio, quindi influenzate dal consumo delle altre. I valori calcolati possono alterarsi quando:
+- ci sono più unità e le nuove unità rischiano di cadere in una cella già esaurita
+- sono passati più giorni, quindi ci possono essere più celle esaurite
+- allo stesso modo, essendo passati più giorni le celle si rigenerano per via di rinnovo_energetico, con diversi livelli energetici da cui l'unità attinge
 
-Ogni gruppo può decidere se comprare nuove unità del proprio gruppo, ad un costo imposto per ogni unità, o investire in un contributo_comune_emergenza o in una riserva_personale moltiplicata per ogni unità del proprio gruppo sopravvissuta al momento. Il costo di questi tre elementi è sottratto a fine giornata dal capitale totale. 
+Per avere maggior controllo suggerisco il set: ritmo_ciclo 11 (40 guadagno giornaliero), bloccando a 7 giorni, massimo dare la possibilità di comprare 4 nuove unità. Testando con solo un attore. Tutto dipende da altri attori.
 
-Il modeller può attivare esternamente una crisi_energetica che sottrae un totale deciso dal modeller dalla riserva_energetica di ogni singola cella (il massimo è energia-max: 50). In caso di crisi energetica, l'effetto di riserva_personale e contributo_comune_emergenza si attivano. Riserva_personale aggiunge il totale di riserva_personale investito dal gruppo all'energia archiviata da ogni singola unità, perchè non sia uguale a zero, così che l'unità può sopravvivere artificialmente. Per il contributo_comune_emergenza, l'investimento di ogni singolo gruppo viene sommato, e si aggiunge alla capacità di rinnovo energetico di ogni cella, rinforzando quindi le risorse comuni.
+Suggerisco di lasciare consumo_energetico uguale per tutti i gruppi: se un gruppo consuma meno, di fatto ha più chance di aumentare il capitale, perchè ottiene più energia nel tempo e si riproduce più velocemente, con effetto del tempo, è più complicato (vedi slides HubNet).
 
-## PARAMETRI, CONDIZIONI, MONITORS
+Qui suggerisco una strategia più semplice, senza sliders continui, con il contributo comune una tantum da dividersi tra le celle con energia < 50 e più semplice. Cambiata anche la grafica con istruzioni per gli studenti. Il contributo quale spesa è sottratto dal capitale.
 
-Globali: solo il modeller al nodo centrale può visualizzarli e manipolarli
-
-* muovi_unità: per lasciar le unità muoversi e cercare nuova energia sul territorio, consigliato
-* rinnovo_energetico: il totale di energia rinnovata naturalmente, senza interventi esterni, per ogni cella, ogni decimo di secondo (every 0.1)
-* is_crisi_energetica: attiva la crisi energetica se su on
-* crisi_energetica: il totale di risorse energetiche sottratte dalle risorse comuni ad ogni decimo di secondo (every 0.1)
-* ritmo_cicli: quanti steps compongono un giorno (significando quanta energia è raccolta, quante nuove unità ci saranno in meno o più tempo o velocità di costi/guadagni)
-* unità_iniziali/gruppo: con quante unità ogni gruppo inizia (di fatto  non c'è costo per questi)
-* costi/nuove_unità: il costo per ogni unità successive al giorno 1
-
-Locali: appaiono solo al gruppo sul loro monitor e loro possono modificarli per il proprio gruppo (sono indipendenti dalle scelte degli altri gruppi):
-
-* compra_nuove_unità: nuove unità che si vogliono comprare dal giorno 1
-* contributo_comune_emergenza: quanto si vuole investire sulle risorse comuni da attivarsi in caso di crisi energetica. Rappresenta 
-* riserva_personale: quanto si vuole investire sulle risorse per ogni singola unità del proprio gruppo in caso di crisi energetica
-* Guadagno giornaliero: il totale dell'energia delle unità del proprio gruppo sopravvissute
-* Capitale totale: il proprio capitale accumulatosi nel tempo (consiste di guadagni e costi sottratti)
-
-## COMPUTAZIONI (semplificato citando gli steps dove avvengono)
-
-* reset-patches (energia disponibile in ogni singola cella):
-riserva-energeticsa iniziale = 50
-new-energia-amt = (riserva-energetica + rinnovo_energetico)
-energia-growth-rate_emergency = somma [contributo_comune_emergenza] di tutti i gruppi
-se is_crisi_energetica attivato:
-riserva-energetica (riserva-energetica - crisi_energetica)
-new-energia-amt = riserva-energetica + rinnovo_energetico + energia-growth-rate_emergency
-
-*  profit-units (guadagno dalle proprie unità per ogni gruppo
-my-units: unità di quel gruppo
-guadagno_giornaliero: (sum of [energia_acquisita] of my-units)
-capitale_totale: capitale_totale + guadagno_giornaliero
-capitale_totale per ogni singolo gruppo: capitale_totale + guadagno_giornaliero
-
-* invest_capital (investimento del capitale guadagnato per ogni gruppo):
-capitale_totale = capitale_totale - contributo_comune_emergenza - (riserva_personale * count my-units)
-
-
-* guadagno_giornaliero = sum(energia_acquisita) delle units
-energia_acquisita = ( riserva-energetica della cella - (energia_richiesta * consumo_individuale)), from report get-amt-eaten
-
-* guadagno totale = (guadagno giornaliero * giorno - (costo_unità * (giorno - 1))), perchè al giorno 1 viene regalato o sarebbero in capitale negativo. Ci deve essere almeno 1 unità per ciclo come nuova unità.
-
-* energia_richiesta = (round (100 / (ritmo_cicli - 1))). Con ritmo_cicli = 9: 13
-* riserva_energetica at step 1 = (riserva_energetica (50) -  energia_richiesta (13) + rinnovo_energetico = (0.1)) = 37.1 --> step 2 =  (riserva_energetica (27.1) -  energia_richiesta (13) + rinnovo_energetico = (0.1))
 
 ## HOW TO CITE
 
