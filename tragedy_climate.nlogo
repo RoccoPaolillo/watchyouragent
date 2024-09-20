@@ -54,7 +54,7 @@ farmers-own
   capitale_totale       ;; total of past revenue, minus expenses
   guadagno_giornaliero    ;; the revenue collected at the end of the last day
   contributo_comune
-  riserva_personale
+  ; riserva_personale
 
 ]
 
@@ -84,7 +84,7 @@ to setup
 ;    (word "Everyone starts with " unità_iniziali/gruppo " units.")
   hubnet-broadcast "compra_nuove_unità" 1
    hubnet-broadcast "contributo_comune" 0
-  hubnet-broadcast "riserva_personale" 0
+;  hubnet-broadcast "riserva_personale" 0
   broadcast-system-info
 end
 
@@ -178,14 +178,14 @@ ifelse muovi_unità [
   fd 1
   ][]
 
-  ifelse is_crisi_energetica [
+;  ifelse is_crisi_energetica [
   ; set riserve_unità (energia_acquisita + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
   ; ask patch-here [set ]
-    set riserve_unità [riserva_personale] of one-of farmers with [user-id = [owner#] of myself]
-  ]
-  [
-      set riserve_unità 0
-  ]
+  ;   set riserve_unità [riserva_personale] of one-of farmers with [user-id = [owner#] of myself]
+ ; ]
+ ; [
+ ;     set riserve_unità 0
+ ; ]
    ; if riserve_unità = 0 [die]
   if energia_acquisita = 0 [die]
 end
@@ -228,7 +228,7 @@ to invest_capital
     if compra_nuove_unità = 0
       [ hubnet-send user-id "Aspetta per la tua nuova mossa ..." " " ]
     send-personal-info
-    set capitale_totale (capitale_totale - contributo_comune - (riserva_personale * count my-units))
+    set capitale_totale (capitale_totale - contributo_comune ) ; - (riserva_personale * count my-units))
   ]
 end
 
@@ -504,12 +504,12 @@ to execute-command [command]
     stop
   ]
 
-   if command = "riserva_personale"
-  [
-    ask farmers with [user-id = hubnet-message-source]
-      [ set riserva_personale hubnet-message ]
-    stop
-  ]
+ ;  if command = "riserva_personale"
+  ; [
+ ;    ask farmers with [user-id = hubnet-message-source]
+ ;      [ set riserva_personale hubnet-message ]
+   ;  stop
+ ;  ]
 end
 
 to create-new-farmer [ id ]
@@ -547,7 +547,7 @@ to reset-farmers-vars  ;; farmer procedure
   set revenue-lst []
   set compra_nuove_unità 1
   set contributo_comune 0
-    set riserva_personale 0
+  ;   set riserva_personale 0
   set capitale_totale costo/nuove_unità
   set guadagno_giornaliero 0
 
@@ -943,23 +943,6 @@ muovi_unità
 -1000
 
 BUTTON
-1548
-66
-1642
-99
-show_cost
-hubnet-broadcast \"Aspetta per la tua nuova mossa ...\"\n    (word \"Adesso puoi decidere come investire il tuo capitale\")\nask farmers [hubnet-send user-id \"Questo è quanto spenderai:\" (compra_nuove_unità * costo/nuove_unità) + contributo_comune + riserva_personale]
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
 1550
 133
 1653
@@ -1218,16 +1201,6 @@ TEXTBOX
 1089
 157
 show run stop 7
-10
-0.0
-1
-
-TEXTBOX
-1022
-169
-1048
-187
-setup
 10
 0.0
 1
@@ -1652,8 +1625,8 @@ need-to-manually-make-preview-for-this-model
 VIEW
 460
 10
-880
-430
+875
+425
 0
 0
 0
@@ -1744,24 +1717,9 @@ SLIDER
 contributo_comune
 contributo_comune
 0.0
-100.0
+400.0
 0
 1.0
-1
-NIL
-HORIZONTAL
-
-SLIDER
-48
-406
-172
-439
-riserva_personale
-riserva_personale
-0.0
-100.0
-0
-0.1
 1
 NIL
 HORIZONTAL
@@ -1774,16 +1732,6 @@ MONITOR
 Voi siete il gruppo:
 NIL
 3
-1
-
-TEXTBOX
-175
-414
-244
-432
-da eliminare
-10
-0.0
 1
 
 @#$#@#$#@
