@@ -1248,7 +1248,7 @@ NIL
 * giorno = ticks mod ritmo_cicli, scatta quando ticks è multiplo di ritmo_cicli, ogni tick in un giorno, stando le condizioni sottostanti, permette il calcolo di guadagno_giornaliero
 * energia_richiesta = (round (100 / (ritmo_cicli - 1))). Con ritmo_cicli = 11: 10, sottratta alla riserva_energetica del patch, at time 0 = 50
 * guadagno_giornaliero = riserva_energetica patch-here - energia_richiesta + rinnovo_energetico. Con rinnovo_energetico = 0.1 e ritmo_cicli 11:
-(50 - 10 + 1) = (40.1 - 10 + 0.1) = (30.2 - 10 + 0.1) = (20.3 - 10 + 0.1) = (10.40 - 10 + 0.1) = sono 4 ticks in cui sottrae 10 unità = guadagno giornaliero 40
+(50 - 10 + 0.1) = (40.1 - 10 + 0.1) = (30.2 - 10 + 0.1) = (20.3 - 10 + 0.1) = (10.40 - 10 + 0.1) = sono 4 ticks in cui sottrae 10 unità = guadagno giornaliero 40
 * guadagno totale = (guadagno giornaliero * 1) + ((guadagno giornaliero * units) * (day-1)) - ((costo_unità * units) * (day-1)) - (costo_unità * (units - 1)), perchè il primo giorno c'è solo un'unità e il costo è annullato (capitale = costo unità) by default.
 
 Con 1 unità e 7 giorni con ritmo_cicli 11 e rinnovo_energetico 0.1, costo unità 10:
@@ -1265,7 +1265,7 @@ Per avere maggior controllo suggerisco il set: ritmo_ciclo 11 (40 guadagno giorn
 
 Suggerisco di lasciare consumo_energetico uguale per tutti i gruppi: se un gruppo consuma meno, di fatto ha più chance di aumentare il capitale, perchè ottiene più energia nel tempo e si riproduce più velocemente, con effetto del tempo, è più complicato (vedi slides HubNet).
 
-Qui suggerisco una strategia più semplice, senza sliders continui, con il contributo comune una tantum da dividersi tra le celle con energia < 50 e più semplice. Cambiata anche la grafica con istruzioni per gli studenti. Il contributo quale spesa è sottratto dal capitale.
+Qui suggerisco una strategia più semplice, senza sliders continui, con il contributo comune una tantum da dividersi tra le celle con energia < 50 è più semplice. Cambiata anche la grafica con istruzioni per gli studenti. Il contributo quale spesa è sottratto dal capitale.
 
 
 ## HOW TO CITE
