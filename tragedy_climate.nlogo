@@ -155,7 +155,7 @@ to go
     reset-patches
   ]
   ; ask farmers [if not any? my-units [die]]
- if not any? units [create-turtles 1 [set shape "gameover" set size 20] stop ]
+ ; if not any? units [create-turtles 1 [set shape "gameover" set size 20] stop ]
  ask farmers [if capitale_totale <= 0 [die]]
  broadcast-system-info
 ;  if giorno = 7 [stop]
