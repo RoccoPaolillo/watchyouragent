@@ -73,7 +73,7 @@ end
 ;; but does not clear already created farmers
 to setup
   ; hubnet-broadcast "Istruzioni" ""
-  if any? turtles with [shape = "gameover"] [ask turtles with [shape = "gameover"][die]]
+ ; if any? turtles with [shape = "gameover"] [ask turtles with [shape = "gameover"][die]]
   setup-globals
   setup-patches
   clear-output
