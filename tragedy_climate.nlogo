@@ -228,7 +228,7 @@ to invest_capital
     if compra_nuove_unità = 0
       [ hubnet-send user-id "Aspetta per la tua nuova mossa ..." " " ]
     send-personal-info
-    set capitale_totale (capitale_totale - contributo_comune ) ; - (riserva_personale * count my-units))
+   ; set capitale_totale (capitale_totale - contributo_comune ) ; - (riserva_personale * count my-units))
   ]
 end
 
@@ -678,7 +678,7 @@ costo/nuove_unità
 costo/nuove_unità
 1
 2000
-10.0
+11.0
 1
 1
 €
