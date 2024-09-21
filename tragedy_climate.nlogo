@@ -1189,29 +1189,32 @@ NIL
 1
 
 @#$#@#$#@
-## Calculations and strategy
+## Calculations
 
-* giorno = ticks mod ritmo_cicli, scatta quando ticks è multiplo di ritmo_cicli, ogni tick in un giorno, stando le condizioni sottostanti, permette il calcolo di guadagno_giornaliero
-* energia_richiesta = (round (100 / (ritmo_cicli - 1))). Con ritmo_cicli = 11: 10, sottratta alla riserva_energetica del patch, at time 0 = 50
-* guadagno_giornaliero = riserva_energetica patch-here - energia_richiesta + rinnovo_energetico. Con rinnovo_energetico = 0.1 e ritmo_cicli 11:
-(50 - 10 + 0.1) = (40.1 - 10 + 0.1) = (30.2 - 10 + 0.1) = (20.3 - 10 + 0.1) = (10.40 - 10 + 0.1) = sono 4 ticks in cui sottrae 10 unità = guadagno giornaliero 40
-* guadagno totale = (guadagno giornaliero * 1) + ((guadagno giornaliero * units) * (day-1)) - ((costo_unità * units) * (day-1)) - (costo_unità * (units - 1)), perchè il primo giorno c'è solo un'unità e il costo è annullato (capitale = costo unità) by default.
+* giorno = ticks mod ritmo_cicli, usa il remainder della divisione (mod): scatta quando ticks è multiplo di ritmo_cicli. All’interno di ogni giorno, si ripete l’assorbimento dell’energia_richiesta  da parte di ogni unità dalla riserva-energetica del patch (la cella nello spazio) dove si trova (patch-here). L’assorbimento continua e l’unità sopravvive intanto che riserva-energetica del patch-here > 0. Anche se l’unità muore, l’energia assorbita si somma per calcolare il guadagno_giornaliero del suo gruppo (farmer nel modello)
+
+* energia_richiesta da ogni singola unità = (round (100 / (ritmo_cicli - 1))). Con ritmo_cicli = 11: 10 unità di energia_richiesta che viene sottratta alla riserva_energetica del patch dove si trova l’unità (patch-here)
+Di default, riserva_energetica di ogni patch a tempo 0 = 50, con riserva-max =  50
+
+* guadagno_giornaliero = (riserva_energetica patch-here - energia_richiesta dall’unità) + rinnovo_energetico (costante di rigenerazione del patch, altrimenti può solo esaursi), ripetuto all’interno del giono finchè riserva-energetica patch-here > 0. 
+Con rinnovo_energetico = 0.1 e ritmo_cicli 11:
+(50 - 10 + 0.1) = (40.1 - 10 + 0.1) [10 unità acquisite] = (30.2 - 10 + 0.1) [10 unità acquisite] = (20.3 - 10 + 0.1) [10 unità  acquisite] = (10.40 - 10 + 0.1)  [10 unità acquisite] = in 1 giorno si sottraggono 10 unità di energia_richiesta dal patch 4 volte, con un guadagno giornaliero uguale a 40.
+
+* guadagno totale (capitale) = (guadagno giornaliero * 1) + ((guadagno giornaliero * units) * (day-1)) - ((costo_unità * units) * (day-1)) - (costo_unità * (units - 1)), perchè by default il modello originale impone che il primo giorno ci sia solo un'unità e il costo dell’unità del primo giorno è annullato (capitale = costo unità) per far bilanciare a zero e non iniziare con un debito.
+Con capitale < 0, il gruppo muore
 
 Con 1 unità e 7 giorni con ritmo_cicli 11 e rinnovo_energetico 0.1, costo unità 10:
 (40 + ((40 * 1) * 6)) - ((1 * 10) * 6) - (10 * (1 - 1))) = 220
 Con 4 unità e 7 giorni con ritmo_cicli 11 e rinnovo_energetico 0.1, costo unità 10:
 (40 + ((40 * 4) * 6)) - ((4 * 10) * 6) - (10 * (4 - 1)) = 730
 
-Da considerarsi che le nuove unità si collocano random nello spazio, quindi influenzate dal consumo delle altre. I valori calcolati possono alterarsi quando:
+Da considerarsi che i calcoli di queste equazioni risentono delle dinamiche del modello per cui possono variare: le nuove unità si collocano random nello spazio, quindi influenzate dal consumo energetico delle altre unità. I valori calcolati sono alterati soprattutto quando:
 - ci sono più unità e le nuove unità rischiano di cadere in una cella già esaurita
 - sono passati più giorni, quindi ci possono essere più celle esaurite
-- allo stesso modo, essendo passati più giorni le celle si rigenerano per via di rinnovo_energetico, con diversi livelli energetici da cui l'unità attinge
+- dato che le celle (patch) si rigenerano non allo stesso momento (dipendendo dalle unità che hanno attinto nel frattempo), il livello iniziale di riserva_energetica del patch da cui attingono nuove unità può essere diverso
 
-Per avere maggior controllo suggerisco il set: ritmo_ciclo 11 (40 guadagno giornaliero), bloccando a 7 giorni, massimo dare la possibilità di comprare 4 nuove unità. Testando con solo un attore. Tutto dipende da altri attori.
+Noi dobbiamo cercare di tenere quanto più controllo per avere risultati quanto più controllabili ai fini della discussione: qui con lo scenario proposto da usare nel gioco
 
-Suggerisco di lasciare consumo_energetico uguale per tutti i gruppi: se un gruppo consuma meno, di fatto ha più chance di aumentare il capitale, perchè ottiene più energia nel tempo e si riproduce più velocemente, con effetto del tempo, è più complicato (vedi slides Extra HubNet).
-
-Qui suggerisco una strategia più semplice, senza sliders continui, con il contributo comune una tantum da dividersi tra le celle con energia < 50 è più semplice. Cambiata anche la grafica con istruzioni per gli studenti. Il contributo quale spesa è sottratto dal capitale.
 
 
 ## HOW TO CITE
