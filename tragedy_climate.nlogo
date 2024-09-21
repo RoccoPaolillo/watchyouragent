@@ -1209,7 +1209,7 @@ Da considerarsi che le nuove unità si collocano random nello spazio, quindi inf
 
 Per avere maggior controllo suggerisco il set: ritmo_ciclo 11 (40 guadagno giornaliero), bloccando a 7 giorni, massimo dare la possibilità di comprare 4 nuove unità. Testando con solo un attore. Tutto dipende da altri attori.
 
-Suggerisco di lasciare consumo_energetico uguale per tutti i gruppi: se un gruppo consuma meno, di fatto ha più chance di aumentare il capitale, perchè ottiene più energia nel tempo e si riproduce più velocemente, con effetto del tempo, è più complicato (vedi slides HubNet).
+Suggerisco di lasciare consumo_energetico uguale per tutti i gruppi: se un gruppo consuma meno, di fatto ha più chance di aumentare il capitale, perchè ottiene più energia nel tempo e si riproduce più velocemente, con effetto del tempo, è più complicato (vedi slides Extra HubNet).
 
 Qui suggerisco una strategia più semplice, senza sliders continui, con il contributo comune una tantum da dividersi tra le celle con energia < 50 è più semplice. Cambiata anche la grafica con istruzioni per gli studenti. Il contributo quale spesa è sottratto dal capitale.
 
