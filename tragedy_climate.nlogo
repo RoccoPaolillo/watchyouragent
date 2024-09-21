@@ -301,30 +301,30 @@ end
 to reset-patches
   ask patches [
     let crisis_patches count patches with [riserva-energetica < energia-max]
-    ifelse is_crisi_energetica
-    [
-    set riserva-energetica (riserva-energetica - crisi_energetica)
-      if (riserva-energetica < energia-max)
-      [
-      ifelse any? units-here [
-        let new-energia-amt (riserva-energetica + rinnovo_energetico + (energia-growth-rate_emergency / crisis_patches) + sum [riserve_unità] of units-here)
-        ifelse (new-energia-amt > energia-max)
-      [ set riserva-energetica energia-max ]
-      [ set riserva-energetica new-energia-amt]
-        ]
-        [
-        let new-energia-amt (riserva-energetica + rinnovo_energetico + (energia-growth-rate_emergency / crisis_patches))
-        ifelse (new-energia-amt > energia-max)
-      [ set riserva-energetica energia-max ]
-      [ set riserva-energetica new-energia-amt]
-        ]
+;    ifelse is_crisi_energetica
+;    [
+;    set riserva-energetica (riserva-energetica - crisi_energetica)
+;      if (riserva-energetica < energia-max)
+;      [
+;      ifelse any? units-here [
+;        let new-energia-amt (riserva-energetica + rinnovo_energetico + (energia-growth-rate_emergency / crisis_patches) + sum [riserve_unità] of units-here)
+;        ifelse (new-energia-amt > energia-max)
+;      [ set riserva-energetica energia-max ]
+;      [ set riserva-energetica new-energia-amt]
+;        ]
+;        [
+;        let new-energia-amt (riserva-energetica + rinnovo_energetico + (energia-growth-rate_emergency / crisis_patches))
+;        ifelse (new-energia-amt > energia-max)
+;      [ set riserva-energetica energia-max ]
+;      [ set riserva-energetica new-energia-amt]
+;        ]
 
-    color-patches
-      ]
-    ]
+;    color-patches
+;      ]
+;    ]
 
-    [
-    set riserva-energetica (riserva-energetica)
+ ;   [
+ ;     set riserva-energetica (riserva-energetica)
 
   if (riserva-energetica < energia-max)
   [
@@ -334,7 +334,7 @@ to reset-patches
       [ set riserva-energetica new-energia-amt]
     color-patches
       ]
-    ]
+;    ]
  ]
 end
 
@@ -847,21 +847,6 @@ NIL
 1
 
 SLIDER
-1533
-207
-1670
-240
-crisi_energetica
-crisi_energetica
-0
-5
-0.0
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
 199
 97
 374
@@ -919,17 +904,6 @@ PENS
 "house" 1.0 0 -2674135 true "" "plot count units with [owner# = \"house\"]"
 "plant" 1.0 0 -11221820 true "" "plot count units with [owner# = \"plant\"]"
 "chicken" 1.0 0 -13345367 true "" "plot count units with [owner# = \"chicken\"]"
-
-SWITCH
-1533
-170
-1671
-203
-is_crisi_energetica
-is_crisi_energetica
-1
-1
--1000
 
 SWITCH
 1438
