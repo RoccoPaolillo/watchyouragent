@@ -678,7 +678,7 @@ costo/nuove_unità
 costo/nuove_unità
 1
 2000
-11.0
+10.0
 1
 1
 €
@@ -1682,7 +1682,7 @@ SLIDER
 compra_nuove_unità
 compra_nuove_unità
 0.0
-4.0
+20.0
 0
 1.0
 1
