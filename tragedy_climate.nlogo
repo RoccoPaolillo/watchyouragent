@@ -1682,7 +1682,7 @@ SLIDER
 compra_nuove_unità
 compra_nuove_unità
 0.0
-20.0
+100.0
 0
 1.0
 1
@@ -1717,7 +1717,7 @@ SLIDER
 contributo_comune
 contributo_comune
 0.0
-400.0
+1000.0
 0
 1.0
 1
