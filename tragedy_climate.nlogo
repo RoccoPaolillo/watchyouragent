@@ -172,11 +172,11 @@ to graze  ;; goat procedure
      ; [ set energia_acquisita food-max ]
   ]
 ; bloccare prossime tre linee se non si vogliono far muovere gli agenti
-ifelse muovi_unità [
-  rt (random-float 90)
-  lt (random-float 90)
-  fd 1
-  ][]
+;ifelse muovi_unità [
+;  rt (random-float 90)
+;  lt (random-float 90)
+;  fd 1
+;  ][]
 
 ;  ifelse is_crisi_energetica [
   ; set riserve_unità (energia_acquisita + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
@@ -904,34 +904,6 @@ PENS
 "house" 1.0 0 -2674135 true "" "plot count units with [owner# = \"house\"]"
 "plant" 1.0 0 -11221820 true "" "plot count units with [owner# = \"plant\"]"
 "chicken" 1.0 0 -13345367 true "" "plot count units with [owner# = \"chicken\"]"
-
-SWITCH
-1438
-251
-1563
-284
-muovi_unità
-muovi_unità
-1
-1
--1000
-
-BUTTON
-1550
-133
-1653
-166
-crisi_once
-ask patches [set riserva-energetica riserva-energetica - 20]
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 BUTTON
 989
