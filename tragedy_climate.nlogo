@@ -994,9 +994,9 @@ NIL
 BUTTON
 927
 238
-1048
+1112
 271
-step: environment crisis
+step: resources-consumption
  hubnet-broadcast \"Istruzioni\" \"OK, ma stiamo consumando le risorse dell'ambiente! Vogliamo riparare?\"
 NIL
 1
@@ -1009,11 +1009,11 @@ NIL
 1
 
 BUTTON
-1052
-239
-1181
-272
-step: contributo comune
+1121
+238
+1290
+271
+option-contributo_comune
  hubnet-broadcast \"Istruzioni\" \"Potete decidere se investire a vostre spese con contributo_comune, quanto o niente\"
 NIL
 1
@@ -1026,11 +1026,11 @@ NIL
 1
 
 BUTTON
-1018
+1102
 275
-1173
+1294
 308
-step: contributo comune calc
+contributo_comune-calculation
  hubnet-broadcast \"Istruzioni\" (word \"Potremmo salvare l'ambiente se ogni gruppo investisse \"  round (((count patches * 50) - totale_riserva-energetica) / 5)\" Euro , a voi la scelta!\")
 NIL
 1
@@ -1091,11 +1091,11 @@ TEXTBOX
 1
 
 BUTTON
-1023
-98
-1115
-131
-explore: capital
+1048
+94
+1174
+127
+capital-calculation
  hubnet-broadcast \"Istruzioni\" \"... a fine giornata, il vostro guadagno totale viene calcolato\"\n 
 NIL
 1
@@ -1110,9 +1110,9 @@ NIL
 BUTTON
 1011
 54
-1132
+1150
 87
-instruction: energy cons
+energy-consumption
  hubnet-broadcast \"Istruzioni\" \"Le unità del vostro gruppo sopravvivono assumendo risorse dal territorio dove sono...\"\n 
 NIL
 1
@@ -1127,9 +1127,9 @@ NIL
 BUTTON
 931
 97
-1017
+1039
 130
-energy: money
+energy-money
  hubnet-broadcast \"Istruzioni\" \"... le risorse consumate si trasformano nel vostro guadagno...\"\n 
 NIL
 1
@@ -1174,9 +1174,9 @@ decide, go, stop 14
 BUTTON
 936
 276
-1007
+1094
 309
-division
+contributo_comune-sum
  hubnet-broadcast \"Istruzioni\" \"I singoli contributi comuni sono sommati e divisi tra i territori esauriti\" 
 NIL
 1
