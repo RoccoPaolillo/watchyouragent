@@ -359,7 +359,6 @@ to plot-value [ name-of-plot value ]
   plot value
 end
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Calculation Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -614,10 +613,10 @@ end
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-476
-33
-921
-479
+506
+17
+951
+463
 -1
 -1
 20.81
@@ -944,10 +943,10 @@ PENS
 "" 1.0 0 -14333415 true "" "plot totale_riserva-energetica"
 
 BUTTON
-930
-161
-1019
-194
+967
+164
+1056
+197
 step: nuove unità
  hubnet-broadcast \"Istruzioni\" \"Ora che avete capito il gioco, potete decidere se comprare nuove unità\"
 NIL
@@ -961,10 +960,10 @@ NIL
 1
 
 BUTTON
-952
-15
-1083
-48
+989
+18
+1120
+51
 cleanup-istructions
  hubnet-broadcast \"Istruzioni\" \"\"
 NIL
@@ -978,10 +977,10 @@ NIL
 1
 
 BUTTON
-929
-54
-1006
-87
+966
+57
+1043
+90
 step: explore
  hubnet-broadcast \"Istruzioni\" \"Benvenuti! Prima vediamo come funziona il gioco!\"\n 
 NIL
@@ -995,10 +994,10 @@ NIL
 1
 
 BUTTON
-927
-238
-1112
-271
+965
+242
+1121
+275
 step: resources-consumption
  hubnet-broadcast \"Istruzioni\" \"OK, ma stiamo consumando le risorse dell'ambiente! Vogliamo riparare?\"
 NIL
@@ -1012,10 +1011,10 @@ NIL
 1
 
 BUTTON
-1121
-238
-1290
-271
+1129
+241
+1289
+274
 option-contributo_comune
  hubnet-broadcast \"Istruzioni\" \"Potete decidere se investire a vostre spese con contributo_comune, quanto o niente\"
 NIL
@@ -1029,10 +1028,10 @@ NIL
 1
 
 BUTTON
-1102
-275
-1294
-308
+1129
+278
+1289
+311
 contributo_comune-calculation
  hubnet-broadcast \"Istruzioni\" (word \"Potremmo salvare l'ambiente se ogni gruppo investisse \"  round (((count patches * 50) - totale_riserva-energetica) / 5)\" Euro , a voi la scelta!\")
 NIL
@@ -1048,7 +1047,7 @@ NIL
 MONITOR
 66
 445
-158
+177
 490
 risorse ambientali
 totale_riserva-energetica
@@ -1057,10 +1056,10 @@ totale_riserva-energetica
 11
 
 BUTTON
-1053
-160
-1140
-193
+1090
+163
+1177
+196
 come comprare
  hubnet-broadcast \"Istruzioni\" \"Per comprare: compra_nuove_unità, con relativo costo. Potete decidere ora!\"
 NIL
@@ -1094,10 +1093,10 @@ TEXTBOX
 1
 
 BUTTON
-1048
-94
-1174
-127
+1085
+97
+1189
+130
 capital-calculation
  hubnet-broadcast \"Istruzioni\" \"... a fine giornata, il vostro guadagno totale viene calcolato\"\n 
 NIL
@@ -1111,10 +1110,10 @@ NIL
 1
 
 BUTTON
-1011
-54
-1150
-87
+1048
+57
+1187
+90
 energy-consumption
  hubnet-broadcast \"Istruzioni\" \"Le unità del vostro gruppo sopravvivono assumendo risorse dal territorio dove sono...\"\n 
 NIL
@@ -1128,10 +1127,10 @@ NIL
 1
 
 BUTTON
-931
-97
-1039
-130
+968
+100
+1076
+133
 energy-money
  hubnet-broadcast \"Istruzioni\" \"... le risorse consumate si trasformano nel vostro guadagno...\"\n 
 NIL
@@ -1145,20 +1144,20 @@ NIL
 1
 
 TEXTBOX
-939
-139
-1089
-157
+976
+142
+1126
+160
 show run stop 7
 10
 0.0
 1
 
 TEXTBOX
-946
-208
-1043
-226
+983
+211
+1080
+229
 decide, go, stop 7
 10
 0.0
@@ -1175,10 +1174,10 @@ decide, go, stop 14
 1
 
 BUTTON
-936
-276
-1094
-309
+963
+279
+1121
+312
 contributo_comune-sum
  hubnet-broadcast \"Istruzioni\" \"I singoli contributi comuni sono sommati e divisi tra i territori esauriti\" 
 NIL
@@ -1197,8 +1196,47 @@ BUTTON
 142
 44
 show_costs
-ask farmers [\nsend-personal-info\n\n]
+ask farmers [\nsend-personal-info\n; if any? farmers with [user-id = \"viola\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"viola\"] ]\n; if any? farmers with [user-id = \"marrone\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"marrone\"] ]\n; if any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"rosso\"] ]\n; if any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"azzurro\"] ]\n; if any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"blu\"] ]\n]
 T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+240
+312
+473
+455
+Contributo comune investito
+NIL
+NIL
+0.0
+0.0
+0.0
+50.0
+true
+true
+"" ""
+PENS
+"viola" 1.0 1 -8630108 true "" "plot [contributo_comune] of one-of farmers with [user-id = \"viola\"]"
+"marrone" 1.0 1 -6459832 true "" "plot [contributo_comune] of one-of farmers with [user-id = \"marrone\"]"
+"rosso" 1.0 1 -2674135 true "" "plot [contributo_comune] of one-of farmers with [user-id = \"red\"]"
+"azzurro" 1.0 1 -11221820 true "" "plot [contributo_comune] of one-of farmers with [user-id = \"azzurro\"]"
+"blu" 1.0 1 -13345367 true "" "plot [contributo_comune] of one-of farmers with [user-id = \"blu\"]"
+
+BUTTON
+959
+408
+1104
+441
+contributo_comune_plot
+if any? farmers with [user-id = \"viola\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"viola\"] ]\nif any? farmers with [user-id = \"marrone\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"marrone\"] ]\nif any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"rosso\"] ]\nif any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"azzurro\"] ]\nif any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"blu\"] ]
+NIL
 1
 T
 OBSERVER
