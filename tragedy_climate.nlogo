@@ -568,6 +568,9 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "Voi siete il gruppo:" user-id
   hubnet-send user-id "Guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "Guadagno totale, Euro:" capitale_totale
+  hubnet-send user-id "costo nuove unità" ((unità_giornaliere * costo/nuove_unità) * 7)
+  hubnet-send user-id "costo contributo comune" contributo_comune
+  hubnet-send user-id "unità settimanali" (unità_giornaliere * 7)
 ;  hubnet-send user-id "My unit Population" count my-units
 end
 
@@ -638,9 +641,9 @@ ticks
 30.0
 
 BUTTON
-248
+271
 10
-341
+326
 43
 NIL
 go
@@ -740,9 +743,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-145
+210
 10
-243
+265
 43
 NIL
 setup
@@ -757,9 +760,9 @@ NIL
 1
 
 MONITOR
-359
+399
 10
-422
+462
 55
 Giorno
 giorno
@@ -830,10 +833,10 @@ quick-start
 11
 
 BUTTON
-37
-10
-141
-43
+150
+11
+205
+44
 login
 listen-to-clients
 T
@@ -911,7 +914,7 @@ BUTTON
 1078
 393
 rinnovo_risorse
-ask farmers [\nset capitale_totale capitale_totale - contributo_comune\nhubnet-send user-id \"Guadagno totale, Euro:\" capitale_totale\n]\n\nset refilling (sum [contributo_comune] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\nhubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
+ask farmers [\nset capitale_totale capitale_totale - contributo_comune\n; hubnet-send user-id \"Guadagno totale, Euro:\" capitale_totale\n]\n\nset refilling (sum [contributo_comune] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\nhubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
 1
 T
@@ -1179,6 +1182,23 @@ BUTTON
 contributo_comune-sum
  hubnet-broadcast \"Istruzioni\" \"I singoli contributi comuni sono sommati e divisi tra i territori esauriti\" 
 NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+76
+11
+142
+44
+show_costs
+ask farmers [\nsend-personal-info\n\n]
+T
 1
 T
 OBSERVER
