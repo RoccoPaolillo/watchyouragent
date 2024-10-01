@@ -49,7 +49,7 @@ farmers-own
 [
   user-id            ;; unique user-id, input by the client when they log in,
                      ;; to identify each student turtle
-  compra_nuove_unità   ;; desired quantity of units to purchase
+  unità_giornaliere   ;; desired quantity of units to purchase
   revenue-lst        ;; list of each days' revenue collection
   capitale_totale       ;; total of past revenue, minus expenses
   guadagno_giornaliero    ;; the revenue collected at the end of the last day
@@ -82,7 +82,7 @@ to setup
     [ reset-farmers-vars ]
 ;  hubnet-broadcast "Aspetta per la tua nuova mossa ..."
 ;    (word "Everyone starts with " unità_iniziali/gruppo " units.")
-  hubnet-broadcast "compra_nuove_unità" 1
+  hubnet-broadcast "unità_giornaliere" 1
    hubnet-broadcast "contributo_comune" 0
 ;  hubnet-broadcast "riserva_personale" 0
   broadcast-system-info
@@ -221,11 +221,11 @@ end
 to invest_capital
   ask farmers
   [
-    if compra_nuove_unità > 0
-      [ buy-units compra_nuove_unità ]
-    if compra_nuove_unità < 0
-      [ lose-units (- compra_nuove_unità) ]
-    if compra_nuove_unità = 0
+    if unità_giornaliere > 0
+      [ buy-units unità_giornaliere ]
+    if unità_giornaliere < 0
+      [ lose-units (- unità_giornaliere) ]
+    if unità_giornaliere = 0
       [ hubnet-send user-id "Aspetta per la tua nuova mossa ..." " " ]
     send-personal-info
    ; set capitale_totale (capitale_totale - contributo_comune ) ; - (riserva_personale * count my-units))
@@ -488,12 +488,12 @@ end
 
 ;; NetLogo knows what each student turtle is supposed to be
 ;; doing based on the tag sent by the node:
-;; compra_nuove_unità - determine quantity of student's desired purchase
+;; unità_giornaliere - determine quantity of student's desired purchase
 to execute-command [command]
-  if command = "compra_nuove_unità"
+  if command = "unità_giornaliere"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set compra_nuove_unità hubnet-message ]
+      [ set unità_giornaliere hubnet-message ]
     stop
   ]
 
@@ -519,7 +519,7 @@ to create-new-farmer [ id ]
     setup-farm
   ;  set-unique-color
     reset-farmers-vars
-    hubnet-send id "compra_nuove_unità" compra_nuove_unità
+    hubnet-send id "unità_giornaliere" unità_giornaliere
     send-system-info
   ]
 end
@@ -545,7 +545,7 @@ end
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
-  set compra_nuove_unità 1
+  set unità_giornaliere 1
   set contributo_comune 0
   ;   set riserva_personale 0
   set capitale_totale costo/nuove_unità
@@ -580,7 +580,7 @@ end
 to send-system-info  ;; farmer procedure
  ; hubnet-send user-id "Total guadagno_giornaliero" totale_guadagno_giornaliero
  ; hubnet-send user-id "Grass Amt" totale_riserva-energetica
-  hubnet-send user-id "Costo nuove unità, Euro:" costo/nuove_unità
+  hubnet-send user-id "€ costo unità al giorno" costo/nuove_unità
   hubnet-send user-id "Giorno" giorno
 end
 
@@ -589,7 +589,7 @@ to broadcast-system-info
 ;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
 ;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
 ;  hubnet-broadcast "Istruzioni" round (((count patches * 50) - totale_riserva-energetica) / 5)
-  hubnet-broadcast "Costo nuove unità, Euro:" costo/nuove_unità
+  hubnet-broadcast "€ costo unità al giorno" costo/nuove_unità
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -830,10 +830,10 @@ quick-start
 11
 
 BUTTON
-38
-12
-142
-45
+37
+10
+141
+43
 login
 listen-to-clients
 T
@@ -1572,9 +1572,9 @@ need-to-manually-make-preview-for-this-model
 @#$#@#$#@
 @#$#@#$#@
 VIEW
-460
+515
 10
-875
+930
 425
 0
 0
@@ -1604,11 +1604,11 @@ NIL
 1
 
 MONITOR
-243
-205
-386
-254
-Costo nuove unità, Euro:
+17
+218
+169
+267
+€ costo unità al giorno
 NIL
 3
 1
@@ -1624,12 +1624,12 @@ NIL
 1
 
 SLIDER
-33
-213
-233
-246
-compra_nuove_unità
-compra_nuove_unità
+15
+269
+167
+302
+unità_giornaliere
+unità_giornaliere
 0.0
 100.0
 0
@@ -1659,10 +1659,10 @@ NIL
 1
 
 SLIDER
-34
-294
-249
-327
+19
+348
+234
+381
 contributo_comune
 contributo_comune
 0.0
@@ -1679,6 +1679,46 @@ MONITOR
 120
 59
 Voi siete il gruppo:
+NIL
+3
+1
+
+TEXTBOX
+330
+215
+480
+233
+Questa settimana spenderete
+10
+0.0
+1
+
+MONITOR
+350
+242
+455
+291
+costo nuove unità
+NIL
+3
+1
+
+MONITOR
+340
+302
+466
+351
+costo contributo comune
+NIL
+3
+1
+
+MONITOR
+173
+217
+259
+266
+unità settimanali
 NIL
 3
 1
