@@ -865,10 +865,10 @@ NIL
 HORIZONTAL
 
 PLOT
-7
-157
-236
-307
+6
+158
+235
+308
 Capitale Totale
 NIL
 NIL
@@ -891,7 +891,7 @@ PLOT
 157
 471
 307
-Numero mucche
+Numero mucche giornaliero
 NIL
 NIL
 0.0
@@ -926,10 +926,10 @@ NIL
 1
 
 PLOT
-19
+7
 309
-279
-459
+236
+456
 Risorse Ambientali
 NIL
 NIL
@@ -941,7 +941,7 @@ true
 true
 "" ""
 PENS
-"Risorse totali " 1.0 0 -16777216 true "" "plot totale_riserva-energetica"
+"" 1.0 0 -14333415 true "" "plot totale_riserva-energetica"
 
 BUTTON
 930
@@ -1046,10 +1046,10 @@ NIL
 1
 
 MONITOR
-312
-325
-420
-370
+66
+445
+158
+490
 risorse ambientali
 totale_riserva-energetica
 2
