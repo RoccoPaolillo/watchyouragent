@@ -566,7 +566,7 @@ end
 to send-personal-info  ;; farmer procedure
  ; hubnet-send user-id "My unit Color" (color->string color)
   hubnet-send user-id "Voi siete il gruppo:" user-id
-  hubnet-send user-id "Guadagno giornaliero" guadagno_giornaliero
+  hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "€ guadagno totale" capitale_totale
   hubnet-send user-id "costo nuove unità" ((unità_giornaliere * costo/nuove_unità) * 7)
   hubnet-send user-id "costo contributo comune" contributo_comune
@@ -1616,9 +1616,9 @@ VIEW
 MONITOR
 95
 129
-221
+230
 178
-Guadagno giornaliero
+€ guadagno giornaliero
 NIL
 3
 1
