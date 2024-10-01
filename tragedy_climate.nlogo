@@ -49,7 +49,7 @@ farmers-own
 [
   user-id            ;; unique user-id, input by the client when they log in,
                      ;; to identify each student turtle
-  unità_giornaliere   ;; desired quantity of units to purchase
+  numero_mucche_giornaliero   ;; desired quantity of units to purchase
   revenue-lst        ;; list of each days' revenue collection
   capitale_totale       ;; total of past revenue, minus expenses
   guadagno_giornaliero    ;; the revenue collected at the end of the last day
@@ -221,11 +221,11 @@ end
 to invest_capital
   ask farmers
   [
-    if unità_giornaliere > 0
-      [ buy-units unità_giornaliere ]
-    if unità_giornaliere < 0
-      [ lose-units (- unità_giornaliere) ]
-    if unità_giornaliere = 0
+    if numero_mucche_giornaliero > 0
+      [ buy-units numero_mucche_giornaliero ]
+    if numero_mucche_giornaliero < 0
+      [ lose-units (- numero_mucche_giornaliero) ]
+    if numero_mucche_giornaliero = 0
       [ hubnet-send user-id "Aspetta per la tua nuova mossa ..." " " ]
     send-personal-info
    ; set capitale_totale (capitale_totale - contributo_comune ) ; - (riserva_personale * count my-units))
@@ -488,12 +488,12 @@ end
 
 ;; NetLogo knows what each student turtle is supposed to be
 ;; doing based on the tag sent by the node:
-;; unità_giornaliere - determine quantity of student's desired purchase
+;; numero_mucche_giornaliero - determine quantity of student's desired purchase
 to execute-command [command]
-  if command = "unità_giornaliere"
+  if command = "numero_mucche_giornaliero"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set unità_giornaliere hubnet-message ]
+      [ set numero_mucche_giornaliero hubnet-message ]
     stop
   ]
 
@@ -519,7 +519,7 @@ to create-new-farmer [ id ]
     setup-farm
   ;  set-unique-color
     reset-farmers-vars
-    hubnet-send id "unità_giornaliere" unità_giornaliere
+    hubnet-send id "numero_mucche_giornaliero" numero_mucche_giornaliero
     send-system-info
   ]
 end
@@ -545,7 +545,7 @@ end
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
-  set unità_giornaliere 1
+  set numero_mucche_giornaliero 1
   set contributo_comune 0
   ;   set riserva_personale 0
   set capitale_totale costo/nuove_unità
@@ -568,9 +568,9 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "Voi siete il gruppo:" user-id
   hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "€ guadagno totale" capitale_totale
-  hubnet-send user-id "costo settimanale mucche" ((unità_giornaliere * costo/nuove_unità) * 7)
+  hubnet-send user-id "costo settimanale mucche" ((numero_mucche_giornaliero * costo/nuove_unità) * 7)
   hubnet-send user-id "costo contributo comune" contributo_comune
-  hubnet-send user-id "totale mucche settimana" (unità_giornaliere * 7)
+  hubnet-send user-id "totale mucche settimana" (numero_mucche_giornaliero * 7)
 ;  hubnet-send user-id "My unit Population" count my-units
 end
 
