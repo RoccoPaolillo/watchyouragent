@@ -99,9 +99,9 @@ to setup-globals
   set energia_richiesta (round (100 / (ritmo_cicli - 1)))
 
 ;  set colori      [ white   gray   orange   brown    yellow    turquoise
-;                    cyan    sky    blue     violet   magenta   pink ]
+;                    cyan    sky    blu     violet   magenta   pink ]
 ;  set nomi-colori ["white" "gray" "orange" "brown"  "yellow"  "turquoise"
-;                   "cyan"  "sky"  "blue"   "violet" "magenta" "pink"]
+;                   "cyan"  "sky"  "blu"   "violet" "magenta" "pink"]
 ;  set colori-usati []
 ;  set numero-colori length colori
   set n/a "n/a"
@@ -291,7 +291,7 @@ to setup-units [ farmer# ]  ;; turtle procedure
   if owner# = "viola" [set shape "cow" set color violet]
   if owner# = "marrone" [set shape "cow" set color brown]
   if owner# = "rosso" [set shape "cow" set color red]
-  if owner# = "blue" [set shape "cow" set color blue]
+  if owner# = "blu" [set shape "cow" set color blue]
   set energia_acquisita 0
   set riserve_unità 0
   show-turtle
@@ -396,7 +396,7 @@ to-report consumo_individuale
   if owner# = "viola" [report 1]
   if owner# = "marrone" [report 1]
   if owner# = "rosso" [report 1]
-  if owner# = "blue" [report 1]
+  if owner# = "blu" [report 1]
 end
 
 
@@ -865,9 +865,9 @@ NIL
 HORIZONTAL
 
 PLOT
-6
+7
 157
-235
+236
 307
 Capitale Totale
 NIL
@@ -880,18 +880,18 @@ true
 true
 "" ""
 PENS
-"car" 1.0 0 -8630108 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"car\"]"
-"cow" 1.0 0 -6459832 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"cow\"]"
-"house" 1.0 0 -2674135 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"house\"]"
-"plant" 1.0 0 -11221820 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"plant\"]"
-"chicken" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"chicken\"]"
+"viola" 1.0 0 -8630108 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"viola\"]"
+"marrone" 1.0 0 -6459832 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"marrone\"]"
+"rosso" 1.0 0 -2674135 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"rosso\"]"
+"azzurro" 1.0 0 -11221820 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"azzurro\"]"
+"blu" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
 244
 157
 471
 307
-Unità
+Numero mucche
 NIL
 NIL
 0.0
@@ -902,11 +902,11 @@ true
 true
 "" ""
 PENS
-"car" 1.0 0 -8630108 true "" "plot count units with [owner# = \"car\"]"
-"cow" 1.0 0 -6459832 true "" "plot count units with [owner# = \"cow\"]"
-"house" 1.0 0 -2674135 true "" "plot count units with [owner# = \"house\"]"
-"plant" 1.0 0 -11221820 true "" "plot count units with [owner# = \"plant\"]"
-"chicken" 1.0 0 -13345367 true "" "plot count units with [owner# = \"chicken\"]"
+"viola" 1.0 0 -8630108 true "" "plot count units with [owner# = \"viola\"]"
+"marrone" 1.0 0 -6459832 true "" "plot count units with [owner# = \"marrone\"]"
+"rosso" 1.0 0 -2674135 true "" "plot count units with [owner# = \"rosso\"]"
+"azzurro" 1.0 0 -11221820 true "" "plot count units with [owner# = \"azzurro\"]"
+"blu" 1.0 0 -13345367 true "" "plot count units with [owner# = \"blu\"]"
 
 BUTTON
 989
@@ -1192,7 +1192,7 @@ NIL
 1
 
 BUTTON
-76
+51
 11
 142
 44
