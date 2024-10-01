@@ -82,7 +82,7 @@ to setup
     [ reset-farmers-vars ]
 ;  hubnet-broadcast "Aspetta per la tua nuova mossa ..."
 ;    (word "Everyone starts with " unità_iniziali/gruppo " units.")
-  hubnet-broadcast "unità_giornaliere" 1
+  hubnet-broadcast "numero_mucche_giornaliero" 1
    hubnet-broadcast "contributo_comune" 0
 ;  hubnet-broadcast "riserva_personale" 0
   broadcast-system-info
