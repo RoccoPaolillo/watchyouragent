@@ -568,9 +568,9 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "Voi siete il gruppo:" user-id
   hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "€ guadagno totale" capitale_totale
-  hubnet-send user-id "costo nuove unità" ((unità_giornaliere * costo/nuove_unità) * 7)
+  hubnet-send user-id "costo settimanale mucche" ((unità_giornaliere * costo/nuove_unità) * 7)
   hubnet-send user-id "costo contributo comune" contributo_comune
-  hubnet-send user-id "unità settimanali" (unità_giornaliere * 7)
+  hubnet-send user-id "totale mucche settimana" (unità_giornaliere * 7)
 ;  hubnet-send user-id "My unit Population" count my-units
 end
 
@@ -583,7 +583,7 @@ end
 to send-system-info  ;; farmer procedure
  ; hubnet-send user-id "Total guadagno_giornaliero" totale_guadagno_giornaliero
  ; hubnet-send user-id "Grass Amt" totale_riserva-energetica
-  hubnet-send user-id "€ costo unità al giorno" costo/nuove_unità
+  hubnet-send user-id "€ costo giornaliero mucche" costo/nuove_unità
   hubnet-send user-id "Giorno" giorno
 end
 
@@ -592,7 +592,7 @@ to broadcast-system-info
 ;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
 ;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
 ;  hubnet-broadcast "Istruzioni" round (((count patches * 50) - totale_riserva-energetica) / 5)
-  hubnet-broadcast "€ costo unità al giorno" costo/nuove_unità
+  hubnet-broadcast "€ costo giornaliero mucche" costo/nuove_unità
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -1626,9 +1626,9 @@ NIL
 MONITOR
 17
 218
-169
+172
 267
-€ costo unità al giorno
+€ costo giornaliero mucche
 NIL
 3
 1
@@ -1644,12 +1644,12 @@ NIL
 1
 
 SLIDER
-15
-269
-167
-302
-unità_giornaliere
-unità_giornaliere
+20
+293
+234
+326
+numero_mucche_giornaliero
+numero_mucche_giornaliero
 1.0
 100.0
 0
@@ -1704,9 +1704,9 @@ NIL
 1
 
 TEXTBOX
-330
+347
 215
-480
+497
 233
 Questa settimana spenderete
 10
@@ -1714,19 +1714,19 @@ Questa settimana spenderete
 1
 
 MONITOR
-350
+338
 242
-455
+483
 291
-costo nuove unità
+costo settimanale mucche
 NIL
 3
 1
 
 MONITOR
-340
+339
 302
-466
+483
 351
 costo contributo comune
 NIL
@@ -1734,11 +1734,11 @@ NIL
 1
 
 MONITOR
-173
+177
 217
-259
+311
 266
-unità settimanali
+totale mucche settimana
 NIL
 3
 1
