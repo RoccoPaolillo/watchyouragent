@@ -287,7 +287,7 @@ to setup-units [ farmer# ]  ;; turtle procedure
   set breed units
   setxy random-xcor random-ycor
   set owner# farmer#
-  if owner# = "azzurro" [set shape "cow" set color cyan]
+  if owner# = "azzurro" [set shape "cow"   color cyan]
   if owner# = "viola" [set shape "cow" set color violet]
   if owner# = "marrone" [set shape "cow" set color brown]
   if owner# = "rosso" [set shape "cow" set color red]
