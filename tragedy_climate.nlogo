@@ -64,7 +64,7 @@ farmers-own
 ;;;;;;;;;;;;;;;;;;;;;
 
 to startup
-  setup-quick-start
+;  setup-quick-start
   hubnet-reset
   setup
 end
@@ -149,7 +149,7 @@ to go
       ask farmers
         [ profit-units ]
       invest_capital ;; toene buy units
-      plot-graph
+ ;      plot-graph
     ]
 
     reset-patches
@@ -349,9 +349,9 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; plots the graph of the system
-to plot-graph
-  plot-value "Guadagno medio" guadagno_medio
-end
+; to plot-graph
+;   plot-value "Guadagno medio" guadagno_medio
+; end
 
 ;; plot value on the plot called name-of-plot
 to plot-value [ name-of-plot value ]
@@ -405,47 +405,47 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; instructions to quickly setup the model, and clients to run this activity
-to setup-quick-start
-  set qs-item 0
-  set qs-items
-  [
-    "Teacher: Follow these directions to run the HubNet activity."
-      "Optional: Zoom In (see Tools in the Menu Bar)"
-      "Optional: Change any of the settings...."
-      "If you do change the settings, press the SETUP button."
-      "Press the LOGIN button to allow people to login."
-      "Everyone: Open up a HubNet Client on your machine and..."
-        "type your user name, select this activity and press ENTER."
+; to setup-quick-start
+;   set qs-item 0
+;   set qs-items
+;   [
+;     "Teacher: Follow these directions to run the HubNet activity."
+;       "Optional: Zoom In (see Tools in the Menu Bar)"
+;       "Optional: Change any of the settings...."
+;       "If you do change the settings, press the SETUP button."
+;        "Press the LOGIN button to allow people to login."
+;       "Everyone: Open up a HubNet Client on your machine and..."
+ ;        "type your user name, select this activity and press ENTER."
 
-    "Teacher: Once everyone has logged in,..."
-        "turn off the LOGIN button by pressing it again."
-      "Have the students acquaint themselves with the information..."
-        "available to them in the monitors, buttons, and sliders."
-      "Then press the GO button to start the simulation."
-      "Please note that you may adjust the length of time..."
-        "GRAZING-PERIOD, that units are allowed to graze each day."
-      "For a quicker demonstration, reduce the..."
-        "GRASS-GROWTH-RATE slider."
-      "To curb buying incentives of the students, increase..."
-        "the COSTO/ITEM slider."
-      "Any of the above mentioned parameters - ..."
-        "GRAZING-PERIOD, GRASS-GROWTH-RATE, and COSTO/ITEM -..."
-        "may be altered without stopping the simulation."
+;     "Teacher: Once everyone has logged in,..."
+;         "turn off the LOGIN button by pressing it again."
+;       "Have the students acquaint themselves with the information..."
+;         "available to them in the monitors, buttons, and sliders."
+;        "Then press the GO button to start the simulation."
+;       "Please note that you may adjust the length of time..."
+;           "GRAZING-PERIOD, that units are allowed to graze each day."
+;       "For a quicker demonstration, reduce the..."
+;         "GRASS-GROWTH-RATE slider."
+;      "To curb buying incentives of the students, increase..."
+;        "the COSTO/ITEM slider."
+;       "Any of the above mentioned parameters - ..."
+;         "GRAZING-PERIOD, GRASS-GROWTH-RATE, and COSTO/ITEM -..."
+;         "may be altered without stopping the simulation."
 
-    "Teacher: To run the activity again with the same group,..."
-        "stop the model by pressing the GO button, if it is on."
-        "Change any of the settings that you would like."
-      "Press the SETUP button."
+;     "Teacher: To run the activity again with the same group,..."
+;         "stop the model by pressing the GO button, if it is on."
+;         "Change any of the settings that you would like."
+;       "Press the SETUP button."
 
-    "Teacher: Restart the simulation by pressing the GO button again."
+;     "Teacher: Restart the simulation by pressing the GO button again."
 
-    "Teacher: To start the simulation over with a new group,..."
-        "stop the model by pressing the GO button if it is on..."
-        "press the RESET button in the Control Center"
-        "and follow these instructions again from the beginning."
-  ]
-  set quick-start (item qs-item qs-items)
-end
+;      "Teacher: To start the simulation over with a new group,..."
+;          "stop the model by pressing the GO button if it is on..."
+;          "press the RESET button in the Control Center"
+;            "and follow these instructions again from the beginning."
+;    ]
+;    set quick-start (item qs-item qs-items)
+;  end
 
 ;; view the next item in the quickstart monitor
 to view-next
@@ -686,46 +686,6 @@ costo/nuove_unità
 €
 HORIZONTAL
 
-MONITOR
-1308
-230
-1406
-275
-Avg-Revenue
-guadagno_medio
-1
-1
-11
-
-PLOT
-1305
-52
-1520
-220
-Guadagno medio
-Day
-Revenue
-0.0
-20.0
-0.0
-1000.0
-true
-false
-"" ""
-PENS
-"" 1.0 0 -16777216 true "" ""
-
-MONITOR
-1309
-297
-1444
-342
-Guadagno attuale (all)
-totale_guadagno_giornaliero
-0
-1
-11
-
 SLIDER
 14
 58
@@ -766,68 +726,6 @@ MONITOR
 Giorno
 giorno
 3
-1
-11
-
-BUTTON
-1291
-10
-1409
-43
-Reset Instructions
-setup-quick-start
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1493
-10
-1577
-43
-NEXT >>>
-view-next
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1415
-10
-1493
-43
-<<< PREV
-view-prev
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-MONITOR
-1311
-353
-1731
-398
-Quick Start Instructions- More in Info Window
-quick-start
-0
 1
 11
 
