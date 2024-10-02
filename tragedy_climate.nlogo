@@ -536,10 +536,10 @@ NIL
 HORIZONTAL
 
 PLOT
-6
-159
-235
-309
+4
+139
+233
+289
 Capitale Totale
 NIL
 NIL
@@ -558,10 +558,10 @@ PENS
 "blu" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
-244
-157
-471
-307
+238
+137
+469
+287
 Numero mucche giornaliero
 NIL
 NIL
@@ -597,10 +597,10 @@ NIL
 1
 
 PLOT
-7
-309
-236
-456
+5
+289
+234
+436
 Risorse Ambientali
 NIL
 NIL
@@ -717,10 +717,10 @@ NIL
 1
 
 MONITOR
-66
-445
-177
-490
+64
+425
+175
+470
 risorse ambientali
 totale_riserva-energetica
 2
@@ -880,10 +880,10 @@ NIL
 1
 
 PLOT
-240
-312
-473
-455
+254
+292
+487
+435
 Contributo comune investito
 NIL
 NIL
@@ -902,10 +902,10 @@ PENS
 "blu" 1.0 1 -13345367 true "" "plot [contributo_comune] of one-of farmers with [user-id = \"blu\"]"
 
 BUTTON
-959
-408
-1104
-441
+1003
+407
+1148
+440
 contributo_comune_plot
 if any? farmers with [user-id = \"viola\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"viola\"] ]\nif any? farmers with [user-id = \"marrone\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"marrone\"] ]\nif any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"rosso\"] ]\nif any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"azzurro\"] ]\nif any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"blu\"] ]
 NIL
@@ -917,6 +917,61 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+237
+424
+287
+469
+viola
+[contributo_comune] of one-of farmers with [user-id = \"viola\"]
+2
+1
+11
+
+MONITOR
+285
+424
+340
+469
+marrone
+[contributo_comune] of one-of farmers with [user-id = \"marrone\"]
+2
+1
+11
+
+MONITOR
+339
+424
+391
+469
+rosso
+[contributo_comune] of one-of farmers with [user-id = \"rosso\"]
+2
+1
+11
+
+MONITOR
+391
+424
+441
+469
+azzurro
+[contributo_comune] of one-of farmers with [user-id = \"azzurro\"]
+2
+1
+11
+
+MONITOR
+440
+424
+497
+469
+blu
+[contributo_comune] of one-of farmers with [user-id = \"blu\"]
+2
+1
+11
 
 @#$#@#$#@
 ## Calculations
