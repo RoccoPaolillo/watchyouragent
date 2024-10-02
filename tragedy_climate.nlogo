@@ -390,10 +390,10 @@ end
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-506
-17
-951
-463
+527
+22
+972
+468
 -1
 -1
 20.81
@@ -434,10 +434,10 @@ NIL
 1
 
 SLIDER
-13
-96
-187
-129
+1285
+142
+1415
+175
 unità_iniziali/gruppo
 unità_iniziali/gruppo
 0
@@ -449,10 +449,10 @@ unità
 HORIZONTAL
 
 SLIDER
-198
-61
-373
-94
+1285
+29
+1414
+62
 costo/nuove_unità
 costo/nuove_unità
 1
@@ -464,10 +464,10 @@ costo/nuove_unità
 HORIZONTAL
 
 SLIDER
-14
-58
-187
-91
+1285
+104
+1415
+137
 ritmo_cicli
 ritmo_cicli
 2
@@ -524,10 +524,10 @@ NIL
 1
 
 SLIDER
-199
-97
-374
-130
+1286
+65
+1416
+98
 rinnovo_energetico
 rinnovo_energetico
 0
@@ -539,10 +539,10 @@ NIL
 HORIZONTAL
 
 PLOT
-4
-139
-233
-289
+2
+62
+264
+239
 Capitale Totale
 NIL
 NIL
@@ -561,10 +561,10 @@ PENS
 "blu" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
-238
-137
-469
-287
+265
+62
+518
+239
 Numero mucche giornaliero
 NIL
 NIL
@@ -583,10 +583,10 @@ PENS
 "blu" 1.0 0 -13345367 true "" "plot count units with [owner# = \"blu\"]"
 
 BUTTON
-989
-360
-1078
-393
+1053
+362
+1142
+395
 rinnovo_risorse
 ask farmers [\nset capitale_totale capitale_totale - contributo_comune\n; hubnet-send user-id \"Guadagno totale, Euro:\" capitale_totale\n]\n\nset refilling (sum [contributo_comune] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\nhubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
@@ -600,10 +600,10 @@ NIL
 1
 
 PLOT
-5
-289
-234
-436
+4
+244
+265
+416
 Risorse Ambientali
 NIL
 NIL
@@ -618,10 +618,10 @@ PENS
 "" 1.0 0 -14333415 true "" "plot totale_riserva-energetica"
 
 BUTTON
-967
-164
-1056
-197
+1031
+166
+1120
+199
 step: nuove unità
  hubnet-broadcast \"Istruzioni\" \"Ora che avete capito il gioco, potete decidere se comprare nuove unità\"
 NIL
@@ -635,10 +635,10 @@ NIL
 1
 
 BUTTON
-989
-18
-1120
-51
+1053
+20
+1184
+53
 cleanup-istructions
  hubnet-broadcast \"Istruzioni\" \"\"
 NIL
@@ -652,10 +652,10 @@ NIL
 1
 
 BUTTON
-966
-57
-1043
-90
+1030
+59
+1107
+92
 step: explore
  hubnet-broadcast \"Istruzioni\" \"Benvenuti! Prima vediamo come funziona il gioco!\"\n 
 NIL
@@ -669,10 +669,10 @@ NIL
 1
 
 BUTTON
-965
-242
-1121
-275
+1029
+244
+1185
+277
 step: resources-consumption
  hubnet-broadcast \"Istruzioni\" \"OK, ma stiamo consumando le risorse dell'ambiente! Vogliamo riparare?\"
 NIL
@@ -686,10 +686,10 @@ NIL
 1
 
 BUTTON
-1129
-241
-1289
-274
+1193
+243
+1353
+276
 option-contributo_comune
  hubnet-broadcast \"Istruzioni\" \"Potete decidere se investire a vostre spese con contributo_comune, quanto o niente\"
 NIL
@@ -703,10 +703,10 @@ NIL
 1
 
 BUTTON
-1129
-278
-1289
-311
+1193
+280
+1353
+313
 contributo_comune-calculation
  hubnet-broadcast \"Istruzioni\" (word \"Potremmo salvare l'ambiente se ogni gruppo investisse \"  round (((count patches * 50) - totale_riserva-energetica) / 5)\" Euro , a voi la scelta!\")
 NIL
@@ -720,10 +720,10 @@ NIL
 1
 
 MONITOR
-64
-425
-175
-470
+78
+385
+189
+430
 risorse ambientali
 totale_riserva-energetica
 2
@@ -731,10 +731,10 @@ totale_riserva-energetica
 11
 
 BUTTON
-1090
-163
-1177
-196
+1154
+165
+1241
+198
 come comprare
  hubnet-broadcast \"Istruzioni\" \"Per comprare: compra_nuove_unità, con relativo costo. Potete decidere ora!\"
 NIL
@@ -748,30 +748,30 @@ NIL
 1
 
 TEXTBOX
-951
-360
-985
-385
+1015
+362
+1049
+387
 >>
 20
 0.0
 1
 
 TEXTBOX
-1085
-362
-1128
-387
+1149
+364
+1192
+389
 <<
 20
 0.0
 1
 
 BUTTON
-1085
-97
-1189
-130
+1149
+99
+1253
+132
 capital-calculation
  hubnet-broadcast \"Istruzioni\" \"... a fine giornata, il vostro guadagno totale viene calcolato\"\n 
 NIL
@@ -785,10 +785,10 @@ NIL
 1
 
 BUTTON
-1048
-57
-1187
-90
+1112
+59
+1251
+92
 energy-consumption
  hubnet-broadcast \"Istruzioni\" \"Le unità del vostro gruppo sopravvivono assumendo risorse dal territorio dove sono...\"\n 
 NIL
@@ -802,10 +802,10 @@ NIL
 1
 
 BUTTON
-968
-100
-1076
-133
+1032
+102
+1140
+135
 energy-money
  hubnet-broadcast \"Istruzioni\" \"... le risorse consumate si trasformano nel vostro guadagno...\"\n 
 NIL
@@ -819,40 +819,40 @@ NIL
 1
 
 TEXTBOX
-976
-142
-1126
-160
+1040
+144
+1190
+162
 show run stop 7
 10
 0.0
 1
 
 TEXTBOX
-983
-211
-1080
-229
+1047
+213
+1144
+231
 decide, go, stop 7
 10
 0.0
 1
 
 TEXTBOX
-973
-333
-1123
-351
+1037
+335
+1187
+353
 decide, go, stop 14
 10
 0.0
 1
 
 BUTTON
-963
-279
-1121
-312
+1027
+281
+1185
+314
 contributo_comune-sum
  hubnet-broadcast \"Istruzioni\" \"I singoli contributi comuni sono sommati e divisi tra i territori esauriti\" 
 NIL
@@ -883,10 +883,10 @@ NIL
 1
 
 PLOT
-254
-292
-487
-435
+268
+245
+518
+390
 Contributo comune investito
 NIL
 NIL
@@ -905,10 +905,10 @@ PENS
 "blu" 1.0 1 -13345367 true "" "plot [contributo_comune] of one-of farmers with [user-id = \"blu\"]"
 
 BUTTON
-1003
-407
-1148
-440
+1067
+409
+1212
+442
 contributo_comune_plot
 if any? farmers with [user-id = \"viola\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"viola\"] ]\nif any? farmers with [user-id = \"marrone\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"marrone\"] ]\nif any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"rosso\"] ]\nif any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"azzurro\"] ]\nif any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"blu\"] ]
 NIL
@@ -922,10 +922,10 @@ NIL
 1
 
 MONITOR
-237
-424
-287
-469
+261
+383
+311
+428
 viola
 [contributo_comune] of one-of farmers with [user-id = \"viola\"]
 2
@@ -933,10 +933,10 @@ viola
 11
 
 MONITOR
-285
-424
-340
-469
+309
+383
+364
+428
 marrone
 [contributo_comune] of one-of farmers with [user-id = \"marrone\"]
 2
@@ -944,10 +944,10 @@ marrone
 11
 
 MONITOR
-339
-424
-391
-469
+363
+383
+415
+428
 rosso
 [contributo_comune] of one-of farmers with [user-id = \"rosso\"]
 2
@@ -955,10 +955,10 @@ rosso
 11
 
 MONITOR
-391
-424
-441
-469
+415
+383
+465
+428
 azzurro
 [contributo_comune] of one-of farmers with [user-id = \"azzurro\"]
 2
@@ -966,15 +966,25 @@ azzurro
 11
 
 MONITOR
-440
-424
-497
-469
+464
+383
+521
+428
 blu
 [contributo_comune] of one-of farmers with [user-id = \"blu\"]
 2
 1
 11
+
+TEXTBOX
+194
+462
+326
+540
+Nomi dei gruppi da inserire:\nviola\nmarrone\nrosso\nazzurro\nblue
+10
+0.0
+1
 
 @#$#@#$#@
 ## Calculations
@@ -1482,10 +1492,10 @@ NIL
 1
 
 MONITOR
-286
-339
-423
-388
+280
+356
+417
+405
 € costi settimanali totale
 NIL
 3
@@ -1502,12 +1512,12 @@ NIL
 1
 
 TEXTBOX
-278
-302
-451
-337
-Ricordate: potete spendere entro il vostro € guadagno totale!
-10
+281
+290
+435
+348
+Questo è quanto spendereste per una settimana: \nRicordate di spendere entro il vostro € guadagno totale!
+11
 0.0
 1
 
