@@ -31,7 +31,7 @@ farmers-own
 [
   user-id            ;; unique user-id, input by the client when they log in,
                      ;; to identify each student turtle
-  numero_mucche_giornaliero   ;; desired quantity of units to purchase
+  numero_mucche_settimanale   ;; desired quantity of units to purchase
   revenue-lst        ;; list of each days' revenue collection
   capitale_totale       ;; total of past revenue, minus expenses
   guadagno_giornaliero    ;; the revenue collected at the end of the last day
@@ -57,7 +57,7 @@ to setup
   clear-all-plots
   ask farmers
     [ reset-farmers-vars ]
-  hubnet-broadcast "numero_mucche_giornaliero" 1
+  hubnet-broadcast "numero_mucche_settimanale" 7
    hubnet-broadcast "contributo_comune" 0
   broadcast-system-info
 end
@@ -165,10 +165,10 @@ end
 to invest_capital
   ask farmers
   [
-    if numero_mucche_giornaliero > 0
-      [ buy-units numero_mucche_giornaliero ]
-    if numero_mucche_giornaliero < 0
-      [ lose-units (- numero_mucche_giornaliero) ]
+    if numero_mucche_settimanale > 0
+      [ buy-units (numero_mucche_settimanale / 7) ]
+    if numero_mucche_settimanale < 0
+      [ lose-units (- numero_mucche_settimanale / 7) ]
     send-personal-info
   ]
 end
@@ -292,12 +292,12 @@ end
 
 ;; NetLogo knows what each student turtle is supposed to be
 ;; doing based on the tag sent by the node:
-;; numero_mucche_giornaliero - determine quantity of student's desired purchase
+;; numero_mucche_settimanale - determine quantity of student's desired purchase
 to execute-command [command]
-  if command = "numero_mucche_giornaliero"
+  if command = "numero_mucche_settimanale"
   [
     ask farmers with [user-id = hubnet-message-source]
-      [ set numero_mucche_giornaliero hubnet-message ]
+      [ set numero_mucche_settimanale hubnet-message ]
     stop
   ]
 
@@ -316,7 +316,7 @@ to create-new-farmer [ id ]
     set user-id id
     setup-farm
     reset-farmers-vars
-    hubnet-send id "numero_mucche_giornaliero" numero_mucche_giornaliero
+    hubnet-send id "numero_mucche_settimanale" numero_mucche_settimanale
     send-system-info
   ]
 end
@@ -332,7 +332,7 @@ end
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
-  set numero_mucche_giornaliero 1
+  set numero_mucche_settimanale 7
   set contributo_comune 0
   set capitale_totale costo/nuove_unità
   set guadagno_giornaliero 0
@@ -353,20 +353,20 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "Voi siete il gruppo:" user-id
   hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "€ guadagno totale" capitale_totale
-  hubnet-send user-id "costo settimanale mucche" ((numero_mucche_giornaliero * costo/nuove_unità) * 7)
-  hubnet-send user-id "costo contributo comune" contributo_comune
-  hubnet-send user-id "totale mucche settimana" (numero_mucche_giornaliero * 7)
+;  hubnet-send user-id "costo settimanale mucche" ((numero_mucche_settimanale * costo/nuove_unità))
+;  hubnet-send user-id "costo contributo comune" contributo_comune
+;  hubnet-send user-id "totale mucche settimana" (numero_mucche_settimanale)
 end
 
 ;; sends the appropriate monitor information back to one client
 to send-system-info  ;; farmer procedure
-  hubnet-send user-id "€ costo giornaliero mucche" costo/nuove_unità
+  hubnet-send user-id "€ costo settimanale mucche" costo/nuove_unità
   hubnet-send user-id "Giorno" giorno
 end
 
 ;; broadcasts the appropriate monitor information back to all clients
 to broadcast-system-info
-  hubnet-broadcast "€ costo giornaliero mucche" costo/nuove_unità
+  hubnet-broadcast "€ costo settimanale mucche" costo/nuove_unità
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -1391,9 +1391,9 @@ NIL
 MONITOR
 17
 218
-172
+176
 267
-€ costo giornaliero mucche
+€ costo settimanale mucche
 NIL
 3
 1
@@ -1413,12 +1413,12 @@ SLIDER
 293
 234
 326
-numero_mucche_giornaliero
-numero_mucche_giornaliero
-1.0
-100.0
+numero_mucche_settimanale
+numero_mucche_settimanale
+7.0
+700.0
 0
-1.0
+7.0
 1
 NIL
 HORIZONTAL
@@ -1464,46 +1464,6 @@ MONITOR
 120
 59
 Voi siete il gruppo:
-NIL
-3
-1
-
-TEXTBOX
-347
-215
-497
-233
-Questa settimana spenderete
-10
-0.0
-1
-
-MONITOR
-338
-242
-483
-291
-costo settimanale mucche
-NIL
-3
-1
-
-MONITOR
-339
-302
-483
-351
-costo contributo comune
-NIL
-3
-1
-
-MONITOR
-177
-217
-311
-266
-totale mucche settimana
 NIL
 3
 1
