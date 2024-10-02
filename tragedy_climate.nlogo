@@ -353,6 +353,9 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "Voi siete il gruppo:" user-id
   hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "€ guadagno totale" capitale_totale
+  hubnet-send user-id "€ costo settimanale mucche" (costo/nuove_unità * numero_mucche_settimanale)
+  hubnet-send user-id "€ costi settimanali totale" ((costo/nuove_unità * numero_mucche_settimanale) +  contributo_comune)
+  hubnet-send user-id "numero mucche al giorno" (numero_mucche_settimanale / 7)
 ;  hubnet-send user-id "costo settimanale mucche" ((numero_mucche_settimanale * costo/nuove_unità))
 ;  hubnet-send user-id "costo contributo comune" contributo_comune
 ;  hubnet-send user-id "totale mucche settimana" (numero_mucche_settimanale)
@@ -360,13 +363,13 @@ end
 
 ;; sends the appropriate monitor information back to one client
 to send-system-info  ;; farmer procedure
-  hubnet-send user-id "€ costo settimanale mucche" costo/nuove_unità
+  hubnet-send user-id "€ costo giornaliero mucche" costo/nuove_unità
   hubnet-send user-id "Giorno" giorno
 end
 
 ;; broadcasts the appropriate monitor information back to all clients
 to broadcast-system-info
-  hubnet-broadcast "€ costo settimanale mucche" costo/nuove_unità
+  hubnet-broadcast "€ costo giornaliero mucche" costo/nuove_unità
   hubnet-broadcast "Giorno" giorno
 end
 
@@ -1379,40 +1382,40 @@ VIEW
 10
 
 MONITOR
-95
-129
-230
-178
+101
+153
+236
+202
 € guadagno giornaliero
 NIL
 3
 1
 
 MONITOR
-17
-218
-176
-267
+19
+378
+200
+427
 € costo settimanale mucche
 NIL
 3
 1
 
 MONITOR
-230
-129
-365
-178
+239
+154
+374
+203
 € guadagno totale
 NIL
 3
 1
 
 SLIDER
-20
-293
-234
-326
+19
+233
+201
+266
 numero_mucche_settimanale
 numero_mucche_settimanale
 7.0
@@ -1434,20 +1437,20 @@ NIL
 1
 
 MONITOR
-6
-77
-454
-126
+19
+82
+467
+131
 Istruzioni
 NIL
 3
 1
 
 SLIDER
-19
-348
+215
 234
-381
+401
+267
 contributo_comune
 contributo_comune
 0.0
@@ -1466,6 +1469,46 @@ MONITOR
 Voi siete il gruppo:
 NIL
 3
+1
+
+MONITOR
+21
+271
+203
+320
+numero mucche al giorno
+NIL
+3
+1
+
+MONITOR
+286
+339
+423
+388
+€ costi settimanali totale
+NIL
+3
+1
+
+MONITOR
+20
+324
+203
+373
+€ costo giornaliero mucche
+NIL
+3
+1
+
+TEXTBOX
+278
+302
+451
+337
+Ricordate: potete spendere entro il vostro € guadagno totale!
+10
+0.0
 1
 
 @#$#@#$#@
