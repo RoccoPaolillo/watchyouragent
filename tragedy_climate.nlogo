@@ -5,32 +5,14 @@
 globals
 [
   giorno                ;; number of days so far
-
-;  colori             ;; list that holds the colors used for students' turtles
-;  nomi-colori        ;; list that holds the names of the colors used for
-                     ;; students' turtles
-;  numero-colori         ;; number of colors in the color list
-;  colori-usati        ;; list that holds the shape-color pairs that are
-                     ;; already being used
-
-  n/a                ;; unset variable indicator
-
-  ;; quick start instructions variables
-  quick-start        ;; current quickstart instruction displayed in the
-                     ;; quickstart monitor
-  qs-item            ;; index of the current quickstart instruction
-  qs-items           ;; list of quickstart instructions
-
   energia-max          ;; energia capacity
   food-max           ;; energia collection capacity
   energia_richiesta          ;; amount of energia collected at each move
   refilling
- ; tax-paid
 ]
 
 patches-own
 [
- ; special-store
   riserva-energetica       ;; amount of energia currently stored
 ]
 
@@ -54,8 +36,6 @@ farmers-own
   capitale_totale       ;; total of past revenue, minus expenses
   guadagno_giornaliero    ;; the revenue collected at the end of the last day
   contributo_comune
-  ; riserva_personale
-
 ]
 
 
@@ -64,7 +44,6 @@ farmers-own
 ;;;;;;;;;;;;;;;;;;;;;
 
 to startup
-;  setup-quick-start
   hubnet-reset
   setup
 end
@@ -72,19 +51,14 @@ end
 ;; initializes the display
 ;; but does not clear already created farmers
 to setup
-  ; hubnet-broadcast "Istruzioni" ""
- ; if any? turtles with [shape = "gameover"] [ask turtles with [shape = "gameover"][die]]
   setup-globals
   setup-patches
   clear-output
   clear-all-plots
   ask farmers
     [ reset-farmers-vars ]
-;  hubnet-broadcast "Aspetta per la tua nuova mossa ..."
-;    (word "Everyone starts with " unità_iniziali/gruppo " units.")
   hubnet-broadcast "numero_mucche_giornaliero" 1
    hubnet-broadcast "contributo_comune" 0
-;  hubnet-broadcast "riserva_personale" 0
   broadcast-system-info
 end
 
@@ -95,16 +69,7 @@ to setup-globals
 
   set energia-max 50
   set food-max 50
-  ;; why this particular calculation?
   set energia_richiesta (round (100 / (ritmo_cicli - 1)))
-
-;  set colori      [ white   gray   orange   brown    yellow    turquoise
-;                    cyan    sky    blu     violet   magenta   pink ]
-;  set nomi-colori ["white" "gray" "orange" "brown"  "yellow"  "turquoise"
-;                   "cyan"  "sky"  "blu"   "violet" "magenta" "pink"]
-;  set colori-usati []
-;  set numero-colori length colori
-  set n/a "n/a"
 end
 
 ;; initialize energia supply for each patch
@@ -125,9 +90,6 @@ to go
 
   every .1
   [
-  ;  every .5
-  ;   [ broadcast-system-info ]
-
 
     if not any? farmers
     [
@@ -149,16 +111,13 @@ to go
       ask farmers
         [ profit-units ]
       invest_capital ;; toene buy units
- ;      plot-graph
     ]
 
     reset-patches
   ]
-  ; ask farmers [if not any? my-units [die]]
- ; if not any? units [create-turtles 1 [set shape "gameover" set size 20] stop ]
+
  ask farmers [if capitale_totale <= 0 [die]]
  broadcast-system-info
-;  if giorno = 7 [stop]
 end
 
 ;; goat move along the common looking for best patch of energia
@@ -171,22 +130,7 @@ to graze  ;; goat procedure
       [ set energia_acquisita new-food-amt ]
      ; [ set energia_acquisita food-max ]
   ]
-; bloccare prossime tre linee se non si vogliono far muovere gli agenti
-;ifelse muovi_unità [
-;  rt (random-float 90)
-;  lt (random-float 90)
-;  fd 1
-;  ][]
 
-;  ifelse is_crisi_energetica [
-  ; set riserve_unità (energia_acquisita + [riserva_personale] of one-of farmers with [user-id = [owner#] of myself])
-  ; ask patch-here [set ]
-  ;   set riserve_unità [riserva_personale] of one-of farmers with [user-id = [owner#] of myself]
- ; ]
- ; [
- ;     set riserve_unità 0
- ; ]
-   ; if riserve_unità = 0 [die]
   if energia_acquisita = 0 [die]
 end
 
@@ -194,7 +138,7 @@ end
 ;; returns amount of energia eaten at patch and
 ;; sets the patch energia amount accordingly
 to-report get-amt-eaten  ;; goat procedure
-  let reduced-amt (riserva-energetica - (energia_richiesta * consumo_individuale))
+  let reduced-amt (riserva-energetica - energia_richiesta)
   ifelse (reduced-amt < 0)
   [
     set riserva-energetica 0
@@ -225,10 +169,7 @@ to invest_capital
       [ buy-units numero_mucche_giornaliero ]
     if numero_mucche_giornaliero < 0
       [ lose-units (- numero_mucche_giornaliero) ]
-    if numero_mucche_giornaliero = 0
-      [ hubnet-send user-id "Aspetta per la tua nuova mossa ..." " " ]
     send-personal-info
-   ; set capitale_totale (capitale_totale - contributo_comune ) ; - (riserva_personale * count my-units))
   ]
 end
 
@@ -244,10 +185,7 @@ to buy-units [ num-units-desired ]  ;; farmer procedure
   ]
   let cost-of-purchase num-units-purchase * costo/nuove_unità
   set capitale_totale (capitale_totale - cost-of-purchase)
- ; hubnet-send user-id "Aspetta per la tua nuova mossa ..."
- ;   (seller-says got-number-desired? num-units-desired num-units-purchase)
 
-  ;; create the units purchased by the farmer
   hatch num-units-purchase
     [ setup-units user-id ]
 end
@@ -256,30 +194,8 @@ end
 to lose-units [ num-to-lose ]  ;; farmer procedure
   if ((count my-units) < num-to-lose)
     [ set num-to-lose (count my-units) ]
-;  hubnet-send user-id "Aspetta per la tua nuova mossa ..."
-;    (word "You lost " num-to-lose " units.")
-
-  ;; eliminate the units ditched by the farmer
   ask (n-of num-to-lose my-units)
     [ die ]
-end
-
-;; reports the appropriate information on the transaction of purchasing units
-to-report seller-says [ success? desired purchased ]
-  let seller-message ""
-  let cost purchased * costo/nuove_unità
-  ifelse success?
-  [
-    ifelse (purchased > 1)
-      [ set seller-message (word "Here are your " purchased " units.  ") ]
-      [ set seller-message "Here is your unit.  " ]
-    set seller-message (word seller-message "You have spent €" cost ".")
-  ]
-  [
-    set seller-message (word "You do not have enough to buy " desired ".  "
-      "You can afford " purchased " for €" cost ".")
-  ]
-  report seller-message
 end
 
 ;; initializes goat variables
@@ -301,30 +217,7 @@ end
 to reset-patches
   ask patches [
     let crisis_patches count patches with [riserva-energetica < energia-max]
-;    ifelse is_crisi_energetica
-;    [
-;    set riserva-energetica (riserva-energetica - crisi_energetica)
-;      if (riserva-energetica < energia-max)
-;      [
-;      ifelse any? units-here [
-;        let new-energia-amt (riserva-energetica + rinnovo_energetico + (energia-growth-rate_emergency / crisis_patches) + sum [riserve_unità] of units-here)
-;        ifelse (new-energia-amt > energia-max)
-;      [ set riserva-energetica energia-max ]
-;      [ set riserva-energetica new-energia-amt]
-;        ]
-;        [
-;        let new-energia-amt (riserva-energetica + rinnovo_energetico + (energia-growth-rate_emergency / crisis_patches))
-;        ifelse (new-energia-amt > energia-max)
-;      [ set riserva-energetica energia-max ]
-;      [ set riserva-energetica new-energia-amt]
-;        ]
 
-;    color-patches
-;      ]
-;    ]
-
- ;   [
- ;     set riserva-energetica (riserva-energetica)
 
   if (riserva-energetica < energia-max)
   [
@@ -348,12 +241,7 @@ end
 ;; Plotting Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; plots the graph of the system
-; to plot-graph
-;   plot-value "Guadagno medio" guadagno_medio
-; end
 
-;; plot value on the plot called name-of-plot
 to plot-value [ name-of-plot value ]
   set-current-plot name-of-plot
   plot value
@@ -363,16 +251,8 @@ end
 ;; Calculation Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-to-report totale_guadagno_giornaliero
-  report sum [ guadagno_giornaliero ] of farmers
-end
-
 to-report totale_riserva-energetica
   report sum [ riserva-energetica ] of patches
-end
-
-to-report energia-growth-rate_emergency
-  report sum [contributo_comune] of farmers
 end
 
 to-report guadagno_medio
@@ -388,81 +268,6 @@ end
 to-report round-to-place [ num decimal-place ]
   report (round (num * decimal-place)) / decimal-place
 end
-
-to-report consumo_individuale
-
-  if owner# = "azzurro" [report 1]
-  if owner# = "viola" [report 1]
-  if owner# = "marrone" [report 1]
-  if owner# = "rosso" [report 1]
-  if owner# = "blu" [report 1]
-end
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Quick Start functions ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; instructions to quickly setup the model, and clients to run this activity
-; to setup-quick-start
-;   set qs-item 0
-;   set qs-items
-;   [
-;     "Teacher: Follow these directions to run the HubNet activity."
-;       "Optional: Zoom In (see Tools in the Menu Bar)"
-;       "Optional: Change any of the settings...."
-;       "If you do change the settings, press the SETUP button."
-;        "Press the LOGIN button to allow people to login."
-;       "Everyone: Open up a HubNet Client on your machine and..."
- ;        "type your user name, select this activity and press ENTER."
-
-;     "Teacher: Once everyone has logged in,..."
-;         "turn off the LOGIN button by pressing it again."
-;       "Have the students acquaint themselves with the information..."
-;         "available to them in the monitors, buttons, and sliders."
-;        "Then press the GO button to start the simulation."
-;       "Please note that you may adjust the length of time..."
-;           "GRAZING-PERIOD, that units are allowed to graze each day."
-;       "For a quicker demonstration, reduce the..."
-;         "GRASS-GROWTH-RATE slider."
-;      "To curb buying incentives of the students, increase..."
-;        "the COSTO/ITEM slider."
-;       "Any of the above mentioned parameters - ..."
-;         "GRAZING-PERIOD, GRASS-GROWTH-RATE, and COSTO/ITEM -..."
-;         "may be altered without stopping the simulation."
-
-;     "Teacher: To run the activity again with the same group,..."
-;         "stop the model by pressing the GO button, if it is on."
-;         "Change any of the settings that you would like."
-;       "Press the SETUP button."
-
-;     "Teacher: Restart the simulation by pressing the GO button again."
-
-;      "Teacher: To start the simulation over with a new group,..."
-;          "stop the model by pressing the GO button if it is on..."
-;          "press the RESET button in the Control Center"
-;            "and follow these instructions again from the beginning."
-;    ]
-;    set quick-start (item qs-item qs-items)
-;  end
-
-;; view the next item in the quickstart monitor
-to view-next
-  set qs-item qs-item + 1
-  if qs-item >= length qs-items
-    [ set qs-item length qs-items - 1 ]
-  set quick-start (item qs-item qs-items)
-end
-
-;; view the previous item in the quickstart monitor
-to view-prev
-  set qs-item qs-item - 1
-  if qs-item < 0
-    [ set qs-item 0 ]
-  set quick-start (item qs-item qs-items)
-end
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Code for interacting with the clients ;;
@@ -503,12 +308,6 @@ to execute-command [command]
     stop
   ]
 
- ;  if command = "riserva_personale"
-  ; [
- ;    ask farmers with [user-id = hubnet-message-source]
- ;      [ set riserva_personale hubnet-message ]
-   ;  stop
- ;  ]
 end
 
 to create-new-farmer [ id ]
@@ -516,7 +315,6 @@ to create-new-farmer [ id ]
   [
     set user-id id
     setup-farm
-  ;  set-unique-color
     reset-farmers-vars
     hubnet-send id "numero_mucche_giornaliero" numero_mucche_giornaliero
     send-system-info
@@ -530,23 +328,12 @@ to setup-farm  ;; farmer procedure
   hide-turtle
 end
 
-;; pick a color for the turtle ;; RP we don't need anymore
-; to set-unique-color  ;; turtle procedure
-;  let code random numero-colori
-; while [member? code colori-usati and count farmers < numero-colori]
-;   [ set code random numero-colori ]
-;  set colori-usati (lput code colori-usati)
-;  set color item code colori
-
-;end
-
 ;; set farmer variables to initial values
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
   set numero_mucche_giornaliero 1
   set contributo_comune 0
-  ;   set riserva_personale 0
   set capitale_totale costo/nuove_unità
   set guadagno_giornaliero 0
 
@@ -563,34 +350,22 @@ end
 
 ;; sends the appropriate monitor information back to the client
 to send-personal-info  ;; farmer procedure
- ; hubnet-send user-id "My unit Color" (color->string color)
   hubnet-send user-id "Voi siete il gruppo:" user-id
   hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "€ guadagno totale" capitale_totale
   hubnet-send user-id "costo settimanale mucche" ((numero_mucche_giornaliero * costo/nuove_unità) * 7)
   hubnet-send user-id "costo contributo comune" contributo_comune
   hubnet-send user-id "totale mucche settimana" (numero_mucche_giornaliero * 7)
-;  hubnet-send user-id "My unit Population" count my-units
 end
-
-;; returns string version of color name
-;to-report color->string [ color-value ]
-;  report item (position color-value colori) nomi-colori
-;end
 
 ;; sends the appropriate monitor information back to one client
 to send-system-info  ;; farmer procedure
- ; hubnet-send user-id "Total guadagno_giornaliero" totale_guadagno_giornaliero
- ; hubnet-send user-id "Grass Amt" totale_riserva-energetica
   hubnet-send user-id "€ costo giornaliero mucche" costo/nuove_unità
   hubnet-send user-id "Giorno" giorno
 end
 
 ;; broadcasts the appropriate monitor information back to all clients
 to broadcast-system-info
-;  hubnet-broadcast "Total guadagno_giornaliero" totale_guadagno_giornaliero
-;  hubnet-broadcast "Grass Amt" (int totale_riserva-energetica)
-;  hubnet-broadcast "Istruzioni" round (((count patches * 50) - totale_riserva-energetica) / 5)
   hubnet-broadcast "€ costo giornaliero mucche" costo/nuove_unità
   hubnet-broadcast "Giorno" giorno
 end
@@ -605,8 +380,7 @@ to remove-farmer [ id ]
       [ die ]
     die
   ]
-;  if not any? farmers with [color = old-color]
-;    [ set colori-usati remove (position old-color colori) colori-usati ]
+
 end
 
 ; Copyright 2002 Uri Wilensky.
@@ -763,9 +537,9 @@ HORIZONTAL
 
 PLOT
 6
-158
+159
 235
-308
+309
 Capitale Totale
 NIL
 NIL
