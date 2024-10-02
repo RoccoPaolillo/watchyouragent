@@ -905,10 +905,10 @@ PENS
 "blu" 1.0 1 -13345367 true "" "plot [contributo_comune] of one-of farmers with [user-id = \"blu\"]"
 
 BUTTON
-1067
-409
-1212
-442
+1069
+427
+1214
+460
 contributo_comune_plot
 if any? farmers with [user-id = \"viola\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"viola\"] ]\nif any? farmers with [user-id = \"marrone\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"marrone\"] ]\nif any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"rosso\"] ]\nif any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"azzurro\"] ]\nif any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"blu\"] ]
 NIL
@@ -982,6 +982,26 @@ TEXTBOX
 326
 540
 Nomi dei gruppi da inserire:\nviola\nmarrone\nrosso\nazzurro\nblue
+10
+0.0
+1
+
+TEXTBOX
+25
+50
+191
+68
+Tenere sempre premuto show_costs and login
+8
+0.0
+1
+
+TEXTBOX
+1224
+417
+1374
+469
+per riportare il contributo comune nell'istogramma contributo comune investito (o rimangono i monitors)
 10
 0.0
 1
