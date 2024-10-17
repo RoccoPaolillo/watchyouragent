@@ -39,6 +39,8 @@ farmers-own
   capitale_totale-lst
   guadagno_giornaliero    ;; the revenue collected at the end of the last day
   contributo_comune_rigenerazione
+  numero_mucche
+  numero_mucche-lst
 ]
 
 
@@ -115,6 +117,7 @@ to go
       ask farmers
         [ profit-units ]
       invest_capital ;; toene buy units
+ ;     update-plots
     ]
 
     reset-patches
@@ -164,6 +167,7 @@ to profit-units  ;; farmer procedure ex milk-plants
   set revenue-lst (lput guadagno_giornaliero revenue-lst)
   set capitale_totale capitale_totale + guadagno_giornaliero
 ;  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
+  set numero_mucche count my-units
   send-personal-info
 end
 
@@ -363,6 +367,7 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "€ costo settimanale mucche" (costo/nuove_unità * n_mucche_comprate_a_settimana)
   hubnet-send user-id "€ costi totali a settimana" ((costo/nuove_unità * n_mucche_comprate_a_settimana) +  contributo_comune_rigenerazione)
   hubnet-send user-id "numero mucche al giorno" (n_mucche_comprate_a_settimana / 7)
+ ; hubnet-send user-id "c.c.r." contributo_comune_rigenerazione
 ;  hubnet-send user-id "costo settimanale mucche" ((n_mucche_comprate_a_settimana * costo/nuove_unità))
 ;  hubnet-send user-id "costo contributo comune" contributo_comune_rigenerazione
 ;  hubnet-send user-id "totale mucche settimana" (n_mucche_comprate_a_settimana)
@@ -399,13 +404,13 @@ end
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-527
-22
-972
-468
+481
+10
+1042
+572
 -1
 -1
-20.81
+26.333333333333332
 1
 10
 1
@@ -426,10 +431,10 @@ ticks
 30.0
 
 BUTTON
-271
-10
-326
-43
+1077
+202
+1166
+235
 NIL
 go
 T
@@ -443,10 +448,10 @@ NIL
 1
 
 SLIDER
-1285
-142
-1415
-175
+885
+583
+1013
+616
 unità_iniziali/gruppo
 unità_iniziali/gruppo
 0
@@ -458,10 +463,10 @@ unità
 HORIZONTAL
 
 SLIDER
-1285
-29
-1414
-62
+483
+583
+608
+616
 costo/nuove_unità
 costo/nuove_unità
 1
@@ -473,10 +478,10 @@ costo/nuove_unità
 HORIZONTAL
 
 SLIDER
-1285
-104
-1415
-137
+749
+584
+876
+617
 ritmo_cicli
 ritmo_cicli
 2
@@ -488,10 +493,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-210
-10
-265
-43
+1077
+166
+1166
+199
 NIL
 setup
 NIL
@@ -504,22 +509,11 @@ NIL
 NIL
 1
 
-MONITOR
-353
-10
-416
-55
-Giorno
-giorno
-3
-1
-11
-
 BUTTON
-150
-11
-205
-44
+1076
+116
+1166
+149
 login
 listen-to-clients
 T
@@ -533,10 +527,10 @@ NIL
 1
 
 SLIDER
-1286
-65
-1416
-98
+612
+584
+739
+617
 rinnovo_energetico
 rinnovo_energetico
 0
@@ -548,10 +542,10 @@ NIL
 HORIZONTAL
 
 PLOT
-2
-62
-264
-239
+23
+10
+469
+209
 Capitale Totale
 NIL
 NIL
@@ -570,10 +564,10 @@ PENS
 "blu" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
-265
-62
-518
-239
+22
+212
+467
+396
 Numero mucche perse
 NIL
 NIL
@@ -585,19 +579,19 @@ true
 true
 "" ""
 PENS
-"azzurro" 1.0 0 -11221820 true "" "plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"azzurro\"] / 7) / count units with [owner# = \"azzurro\"])"
-"giallo" 1.0 0 -1184463 true "" "plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"giallo\"] / 7) / count units with [owner# = \"giallo\"])"
-"rosa" 1.0 0 -1664597 true "" "plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"rosa\"] / 7) / count units with [owner# = \"rosa\"])"
-"rosso" 1.0 0 -2674135 true "" "plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"rosso\"] / 7) / count units with [owner# = \"rosso\"])"
-"blu" 1.0 0 -13345367 true "" "plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) / count units with [owner# = \"blu\"])"
+"azzurro" 1.0 1 -11221820 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"azzurro\"] / 7) - count units with [owner# = \"azzurro\"])]"
+"giallo" 1.0 1 -1184463 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"giallo\"] / 7) - count units with [owner# = \"giallo\"])]"
+"rosa" 1.0 1 -1664597 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"rosa\"] / 7) - count units with [owner# = \"rosa\"])]"
+"rosso" 1.0 1 -2674135 false "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"rosso\"] / 7) - count units with [owner# = \"rosso\"])]"
+"blu" 1.0 1 -13345367 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) - count units with [owner# = \"blu\"])]"
 
 BUTTON
-1053
-362
-1142
-395
+1078
+266
+1167
+299
 rinnovo_risorse
-ask farmers [\nset capitale_totale capitale_totale - contributo_comune_rigenerazione\n; hubnet-send user-id \"Guadagno totale, Euro:\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_rigenerazione] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\nhubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
+ask farmers [\nset capitale_totale capitale_totale - contributo_comune_rigenerazione\n; hubnet-send user-id \"Guadagno totale, Euro:\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_rigenerazione] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\n;hubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
 1
 T
@@ -608,11 +602,104 @@ NIL
 NIL
 1
 
+BUTTON
+1076
+81
+1167
+114
+show_costs
+ask farmers [\nsend-personal-info\n; if any? farmers with [user-id = \"viola\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"viola\"] ]\n; if any? farmers with [user-id = \"marrone\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"marrone\"] ]\n; if any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"rosso\"] ]\n; if any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"azzurro\"] ]\n; if any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"blu\"] ]\n]
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+MONITOR
+1092
+345
+1149
+390
+azzurro
+[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"azzurro\"]
+2
+1
+11
+
+MONITOR
+1092
+394
+1149
+439
+giallo
+[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"giallo\"]
+2
+1
+11
+
+MONITOR
+1092
+441
+1149
+486
+rosa
+[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosa\"]
+2
+1
+11
+
+MONITOR
+1092
+487
+1149
+532
+rosso
+[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosso\"]
+2
+1
+11
+
+MONITOR
+1092
+534
+1149
+579
+blu
+[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"blu\"]
+2
+1
+11
+
+MONITOR
+1142
+10
+1254
+67
+Settimana
+settimana
+17
+1
+14
+
+TEXTBOX
+1078
+306
+1165
+334
+Contributo comune singoli gruppi
+10
+0.0
+1
+
 PLOT
-4
-244
-265
-416
+24
+401
+468
+581
 Risorse Ambientali
 NIL
 NIL
@@ -627,157 +714,62 @@ PENS
 "" 1.0 0 -14333415 true "" "plot totale_riserva-energetica"
 
 MONITOR
-78
-385
-189
-430
+370
+536
+468
+581
 risorse ambientali
 totale_riserva-energetica
 2
 1
 11
 
-TEXTBOX
-1015
-362
-1049
-387
->>
-20
+PLOT
+1179
+148
+1496
+341
+Mucche in vita
+NIL
+NIL
 0.0
-1
-
-TEXTBOX
-1149
-364
-1192
-389
-<<
-20
+49.0
 0.0
-1
-
-BUTTON
-51
-11
-142
-44
-show_costs
-ask farmers [\nsend-personal-info\n; if any? farmers with [user-id = \"viola\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"viola\"] ]\n; if any? farmers with [user-id = \"marrone\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"marrone\"] ]\n; if any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"rosso\"] ]\n; if any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"azzurro\"] ]\n; if any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"blu\"] ]\n]
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1023
-424
-1168
-457
-contributo_comune_plot
-if any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"azzurro\"] ]\nif any? farmers with [user-id = \"giallo\"] [plot-value \"Contributo comune investito\"  [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"giallo\"] ]\nif any? farmers with [user-id = \"rosa\"] [plot-value \"Contributo comune investito\"  [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosa\"] ]\nif any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosso\"] ]\nif any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"blu\"] ]
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
+10.0
+true
+true
+"" ""
+PENS
+"azzurro" 1.0 1 -11221820 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"azzurro\"]]"
+"giallo" 1.0 1 -1184463 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"yellow\"]]"
+"rosa" 1.0 1 -1664597 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"rosa\"]]"
+"rosso" 1.0 1 -2674135 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"rosso\"]]"
+"blu" 1.0 1 -13345367 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"blu\"]]"
 
 MONITOR
-261
-383
-318
-428
-azzurro
-[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"azzurro\"]
-2
-1
-11
-
-MONITOR
-309
-383
-366
-428
-giallo
-[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"giallo\"]
-2
-1
-11
-
-MONITOR
-363
-383
-420
-428
-rosa
-[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosa\"]
-2
-1
-11
-
-MONITOR
-415
-383
-472
-428
-rosso
-[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosso\"]
-2
-1
-11
-
-MONITOR
-464
-383
-521
-428
-blu
-[contributo_comune_rigenerazione] of one-of farmers with [user-id = \"blu\"]
-2
-1
-11
-
-TEXTBOX
-25
-50
-191
-68
-Tenere sempre premuto show_costs and login
-8
-0.0
-1
-
-TEXTBOX
-1178
-414
-1328
-466
-per riportare il contributo comune nell'istogramma contributo comune investito (o rimangono i monitors)
+1057
 10
-0.0
-1
-
-MONITOR
-423
-10
-490
-55
-NIL
-settimana
+1138
+67
+Giorno
+giorno
 17
 1
-11
+14
 
 @#$#@#$#@
+## Setting per laboratorio (vedi calculations)
+
+costo/nuove_unità 10
+rinnovo_energetico 0.1
+ritmo_cicli 11
+unità_inziali/gruppo 1
+
+Tenere sempre premuto show_costs and login
+SETUP
+GO
+quando scelto contributo comune >> rinnovo_risorse
+
 ## Calculations
 
 * giorno = ticks mod ritmo_cicli, usa il remainder della divisione (mod): scatta quando ticks è multiplo di ritmo_cicli. All’interno di ogni giorno, si ripete l’assorbimento dell’energia_richiesta  da parte di ogni unità dalla riserva-energetica del patch (la cella nello spazio) dove si trova (patch-here). L’assorbimento continua e l’unità sopravvive intanto che riserva-energetica del patch-here > 0. Anche se l’unità muore, l’energia assorbita si somma per calcolare il guadagno_giornaliero del suo gruppo (farmer nel modello)
@@ -1161,10 +1153,10 @@ need-to-manually-make-preview-for-this-model
 @#$#@#$#@
 @#$#@#$#@
 VIEW
-515
-10
-930
-425
+497
+11
+1034
+494
 0
 0
 0
@@ -1228,9 +1220,9 @@ NIL
 HORIZONTAL
 
 MONITOR
-355
+358
 10
-412
+415
 59
 Giorno
 NIL
@@ -1238,10 +1230,10 @@ NIL
 1
 
 SLIDER
-22
-392
-479
-425
+23
+460
+471
+493
 contributo_comune_rigenerazione
 contributo_comune_rigenerazione
 0.0
@@ -1253,10 +1245,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-8
-10
-198
-59
+32
+11
+222
+60
 Voi allevate la mandria:
 NIL
 3
@@ -1303,13 +1295,33 @@ Ricordate di non spendere più di quanto guadagnato (€ guadagno totale)!
 1
 
 MONITOR
-415
+418
 10
-477
+480
 59
 Settimana
 NIL
 3
+1
+
+TEXTBOX
+1032
+15
+1047
+33
+NIL
+10
+0.0
+1
+
+TEXTBOX
+1034
+14
+1049
+32
+NIL
+10
+0.0
 1
 
 @#$#@#$#@
