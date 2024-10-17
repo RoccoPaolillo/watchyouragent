@@ -124,7 +124,16 @@ to go
   ]
 
  ask farmers [if capitale_totale <= 0 [die]]
-  csv:to-file "rosso.csv"  [(list revenue-lst capitale_totale-lst)] of farmers
+
+;  csv:to-file word user-id "_capital.csv"   [capitale_totale-lst] of farmers with [user-id = "rosso"]
+
+;  word user-id "_capital.csv"
+; ask farmers [csv:to-file "capital.csv"  [capitale_totale-lst] of self]
+;  csv:to-file "rosso.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "rosso"]
+;  csv:to-file "azzurro.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "azzurro"]
+;  csv:to-file "giallo.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "giallo"]
+;  csv:to-file "rosa.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "rosa"]
+;  csv:to-file "blu.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "blu"]
  broadcast-system-info
 end
 
@@ -361,7 +370,7 @@ end
 
 ;; sends the appropriate monitor information back to the client
 to send-personal-info  ;; farmer procedure
-  hubnet-send user-id "Voi allevate la mandria:" user-id
+  hubnet-send user-id "Voi allevate la mandria di colore:" user-id
   hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "€ guadagno totale" capitale_totale
   hubnet-send user-id "€ costo settimanale mucche" (costo/nuove_unità * n_mucche_comprate_a_settimana)
@@ -567,14 +576,14 @@ PLOT
 22
 212
 467
-396
+402
 Numero mucche perse
 NIL
 NIL
 0.0
 10.0
 0.0
-10.0
+8.0
 true
 true
 "" ""
@@ -582,7 +591,7 @@ PENS
 "azzurro" 1.0 1 -11221820 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"azzurro\"] / 7) - count units with [owner# = \"azzurro\"])]"
 "giallo" 1.0 1 -1184463 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"giallo\"] / 7) - count units with [owner# = \"giallo\"])]"
 "rosa" 1.0 1 -1664597 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"rosa\"] / 7) - count units with [owner# = \"rosa\"])]"
-"rosso" 1.0 1 -2674135 false "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"rosso\"] / 7) - count units with [owner# = \"rosso\"])]"
+"rosso" 1.0 1 -2674135 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"rosso\"] / 7) - count units with [owner# = \"rosso\"])]"
 "blu" 1.0 1 -13345367 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) - count units with [owner# = \"blu\"])]"
 
 BUTTON
@@ -696,10 +705,10 @@ Contributo comune singoli gruppi
 1
 
 PLOT
-24
-401
-468
-581
+23
+405
+467
+585
 Risorse Ambientali
 NIL
 NIL
@@ -714,10 +723,10 @@ PENS
 "" 1.0 0 -14333415 true "" "plot totale_riserva-energetica"
 
 MONITOR
-370
-536
-468
-581
+369
+540
+467
+585
 risorse ambientali
 totale_riserva-energetica
 2
@@ -725,26 +734,26 @@ totale_riserva-energetica
 11
 
 PLOT
-1179
-148
-1496
-341
+1176
+82
+1505
+275
 Mucche in vita
 NIL
 NIL
 0.0
-49.0
+30.0
 0.0
-10.0
+8.0
 true
 true
 "" ""
 PENS
-"azzurro" 1.0 1 -11221820 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"azzurro\"]]"
-"giallo" 1.0 1 -1184463 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"yellow\"]]"
-"rosa" 1.0 1 -1664597 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"rosa\"]]"
-"rosso" 1.0 1 -2674135 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"rosso\"]]"
-"blu" 1.0 1 -13345367 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"blu\"]]"
+"azzurro" 2.0 1 -11221820 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"azzurro\"]]"
+"giallo" 2.0 1 -1184463 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"giallo\"]]"
+"rosa" 2.0 1 -1664597 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"rosa\"]]"
+"rosso" 2.0 1 -2674135 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"rosso\"]]"
+"blu" 2.0 1 -13345367 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"blu\"]]"
 
 MONITOR
 1057
@@ -1155,8 +1164,8 @@ need-to-manually-make-preview-for-this-model
 VIEW
 497
 11
-1034
-494
+1006
+477
 0
 0
 0
@@ -1230,10 +1239,10 @@ NIL
 1
 
 SLIDER
-23
-460
-471
-493
+20
+444
+468
+477
 contributo_comune_rigenerazione
 contributo_comune_rigenerazione
 0.0
@@ -1249,7 +1258,7 @@ MONITOR
 11
 222
 60
-Voi allevate la mandria:
+Voi allevate la mandria di colore:
 NIL
 3
 1
@@ -1305,20 +1314,20 @@ NIL
 1
 
 TEXTBOX
-1032
-15
-1047
-33
+1010
+17
+1025
+35
 NIL
 10
 0.0
 1
 
 TEXTBOX
-1034
-14
-1049
-32
+1012
+17
+1027
+35
 NIL
 10
 0.0
