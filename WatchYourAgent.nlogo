@@ -41,6 +41,8 @@ farmers-own
   contributo_comune_rigenerazione
   numero_mucche
   numero_mucche-lst
+  n_mucche-lst
+  contrcom-lst
 ]
 
 
@@ -118,6 +120,7 @@ to go
         [ profit-units ]
       invest_capital ;; toene buy units
  ;     update-plots
+    ;  ask farmers [set total-lst (lput revenue-lst total-lst)]
     ]
 
     reset-patches
@@ -125,16 +128,8 @@ to go
 
  ask farmers [if capitale_totale <= 0 [die]]
 
-;  csv:to-file word user-id "_capital.csv"   [capitale_totale-lst] of farmers with [user-id = "rosso"]
-
-;  word user-id "_capital.csv"
-; ask farmers [csv:to-file "capital.csv"  [capitale_totale-lst] of self]
-;  csv:to-file "rosso.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "rosso"]
-;  csv:to-file "azzurro.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "azzurro"]
-;  csv:to-file "giallo.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "giallo"]
-;  csv:to-file "rosa.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "rosa"]
-;  csv:to-file "blu.csv"  [(list user-id revenue-lst capitale_totale-lst)] of farmers with [user-id = "blu"]
  broadcast-system-info
+  write_csv
 end
 
 ;; goat move along the common looking for best patch of energia
@@ -177,6 +172,8 @@ to profit-units  ;; farmer procedure ex milk-plants
   set capitale_totale capitale_totale + guadagno_giornaliero
 ;  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
   set numero_mucche count my-units
+  set numero_mucche-lst (lput (count my-units) numero_mucche-lst)
+
   send-personal-info
 end
 
@@ -188,6 +185,8 @@ to invest_capital
       [ buy-units (n_mucche_comprate_a_settimana / 7) ]
     if n_mucche_comprate_a_settimana < 0
       [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
+    set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
+    set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
     send-personal-info
   ]
 end
@@ -352,6 +351,10 @@ to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
   set capitale_totale-lst []
+  ;set total-lst []
+  set numero_mucche-lst []
+  set contrcom-lst []
+  set n_mucche-lst[]
   set n_mucche_comprate_a_settimana 7
   set contributo_comune_rigenerazione 0
   set capitale_totale costo/nuove_unità
@@ -406,6 +409,17 @@ to remove-farmer [ id ]
       [ die ]
     die
   ]
+
+end
+
+to write_csv
+
+
+foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_muccheslider.csv") [n_mucche-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
 
 end
 
@@ -765,6 +779,17 @@ giorno
 17
 1
 14
+
+INPUTBOX
+1203
+313
+1279
+373
+TURN
+GE_11_
+1
+0
+String
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
@@ -1194,10 +1219,10 @@ NIL
 1
 
 MONITOR
-25
-283
-166
-332
+27
+281
+181
+330
 € costo settimanale mucche
 NIL
 3
@@ -1264,10 +1289,10 @@ NIL
 1
 
 MONITOR
-309
-283
-478
-332
+336
+282
+476
+331
 numero mucche al giorno
 NIL
 3
@@ -1284,9 +1309,9 @@ NIL
 1
 
 MONITOR
-168
+183
 282
-305
+334
 331
 € costo giornaliero mucche
 NIL
