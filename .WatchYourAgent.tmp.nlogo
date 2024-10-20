@@ -188,7 +188,7 @@ to invest_capital
   ask farmers
   [
     if n_mucche_comprate_a_settimana > 0
-      [ buy-units (n_mucche_comprate_a_settimana / 7) ]
+      [ buy-units (n_mucche_comprate_a_settimana ]
 ;    if n_mucche_comprate_a_settimana < 0
 ;      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
     set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
