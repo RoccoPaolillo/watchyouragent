@@ -125,6 +125,7 @@ tick
     ;  ask farmers [set total-lst (lput revenue-lst total-lst)]
     if (ticks mod 7 = 0) [
         hubnet-broadcast "n_mucche_comprate_a_settimana" 1
+        hubnet-broadcast "contributo_comune_rigenerazione" 0
         broadcast-system-info
         stop ]
     ]
@@ -186,7 +187,7 @@ to profit-units  ;; farmer procedure ex milk-plants
   ask my-units
     [ set energia_acquisita 0 ]
   set revenue-lst (lput guadagno_giornaliero revenue-lst)
-  set capitale_totale capitale_totale + guadagno_giornaliero
+  set capitale_totale capitale_totale + guadagno_giornaliero - (costo_gestione/nuove_unità * n_mucche_comprate_a_settimana)
 ;  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
   set numero_mucche count my-units
   set numero_mucche-lst (lput (count my-units) numero_mucche-lst)
@@ -250,6 +251,23 @@ to setup-units [ farmer# ]  ;; turtle procedure
   set riserve_unità 0
   show-turtle
 end
+
+to contributo_comune_refill
+ask farmers [
+set capitale_totale capitale_totale - contributo_comune_rigenerazione
+; hubnet-send user-id "Guadagno totale, Euro:" capitale_totale
+]
+
+set refilling (sum [contributo_comune_rigenerazione] of farmers / count patches with [riserva-energetica < 50])
+ask patches with [riserva-energetica < 50]
+[
+set riserva-energetica riserva-energetica + refilling
+color-patches
+if riserva-energetica >= 50 [set riserva-energetica 50]
+]
+plot-value "Risorse Ambientali" totale_riserva-energetica
+end
+
 
 ;; updates patches' color and increase energia supply with growth rate
 to reset-patches
@@ -579,7 +597,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.05
+0.01
 0.01
 1
 NIL
@@ -630,10 +648,10 @@ PENS
 "blu" 1.0 1 -13345367 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) - count units with [owner# = \"blu\"])]"
 
 BUTTON
-1237
-247
-1326
-280
+1207
+517
+1296
+550
 rinnovo_risorse
 ask farmers [\nset capitale_totale capitale_totale - contributo_comune_rigenerazione\n; hubnet-send user-id \"Guadagno totale, Euro:\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_rigenerazione] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\n;hubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
@@ -813,12 +831,44 @@ GE_12_
 String
 
 BUTTON
-1240
-192
-1343
-225
-NIL
+1210
+462
+1405
+495
 invest_capital
+if giorno >= 7 [invest_capital]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+1055
+613
+1227
+646
+costo_gestione/nuove_unità
+costo_gestione/nuove_unità
+0
+100
+10.0
+1
+1
+€
+HORIZONTAL
+
+BUTTON
+1074
+241
+1162
+274
+choice
+if giorno >= 7 [invest_capital]\n\nif giorno >= 14 [contributo_comune_refill]\n
 NIL
 1
 T
