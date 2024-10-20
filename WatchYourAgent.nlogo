@@ -183,8 +183,8 @@ to invest_capital
   [
     if n_mucche_comprate_a_settimana > 0
       [ buy-units (n_mucche_comprate_a_settimana / 7) ]
-    if n_mucche_comprate_a_settimana < 0
-      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
+;    if n_mucche_comprate_a_settimana < 0
+;      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
     set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
     set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
     send-personal-info
@@ -209,12 +209,12 @@ to buy-units [ num-units-desired ]  ;; farmer procedure
 end
 
 ;; farmers eliminate some of their units (with no gain in assets)
-to lose-units [ num-to-lose ]  ;; farmer procedure
-  if ((count my-units) < num-to-lose)
-    [ set num-to-lose (count my-units) ]
-  ask (n-of num-to-lose my-units)
-    [ die ]
-end
+;to lose-units [ num-to-lose ]  ;; farmer procedure
+;  if ((count my-units) < num-to-lose)
+;    [ set num-to-lose (count my-units) ]
+;  ask (n-of num-to-lose my-units)
+;    [ die ]
+;end
 
 ;; initializes goat variables
 to setup-units [ farmer# ]  ;; turtle procedure
