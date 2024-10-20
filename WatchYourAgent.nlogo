@@ -66,7 +66,7 @@ to setup
   clear-all-plots
   ask farmers
     [ reset-farmers-vars ]
-  hubnet-broadcast "n_mucche_comprate_a_settimana" 7
+  hubnet-broadcast "n_mucche_comprate_a_settimana" 1
    hubnet-broadcast "contributo_comune_rigenerazione" 0
   broadcast-system-info
 end
@@ -120,7 +120,7 @@ to go
       set settimana ceiling (giorno / 7)
       ask farmers
         [ profit-units ]
-      invest_capital ;; toene buy units
+  ;    invest_capital ;; toene buy units
  ;     update-plots
     ;  ask farmers [set total-lst (lput revenue-lst total-lst)]
     ]
@@ -188,7 +188,7 @@ to invest_capital
   ask farmers
   [
     if n_mucche_comprate_a_settimana > 0
-      [ buy-units (n_mucche_comprate_a_settimana / 7) ]
+      [ buy-units n_mucche_comprate_a_settimana ]
 ;    if n_mucche_comprate_a_settimana < 0
 ;      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
     set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
@@ -362,7 +362,7 @@ to reset-farmers-vars  ;; farmer procedure
   set contrcom-lst []
   set n_mucche-lst[]
   set lost_cows-lst []
-  set n_mucche_comprate_a_settimana 7
+  set n_mucche_comprate_a_settimana 1
   set contributo_comune_rigenerazione 0
   set capitale_totale costo/nuove_unità
   set guadagno_giornaliero 0
@@ -385,7 +385,7 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "€ guadagno totale" capitale_totale
   hubnet-send user-id "€ costo settimanale mucche" (costo/nuove_unità * n_mucche_comprate_a_settimana)
   hubnet-send user-id "€ costi totali a settimana" ((costo/nuove_unità * n_mucche_comprate_a_settimana) +  contributo_comune_rigenerazione)
-  hubnet-send user-id "numero mucche al giorno" (n_mucche_comprate_a_settimana / 7)
+  hubnet-send user-id "numero mucche al giorno" (n_mucche_comprate_a_settimana)
  ; hubnet-send user-id "c.c.r." contributo_comune_rigenerazione
 ;  hubnet-send user-id "costo settimanale mucche" ((n_mucche_comprate_a_settimana * costo/nuove_unità))
 ;  hubnet-send user-id "costo contributo comune" contributo_comune_rigenerazione
@@ -797,6 +797,23 @@ GE_12_
 1
 0
 String
+
+BUTTON
+1240
+192
+1343
+225
+NIL
+invest_capital
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
@@ -1252,10 +1269,10 @@ SLIDER
 277
 n_mucche_comprate_a_settimana
 n_mucche_comprate_a_settimana
-7.0
-140.0
+1.0
+30.0
 0
-7.0
+1.0
 1
 NIL
 HORIZONTAL
