@@ -66,7 +66,7 @@ to setup
   clear-all-plots
   ask farmers
     [ reset-farmers-vars ]
-  hubnet-broadcast "n_mucche_comprate_a_settimana" 1
+   hubnet-broadcast "n_mucche_comprate_a_settimana" 1
    hubnet-broadcast "contributo_comune_rigenerazione" 0
   broadcast-system-info
 end
@@ -107,7 +107,7 @@ to go
       stop
     ]
 
-    tick
+tick
 
     ;; when not milking time
     ifelse (ticks mod ritmo_cicli) != 0
@@ -123,14 +123,20 @@ to go
   ;    invest_capital ;; toene buy units
  ;     update-plots
     ;  ask farmers [set total-lst (lput revenue-lst total-lst)]
+    if (ticks mod 7 = 0) [ broadcast-system-info stop ]
     ]
 
     reset-patches
+
+
   ]
 
  ask farmers [if capitale_totale <= 0 [die]]
 
  broadcast-system-info
+
+;  if (giorno != 0 and giorno mod 7 = 0) [stop]
+
   write_csv
 end
 
@@ -142,6 +148,8 @@ to graze  ;; goat procedure
     let new-food-amt (energia_acquisita + get-amt-eaten );
     if (new-food-amt < food-max)
       [ set energia_acquisita new-food-amt ]
+;       if (new-food-amt < food-max)
+ ;     set energia_acquisita new-food-amt
      ; [ set energia_acquisita food-max ]
   ]
 
@@ -157,7 +165,7 @@ end
 ;; sets the patch energia amount accordingly
 to-report get-amt-eaten  ;; goat procedure
   let reduced-amt (riserva-energetica - energia_richiesta)
-  ifelse (reduced-amt < 0)
+  ifelse (reduced-amt <= 0)
   [
     set riserva-energetica 0
     report riserva-energetica
@@ -172,8 +180,8 @@ end
 to profit-units  ;; farmer procedure ex milk-plants
   set guadagno_giornaliero
     (round-to-place (sum [energia_acquisita] of my-units) 10)
-  ask my-units
-    [ set energia_acquisita 0 ]
+;  ask my-units
+ ;   [ set energia_acquisita 0 ]
   set revenue-lst (lput guadagno_giornaliero revenue-lst)
   set capitale_totale capitale_totale + guadagno_giornaliero
 ;  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
@@ -187,8 +195,8 @@ end
 to invest_capital
   ask farmers
   [
-    if n_mucche_comprate_a_settimana > 0
-      [ buy-units n_mucche_comprate_a_settimana ]
+    if n_mucche_comprate_a_settimana > count my-units
+      [ buy-units (n_mucche_comprate_a_settimana - count my-units) ]
 ;    if n_mucche_comprate_a_settimana < 0
 ;      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
     set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
@@ -465,7 +473,7 @@ BUTTON
 200
 1161
 233
-NIL
+go
 go
 T
 1
@@ -616,10 +624,10 @@ PENS
 "blu" 1.0 1 -13345367 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) - count units with [owner# = \"blu\"])]"
 
 BUTTON
-1075
-243
-1164
-276
+1237
+247
+1326
+280
 rinnovo_risorse
 ask farmers [\nset capitale_totale capitale_totale - contributo_comune_rigenerazione\n; hubnet-send user-id \"Guadagno totale, Euro:\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_rigenerazione] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\n;hubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
 NIL
@@ -806,6 +814,23 @@ BUTTON
 NIL
 invest_capital
 NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1344
+338
+1407
+371
+chekc
+print (giorno) print ([energia_acquisita] of units) print ([capitale_totale] of one-of farmers) 
+T
 1
 T
 OBSERVER
