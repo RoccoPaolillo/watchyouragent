@@ -123,7 +123,10 @@ tick
   ;    invest_capital ;; toene buy units
  ;     update-plots
     ;  ask farmers [set total-lst (lput revenue-lst total-lst)]
-    if (ticks mod 7 = 0) [ broadcast-system-info stop ]
+    if (ticks mod 7 = 0) [
+        hubnet-broadcast "n_mucche_comprate_a_settimana" 1
+        broadcast-system-info
+        stop ]
     ]
 
     reset-patches
@@ -180,8 +183,8 @@ end
 to profit-units  ;; farmer procedure ex milk-plants
   set guadagno_giornaliero
     (round-to-place (sum [energia_acquisita] of my-units) 10)
-;  ask my-units
- ;   [ set energia_acquisita 0 ]
+  ask my-units
+    [ set energia_acquisita 0 ]
   set revenue-lst (lput guadagno_giornaliero revenue-lst)
   set capitale_totale capitale_totale + guadagno_giornaliero
 ;  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
@@ -197,6 +200,9 @@ to invest_capital
   [
     if n_mucche_comprate_a_settimana > count my-units
       [ buy-units (n_mucche_comprate_a_settimana - count my-units) ]
+ ;   if n_mucche_comprate_a_settimana < count my-units
+ ;     [ ask n-of (count my-units - n_mucche_comprate_a_settimana) my-units [die]
+ ;       buy-units (n_mucche_comprate_a_settimana) ]
 ;    if n_mucche_comprate_a_settimana < 0
 ;      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
     set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
@@ -573,7 +579,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.01
+0.05
 0.01
 1
 NIL
@@ -814,23 +820,6 @@ BUTTON
 NIL
 invest_capital
 NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1344
-338
-1407
-371
-chekc
-print (giorno) print ([energia_acquisita] of units) print ([capitale_totale] of one-of farmers) 
-T
 1
 T
 OBSERVER
