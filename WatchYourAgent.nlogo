@@ -45,6 +45,7 @@ farmers-own
   contrcom-lst
   lost_cows
   lost_cows-lst
+  units_to_buy
 ]
 
 
@@ -127,7 +128,9 @@ tick
         hubnet-broadcast "n_mucche_comprate_a_settimana" 1
         hubnet-broadcast "contributo_comune_rigenerazione" 0
         broadcast-system-info
-        stop ]
+        stop
+
+        ]
     ]
 
     reset-patches
@@ -205,14 +208,17 @@ to invest_capital
   ask farmers
   [
     if n_mucche_comprate_a_settimana > count my-units
-      [ buy-units (n_mucche_comprate_a_settimana - count my-units) ]
+      [set units_to_buy (n_mucche_comprate_a_settimana - count my-units)
+        buy-units units_to_buy ]; (n_mucche_comprate_a_settimana - count my-units) ]
    if n_mucche_comprate_a_settimana < count my-units
-        [ ask n-of (count my-units - n_mucche_comprate_a_settimana) my-units [die]]
+        [ set units_to_buy (count my-units - n_mucche_comprate_a_settimana)
+            ask n-of units_to_buy my-units [die]] ; (count my-units - n_mucche_comprate_a_settimana) my-units [die]]
  ;       buy-units (n_mucche_comprate_a_settimana) ]
 ;    if n_mucche_comprate_a_settimana < 0
 ;      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
     set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
     set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
+;    set guadagno_giornaliero 0
     send-personal-info
   ]
 end
@@ -425,7 +431,8 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "€ guadagno totale" capitale_totale
   hubnet-send user-id "€ costo nuove mucche" (costo/nuove_unità * new_cows)
   hubnet-send user-id "€ costo gestione mucche settimanale" ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7)
-  hubnet-send user-id "€ costi totali a settimana" (((costo/nuove_unità * n_mucche_comprate_a_settimana))  +  contributo_comune_rigenerazione + ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7))
+  hubnet-send user-id "€ costi totali a settimana" ((new_cows * costo/nuove_unità)  +  contributo_comune_rigenerazione + ((n_mucche_comprate_a_settimana * costo_gestione/unità) * 7))
+;  hubnet-send user-id "€ costi totali a settimana" (((costo/nuove_unità * n_mucche_comprate_a_settimana))  +  contributo_comune_rigenerazione + ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7)) - 10
   hubnet-send user-id "nuove mucche da comprare" new_cows
   hubnet-send user-id "mucche in vita" count my-units
   hubnet-send user-id "mucche perse" lost_cows
@@ -477,11 +484,11 @@ to-report new_cows
   [report (n_mucche_comprate_a_settimana - count my-units)][report 0]
 end
 
-to died_farmers
-hubnet-send user-id "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
+;to died_farmers
+;hubnet-send user-id "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
 ;  hubnet-broadcast "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
-ask my-units [die]
-end
+;ask my-units [die]
+;end
 
 ; Copyright 2002 Uri Wilensky.
 ; See Info tab for full copyright and license.
