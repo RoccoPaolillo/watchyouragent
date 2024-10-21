@@ -416,7 +416,7 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "€ guadagno totale" capitale_totale - 10
   hubnet-send user-id "€ costo settimanale mucche" (costo/nuove_unità * n_mucche_comprate_a_settimana)
-  hubnet-send user-id "€ costi totali a settimana" ((costo/nuove_unità * n_mucche_comprate_a_settimana) +  contributo_comune_rigenerazione)
+  hubnet-send user-id "€ costi totali a settimana" (((costo/nuove_unità * n_mucche_comprate_a_settimana) - costo/nuove_unità)  +  contributo_comune_rigenerazione + (costo_gestione/nuove_unità * n_mucche_comprate_a_settimana))
   hubnet-send user-id "numero mucche al giorno" (n_mucche_comprate_a_settimana)
  ; hubnet-send user-id "c.c.r." contributo_comune_rigenerazione
 ;  hubnet-send user-id "costo settimanale mucche" ((n_mucche_comprate_a_settimana * costo/nuove_unità))
@@ -479,8 +479,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-0
-0
+1
+1
 1
 -10
 10
@@ -1242,9 +1242,9 @@ need-to-manually-make-preview-for-this-model
 @#$#@#$#@
 VIEW
 497
-11
-1006
-477
+10
+960
+459
 0
 0
 0
@@ -1318,10 +1318,10 @@ NIL
 1
 
 SLIDER
-20
-444
-468
-477
+30
+425
+478
+458
 contributo_comune_rigenerazione
 contributo_comune_rigenerazione
 0.0
@@ -1393,20 +1393,30 @@ NIL
 1
 
 TEXTBOX
-1010
-17
-1025
-35
+968
+16
+983
+34
 NIL
 10
 0.0
 1
 
 TEXTBOX
-1012
-17
-1027
-35
+970
+16
+985
+34
+NIL
+10
+0.0
+1
+
+TEXTBOX
+499
+456
+527
+474
 NIL
 10
 0.0
