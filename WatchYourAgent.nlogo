@@ -257,9 +257,9 @@ to contributo_comune_refill
 ask farmers [
 set capitale_totale capitale_totale - contributo_comune_rigenerazione
 ; hubnet-send user-id "Guadagno totale, Euro:" capitale_totale
-if capitale_totale <= 0 [died_farmers die]
-    send-personal-info
-]
+;if capitale_totale <= 0 [died_farmers die]
+;    send-personal-info
+;]
 
 set refilling (sum [(contributo_comune_rigenerazione * 10)] of farmers  / count patches with [riserva-energetica < 50])
 ask patches with [riserva-energetica < 50]
@@ -474,7 +474,7 @@ to-report new_cows
 end
 
 to died_farmers
-  hubnet-send user-id "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
+hubnet-send user-id "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
 ;  hubnet-broadcast "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
 ask my-units [die]
 end
