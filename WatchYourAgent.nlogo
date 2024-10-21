@@ -135,7 +135,7 @@ tick
 
   ]
 
- ask farmers [if capitale_totale <= 0 [die]]
+ ask farmers [if capitale_totale <= 0 [died_farmers die]]
 
  broadcast-system-info
 
@@ -465,6 +465,10 @@ end
 to-report new_cows
   ifelse (n_mucche_comprate_a_settimana > count my-units)
   [report (n_mucche_comprate_a_settimana - count my-units)][report 0]
+end
+
+to died_farmers
+  ask farmers [ask my-units [die]]
 end
 
 ; Copyright 2002 Uri Wilensky.
