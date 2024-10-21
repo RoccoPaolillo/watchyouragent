@@ -135,7 +135,7 @@ tick
 
   ]
 
- ask farmers [if capitale_totale <= 0 [died_farmers die]]
+
 
  broadcast-system-info
 
@@ -192,6 +192,7 @@ to profit-units  ;; farmer procedure ex milk-plants
   set numero_mucche count my-units
   set numero_mucche-lst (lput (count my-units) numero_mucche-lst)
   set lost_cows-lst (lput lost_cows lost_cows-lst)
+  if capitale_totale <= 0 [died_farmers die]
   send-personal-info
 end
 
@@ -256,6 +257,8 @@ to contributo_comune_refill
 ask farmers [
 set capitale_totale capitale_totale - contributo_comune_rigenerazione
 ; hubnet-send user-id "Guadagno totale, Euro:" capitale_totale
+if capitale_totale <= 0 [died_farmers die]
+    send-personal-info
 ]
 
 set refilling (sum [(contributo_comune_rigenerazione * 10)] of farmers  / count patches with [riserva-energetica < 50])
@@ -266,6 +269,7 @@ color-patches
 if riserva-energetica >= 50 [set riserva-energetica 50]
 ]
 plot-value "Risorse Ambientali" totale_riserva-energetica
+
 end
 
 
@@ -470,8 +474,9 @@ to-report new_cows
 end
 
 to died_farmers
-  hubnet-broadcast "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
-  ask farmers [ask my-units [die]]
+  hubnet-send user-id "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
+;  hubnet-broadcast "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
+ask my-units [die]
 end
 
 ; Copyright 2002 Uri Wilensky.
