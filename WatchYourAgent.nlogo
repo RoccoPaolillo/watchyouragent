@@ -129,7 +129,7 @@ tick
         hubnet-broadcast "contributo_comune_rigenerazione" 0
         broadcast-system-info
         stop
-
+        ask farmers [hubnet-send user-id "Messaggio per voi:" (word "Potete comprare fino a " int (capitale_totale / costo/nuove_unità) " mucche")]
         ]
     ]
 
@@ -521,10 +521,10 @@ ticks
 30.0
 
 BUTTON
-1075
-244
-1164
-277
+1119
+245
+1208
+278
 go
 go
 T
@@ -583,10 +583,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-1072
-164
-1161
-197
+1122
+162
+1211
+195
 NIL
 setup
 NIL
@@ -857,12 +857,12 @@ costo_gestione/unità
 HORIZONTAL
 
 BUTTON
-1074
-200
-1162
-233
+1174
+203
+1262
+236
 choice
-if giorno >= 7 [invest_capital]\n\nif giorno >= 14 [contributo_comune_refill]\n
+if giorno >= 7 [invest_capital]\n\nif giorno >= 14 [contributo_comune_refill]\n\nhubnet-broadcast \"Messaggio per voi:\" \"\"
 NIL
 1
 T
@@ -894,6 +894,23 @@ PENS
 "rosa" 1.0 0 -1664597 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [count my-units] of one-of farmers with [user-id = \"rosa\"]]"
 "rosso" 1.0 0 -2674135 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [count my-units] of one-of farmers with [user-id = \"rosso\"]]"
 "blu" 1.0 0 -13345367 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [count my-units] of one-of farmers with [user-id = \"blu\"]]"
+
+BUTTON
+1073
+203
+1167
+236
+max_buying
+ask farmers [hubnet-send user-id \"Messaggio per voi:\" (word \"Potete comprare fino a \" int (capitale_totale / costo/nuove_unità) \" mucche\")]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
