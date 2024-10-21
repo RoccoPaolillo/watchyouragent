@@ -417,7 +417,7 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "€ guadagno totale" capitale_totale - 10
   hubnet-send user-id "€ costo nuove mucche" (costo/nuove_unità * new_cows)
   hubnet-send user-id "€ costo gestione mucche settimanale" ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7)
-  hubnet-send user-id "€ costi totali a settimana" (((costo/nuove_unità * n_mucche_comprate_a_settimana) - costo/nuove_unità)  +  contributo_comune_rigenerazione + ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7))
+  hubnet-send user-id "€ costi totali a settimana" (((costo/nuove_unità * n_mucche_comprate_a_settimana))  +  contributo_comune_rigenerazione + ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7))
   hubnet-send user-id "nuove mucche da comprare" new_cows
   hubnet-send user-id "mucche in vita" count my-units
   hubnet-send user-id "mucche perse" lost_cows
