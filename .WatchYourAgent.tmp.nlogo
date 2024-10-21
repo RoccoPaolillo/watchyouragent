@@ -858,10 +858,10 @@ NIL
 1
 
 PLOT
-1140
-412
-1487
-574
+1143
+307
+1456
+457
 Report mucche vive
 NIL
 NIL
