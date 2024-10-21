@@ -258,7 +258,7 @@ set capitale_totale capitale_totale - contributo_comune_rigenerazione
 ; hubnet-send user-id "Guadagno totale, Euro:" capitale_totale
 ]
 
-set refilling (sum [contributo_comune_rigenerazione] of farmers / count patches with [riserva-energetica < 50])
+set refilling (sum [(contributo_comune_rigenerazione * 10)] of farmers  / count patches with [riserva-energetica < 50])
 ask patches with [riserva-energetica < 50]
 [
 set riserva-energetica riserva-energetica + refilling
@@ -602,7 +602,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.01
+0.1
 0.01
 1
 NIL
@@ -779,7 +779,7 @@ PLOT
 211
 471
 404
-Mucche in vita
+Report mucche
 NIL
 NIL
 0.0
