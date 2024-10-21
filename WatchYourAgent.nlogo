@@ -468,6 +468,7 @@ to-report new_cows
 end
 
 to died_farmers
+  hubnet-broadcast "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
   ask farmers [ask my-units [die]]
 end
 
@@ -1309,7 +1310,7 @@ SLIDER
 n_mucche_comprate_a_settimana
 n_mucche_comprate_a_settimana
 1.0
-30.0
+60.0
 0
 1.0
 1
@@ -1429,6 +1430,16 @@ TEXTBOX
 NIL
 10
 0.0
+1
+
+MONITOR
+19
+355
+476
+404
+Messaggio per voi:
+NIL
+3
 1
 
 @#$#@#$#@
