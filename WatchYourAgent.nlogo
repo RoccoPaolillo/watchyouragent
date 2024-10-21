@@ -161,7 +161,7 @@ to graze  ;; goat procedure
  lt (random-float 360)
  fd 1
 
-  if energia_acquisita <= 0 [ask farmers with [user-id = [owner#] of myself][set lost_cows lost_cows + 1] die]
+ if energia_acquisita <= 0 [ask farmers with [user-id = [owner#] of myself][set lost_cows lost_cows + 1] die]
 end
 
 
@@ -192,8 +192,12 @@ to profit-units  ;; farmer procedure ex milk-plants
   set numero_mucche count my-units
   set numero_mucche-lst (lput (count my-units) numero_mucche-lst)
   set lost_cows-lst (lput lost_cows lost_cows-lst)
-  if capitale_totale <= 0 [died_farmers die]
+
   send-personal-info
+  if capitale_totale <= 0 [
+hubnet-send user-id "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
+ask my-units [die]
+    die]
 end
 
 ;; the goat market setup
@@ -259,7 +263,7 @@ set capitale_totale capitale_totale - contributo_comune_rigenerazione
 ; hubnet-send user-id "Guadagno totale, Euro:" capitale_totale
 ;if capitale_totale <= 0 [died_farmers die]
 ;    send-personal-info
-;]
+]
 
 set refilling (sum [(contributo_comune_rigenerazione * 10)] of farmers  / count patches with [riserva-energetica < 50])
 ask patches with [riserva-energetica < 50]
@@ -418,7 +422,7 @@ end
 to send-personal-info  ;; farmer procedure
   hubnet-send user-id "Voi allevate la mandria di colore:" user-id
   hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
-  hubnet-send user-id "€ guadagno totale" capitale_totale - 10
+  hubnet-send user-id "€ guadagno totale" capitale_totale
   hubnet-send user-id "€ costo nuove mucche" (costo/nuove_unità * new_cows)
   hubnet-send user-id "€ costo gestione mucche settimanale" ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7)
   hubnet-send user-id "€ costi totali a settimana" (((costo/nuove_unità * n_mucche_comprate_a_settimana))  +  contributo_comune_rigenerazione + ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7))
