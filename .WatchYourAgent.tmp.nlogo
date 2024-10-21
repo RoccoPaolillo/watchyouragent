@@ -1334,7 +1334,7 @@ contributo_comune_rigenerazione
 0
 1.0
 1
-€
+NIL
 HORIZONTAL
 
 MONITOR
