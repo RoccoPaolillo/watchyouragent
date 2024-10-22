@@ -168,7 +168,7 @@ to graze  ;; goat procedure
  lt (random-float 360)
  fd 1
 
- if energia_acquisita <= 0 [ask farmers with [user-id = [owner#] of myself][set lost_cows lost_cows + 1] die]
+  if settimana > 1 [if energia_acquisita <= 0 [ask farmers with [user-id = [owner#] of myself][set lost_cows lost_cows + 1] die]]
 end
 
 
@@ -630,7 +630,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.1
+0.6
 0.01
 1
 NIL
@@ -841,7 +841,7 @@ INPUTBOX
 1147
 135
 TURN
-GE_12_
+GE12_
 1
 0
 String
@@ -879,19 +879,19 @@ NIL
 1
 
 OUTPUT
-1130
-329
-1474
-565
+1135
+335
+1494
+571
 10
 
 BUTTON
-1339
-292
-1402
-325
+1329
+295
+1392
+328
 rank
-clear-output\noutput-print (word [user-id] of farmers \" : capitale \" [capitale_totale] of farmers \" mucche in vita: \" [count my-units] of farmers)
+clear-output\nask farmers [output-show (word user-id \" capitale \"  capitale_totale \" ccr \" contributo_comune_rigenerazione)]\n;foreach [\"rosso\" \"azzurro\" \"giallo\" \"rosa\" \"blu\"]  [ x -> output-print (word [user-id] of one-of farmers with [user-id = x]  \" capitale \"  \n;[capitale_totale] of one-of farmers with [user-id = x] \" ccr \" [contributo_comune_rigenerazione] of one-of farmers with [user-id = x])]
 NIL
 1
 T
@@ -980,6 +980,23 @@ totriserva_energetica-lst
 17
 1
 11
+
+BUTTON
+1396
+295
+1491
+328
+NIL
+clear-output
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
