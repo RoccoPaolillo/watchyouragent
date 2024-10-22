@@ -681,7 +681,7 @@ BUTTON
 1246
 107
 show_costs
-ask farmers [\nsend-personal-info\n; if any? farmers with [user-id = \"viola\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"viola\"] ]\n; if any? farmers with [user-id = \"marrone\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"marrone\"] ]\n; if any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"rosso\"] ]\n; if any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"azzurro\"] ]\n; if any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"blu\"] ]\n]
+ask farmers [\nsend-personal-info\n\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n\n]
 T
 1
 T
@@ -901,7 +901,7 @@ BUTTON
 1167
 236
 max_buying
-ask farmers [hubnet-send user-id \"Messaggio per voi:\" (word \"Potete comprare fino a \" int (capitale_totale / costo/nuove_unità) \" mucche\")]
+ask farmers [\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Potete comprare fino a \" int (capitale_totale / costo/nuove_unità) \" mucche\")]\n[]\n]
 NIL
 1
 T
