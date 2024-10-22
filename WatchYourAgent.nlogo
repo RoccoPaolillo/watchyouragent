@@ -11,6 +11,7 @@ globals
   energia_richiesta          ;; amount of energia collected at each move
   refilling
   settimana
+  totriserva_energetica-lst
 ]
 
 patches-own
@@ -80,6 +81,7 @@ to setup-globals
   set energia-max 50
   set food-max 50
   set energia_richiesta (round (100 / (ritmo_cicli - 1)))
+  set totriserva_energetica-lst []
 end
 
 ;; initialize energia supply for each patch
@@ -121,12 +123,14 @@ tick
       set settimana ceiling (giorno / 7)
       ask farmers
         [ profit-units ]
+      set totriserva_energetica-lst (lput precision totale_riserva-energetica 2 totriserva_energetica-lst)
   ;    invest_capital ;; toene buy units
  ;     update-plots
     ;  ask farmers [set total-lst (lput revenue-lst total-lst)]
     if (ticks mod 7 = 0) [
         hubnet-broadcast "n_mucche_comprate_a_settimana" 1
         hubnet-broadcast "contributo_comune_rigenerazione" 0
+
         broadcast-system-info
         stop
 
@@ -476,7 +480,8 @@ foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "dat
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_muccheslider.csv") [n_mucche-lst] of farmers with [user-id = x]]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
-
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_lostcows.csv") [lost_cows-lst] of farmers with [user-id = x]]
+  csv:to-file "data/global_risenergtot.csv" (list totriserva_energetica-lst)
 end
 
 to-report new_cows
@@ -881,10 +886,10 @@ OUTPUT
 10
 
 BUTTON
-1350
-231
-1413
-264
+1339
+292
+1402
+325
 rank
 clear-output\noutput-print (word [user-id] of farmers \" : capitale \" [capitale_totale] of farmers \" mucche in vita: \" [count my-units] of farmers)
 NIL
@@ -964,6 +969,17 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+1525
+148
+1610
+193
+NIL
+totriserva_energetica-lst
+17
+1
+11
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
