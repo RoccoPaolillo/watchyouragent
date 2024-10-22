@@ -693,9 +693,9 @@ NIL
 1
 
 MONITOR
-1075
+1066
 327
-1132
+1123
 372
 azzurro
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"azzurro\"]
@@ -704,9 +704,9 @@ azzurro
 11
 
 MONITOR
-1075
+1066
 376
-1132
+1123
 421
 giallo
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"giallo\"]
@@ -715,9 +715,9 @@ giallo
 11
 
 MONITOR
-1075
+1066
 423
-1132
+1123
 468
 rosa
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosa\"]
@@ -726,9 +726,9 @@ rosa
 11
 
 MONITOR
-1075
+1066
 469
-1132
+1123
 514
 rosso
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosso\"]
@@ -737,9 +737,9 @@ rosso
 11
 
 MONITOR
-1075
+1066
 516
-1132
+1123
 561
 blu
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"blu\"]
@@ -857,12 +857,12 @@ costo_gestione/unità
 HORIZONTAL
 
 BUTTON
-1174
-203
-1262
-236
+1173
+204
+1261
+237
 choice
-if giorno >= 7 [invest_capital]\n\nif giorno >= 14 [contributo_comune_refill]\n
+if giorno >= 7 [invest_capital]\n\nif giorno >= 14 [contributo_comune_refill]\nask farmers [ hubnet-broadcast \"Messaggio per voi:\" \"\"]\n 
 NIL
 1
 T
@@ -874,19 +874,19 @@ NIL
 1
 
 OUTPUT
-1160
-309
-1363
-563
+1130
+329
+1474
+565
 10
 
 BUTTON
-1380
-319
-1443
-352
+1350
+231
+1413
+264
 rank
-clear-output\noutput-print (word [user-id] of farmers [capitale_totale] of farmers)
+clear-output\noutput-print (word [user-id] of farmers \" : capitale \" [capitale_totale] of farmers \" mucche in vita: \" [count my-units] of farmers)
 NIL
 1
 T
@@ -954,7 +954,7 @@ BUTTON
 1171
 235
 max_buying
-ask farmers [\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n]
+ask farmers [\n\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[ifelse contributo_comune_rigenerazione > capitale_totale\n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! L'acquisto di nuove mucche e capitale comune è superiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n]\n[ifelse contributo_comune_rigenerazione > capitale_totale \n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! Il contributo comune dovrebbe essere inferiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n]\n]\n
 T
 1
 T
