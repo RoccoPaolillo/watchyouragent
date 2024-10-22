@@ -129,7 +129,7 @@ tick
         hubnet-broadcast "contributo_comune_rigenerazione" 0
         broadcast-system-info
         stop
-        ask farmers [hubnet-send user-id "Messaggio per voi:" (word "Potete comprare fino a " int (capitale_totale / costo/nuove_unità) " mucche")]
+
         ]
     ]
 
@@ -654,10 +654,10 @@ PENS
 "blu" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
-1532
-117
-1754
-307
+1622
+126
+1844
+316
 Numero mucche perse
 NIL
 NIL
@@ -681,7 +681,7 @@ BUTTON
 1246
 107
 show_costs
-ask farmers [\nsend-personal-info\n\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n\n]
+ask farmers [\nsend-personal-info\n\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n\n]\n\n 
 T
 1
 T
@@ -769,11 +769,11 @@ Contributo comune singoli gruppi
 1
 
 PLOT
-23
-405
-471
-585
-Risorse Ambientali
+1629
+332
+1965
+504
+Risorse Ambientali 7 days
 NIL
 NIL
 0.0
@@ -787,10 +787,10 @@ PENS
 "" 1.0 0 -14333415 true "" "ifelse (ticks mod ritmo_cicli) != 0 [] [plot totale_riserva-energetica]"
 
 MONITOR
-23
-540
-121
-585
+1655
+458
+1753
+503
 risorse ambientali
 totale_riserva-energetica
 2
@@ -798,11 +798,11 @@ totale_riserva-energetica
 11
 
 PLOT
-24
-211
-471
-404
-Report mucche perse
+1634
+131
+2025
+320
+Report mucche perse 7 days
 NIL
 NIL
 0.0
@@ -873,28 +873,6 @@ NIL
 NIL
 1
 
-PLOT
-1140
-412
-1487
-574
-Report mucche vive
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"azzurro" 1.0 0 -11221820 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [count my-units] of one-of farmers with [user-id = \"azzurro\"]]"
-"giallo" 1.0 0 -1184463 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [count my-units] of one-of farmers with [user-id = \"giallo\"]]"
-"rosa" 1.0 0 -1664597 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [count my-units] of one-of farmers with [user-id = \"rosa\"]]"
-"rosso" 1.0 0 -2674135 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [count my-units] of one-of farmers with [user-id = \"rosso\"]]"
-"blu" 1.0 0 -13345367 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [count my-units] of one-of farmers with [user-id = \"blu\"]]"
-
 BUTTON
 1073
 203
@@ -911,6 +889,81 @@ NIL
 NIL
 NIL
 1
+
+OUTPUT
+1160
+309
+1363
+563
+10
+
+BUTTON
+1380
+319
+1443
+352
+rank
+clear-output\noutput-print (word [user-id] of farmers [capitale_totale] of farmers)
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+22
+212
+471
+402
+Report mucche morte
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"azzurro" 1.0 0 -11221820 true "" "plot [lost_cows] of one-of farmers with [user-id = \"azzurro\"]"
+"giallo" 1.0 0 -1184463 true "" "plot [lost_cows] of one-of farmers with [user-id = \"giallo\"]"
+"rosa" 1.0 0 -1664597 true "" "plot [lost_cows] of one-of farmers with [user-id = \"rosa\"]"
+"rosso" 1.0 0 -2674135 true "" "plot [lost_cows] of one-of farmers with [user-id = \"rosso\"]"
+"blu" 1.0 0 -13345367 true "" "plot [lost_cows] of one-of farmers with [user-id = \"blu\"]"
+
+PLOT
+23
+403
+472
+587
+Risorse Ambientali
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot totale_riserva-energetica"
+
+MONITOR
+22
+543
+130
+588
+risorse ambientali
+totale_riserva-energetica
+2
+1
+11
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
@@ -1367,7 +1420,7 @@ SLIDER
 n_mucche_comprate_a_settimana
 n_mucche_comprate_a_settimana
 1.0
-60.0
+100.0
 0
 1.0
 1
@@ -1394,7 +1447,7 @@ contributo_comune_rigenerazione
 0.0
 1000.0
 0
-1.0
+10.0
 1
 €
 HORIZONTAL
@@ -1432,7 +1485,7 @@ NIL
 MONITOR
 290
 237
-473
+480
 286
 € costo gestione mucche settimanale
 NIL
