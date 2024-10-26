@@ -6,6 +6,7 @@ extensions [csv]
 globals
 [
   giorno                ;; number of days so far
+  giorno-lst
   energia-max          ;; energia capacity
   food-max           ;; energia collection capacity
   energia_richiesta          ;; amount of energia collected at each move
@@ -71,6 +72,7 @@ to setup
    hubnet-broadcast "n_mucche_comprate_a_settimana" 1
    hubnet-broadcast "contributo_comune_rigenerazione" 0
   broadcast-system-info
+  write_csv
 end
 
 ;; initialize global variables
@@ -82,6 +84,9 @@ to setup-globals
   set food-max 50
   set energia_richiesta (round (100 / (ritmo_cicli - 1)))
   set totriserva_energetica-lst []
+  set totriserva_energetica-lst (lput precision totale_riserva-energetica 2 totriserva_energetica-lst)
+  set giorno-lst []
+  set giorno-lst (lput giorno giorno-lst)
 end
 
 ;; initialize energia supply for each patch
@@ -124,6 +129,7 @@ tick
       ask farmers
         [ profit-units ]
       set totriserva_energetica-lst (lput precision totale_riserva-energetica 2 totriserva_energetica-lst)
+      set giorno-lst (lput giorno giorno-lst)
   ;    invest_capital ;; toene buy units
  ;     update-plots
     ;  ask farmers [set total-lst (lput revenue-lst total-lst)]
@@ -148,7 +154,7 @@ tick
 
 ;  if (giorno != 0 and giorno mod 7 = 0) [stop]
 
-  write_csv
+ write_csv
 end
 
 ;; goat move along the common looking for best patch of energia
@@ -202,7 +208,7 @@ to profit-units  ;; farmer procedure ex milk-plants
 
   send-personal-info
   if capitale_totale <= 0 [
-hubnet-send user-id "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
+hubnet-send user-id "Messaggio per voi:" "Ci dispiace, GAME OVER :("
 ask my-units [die]
     die]
 end
@@ -406,12 +412,18 @@ end
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
   set revenue-lst []
+  set revenue-lst (lput guadagno_giornaliero revenue-lst)
   set capitale_totale-lst []
+  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
   ;set total-lst []
   set numero_mucche-lst []
+  set numero_mucche-lst (lput (count my-units) numero_mucche-lst)
   set contrcom-lst []
+  set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
   set n_mucche-lst[]
+  set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
   set lost_cows-lst []
+  set lost_cows-lst (lput lost_cows lost_cows-lst)
   set n_mucche_comprate_a_settimana 1
   set contributo_comune_rigenerazione 0
   set capitale_totale costo/nuove_unità
@@ -475,13 +487,14 @@ end
 to write_csv
 
 
-foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_muccheslider.csv") [n_mucche-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_lostcows.csv") [lost_cows-lst] of farmers with [user-id = x]]
-  csv:to-file "data/global_risenergtot.csv" (list totriserva_energetica-lst)
+foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_muccheslider.csv") [n_mucche-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_lostcows.csv") [lost_cows-lst] of farmers with [user-id = x]]
+  csv:to-file (word "data/" TURN CONDITION "global_risenergtot.csv") (list totriserva_energetica-lst)
+  csv:to-file (word "data/" TURN CONDITION "giorno.csv") (list giorno-lst)
 end
 
 to-report new_cows
@@ -605,10 +618,10 @@ NIL
 1
 
 BUTTON
-1157
-112
-1247
-145
+1240
+115
+1330
+148
 login
 listen-to-clients
 T
@@ -652,11 +665,11 @@ true
 true
 "" ""
 PENS
-"azzurro" 1.0 0 -11221820 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"azzurro\"]"
-"giallo" 1.0 0 -1184463 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"giallo\"]"
-"rosa" 1.0 0 -1664597 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"rosa\"]"
-"rosso" 1.0 0 -2674135 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"rosso\"]"
-"blu" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
+"AZZURRO" 1.0 0 -11221820 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"azzurro\"]"
+"GIALLO" 1.0 0 -1184463 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"giallo\"]"
+"ROSA" 1.0 0 -1664597 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"rosa\"]"
+"ROSSO" 1.0 0 -2674135 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"rosso\"]"
+"BLU" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
 1622
@@ -681,10 +694,10 @@ PENS
 "blu" 1.0 1 -13345367 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) - count units with [owner# = \"blu\"])]"
 
 BUTTON
-1155
-74
-1246
-107
+1238
+77
+1329
+110
 show_costs
 ask farmers [\nsend-personal-info\n\n]\n\n 
 T
@@ -838,10 +851,10 @@ giorno
 INPUTBOX
 1071
 75
-1147
+1132
 135
 TURN
-GE12_
+RM01_
 1
 0
 String
@@ -867,7 +880,7 @@ BUTTON
 1261
 237
 choice
-if giorno >= 7 [invest_capital]\n\nif giorno >= 14 [contributo_comune_refill]\nask farmers [ hubnet-broadcast \"Messaggio per voi:\" \"\"]\n 
+if giorno >= day_invest [invest_capital]\n\nif giorno >= day_contrcom [contributo_comune_refill]\nask farmers [ hubnet-broadcast \"Messaggio per voi:\" \"\"]\n 
 NIL
 1
 T
@@ -879,9 +892,9 @@ NIL
 1
 
 OUTPUT
-1135
+1132
 335
-1494
+1505
 571
 10
 
@@ -907,7 +920,7 @@ PLOT
 212
 471
 402
-Report mucche morte
+Report mucche perse
 NIL
 NIL
 0.0
@@ -918,11 +931,11 @@ true
 true
 "" ""
 PENS
-"azzurro" 1.0 0 -11221820 true "" "plot [lost_cows] of one-of farmers with [user-id = \"azzurro\"]"
-"giallo" 1.0 0 -1184463 true "" "plot [lost_cows] of one-of farmers with [user-id = \"giallo\"]"
-"rosa" 1.0 0 -1664597 true "" "plot [lost_cows] of one-of farmers with [user-id = \"rosa\"]"
-"rosso" 1.0 0 -2674135 true "" "plot [lost_cows] of one-of farmers with [user-id = \"rosso\"]"
-"blu" 1.0 0 -13345367 true "" "plot [lost_cows] of one-of farmers with [user-id = \"blu\"]"
+"AZZURRO" 1.0 0 -11221820 true "" "plot [lost_cows] of one-of farmers with [user-id = \"azzurro\"]"
+"GIALLO" 1.0 0 -1184463 true "" "plot [lost_cows] of one-of farmers with [user-id = \"giallo\"]"
+"ROSA" 1.0 0 -1664597 true "" "plot [lost_cows] of one-of farmers with [user-id = \"rosa\"]"
+"ROSSO" 1.0 0 -2674135 true "" "plot [lost_cows] of one-of farmers with [user-id = \"rosso\"]"
+"BLU" 1.0 0 -13345367 true "" "plot [lost_cows] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
 23
@@ -997,6 +1010,77 @@ NIL
 NIL
 NIL
 1
+
+TEXTBOX
+180
+10
+302
+41
+ GUADAGNO
+20
+0.0
+0
+
+TEXTBOX
+161
+208
+316
+234
+MUCCHE PERSE
+20
+0.0
+0
+
+TEXTBOX
+131
+400
+340
+424
+RISORSE AMBIENTALI
+20
+0.0
+0
+
+SLIDER
+1348
+89
+1464
+122
+day_invest
+day_invest
+0
+50
+7.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1349
+126
+1464
+159
+day_contrcom
+day_contrcom
+0
+50
+14.0
+1
+1
+NIL
+HORIZONTAL
+
+INPUTBOX
+1135
+75
+1199
+135
+CONDITION
+_pre_
+1
+0
+String
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
@@ -1426,10 +1510,10 @@ NIL
 1
 
 MONITOR
-178
-295
-319
-344
+176
+275
+317
+324
 € costo nuove mucche
 NIL
 3
@@ -1446,14 +1530,14 @@ NIL
 1
 
 SLIDER
-27
-244
-283
-277
+23
+230
+477
+263
 n_mucche_comprate_a_settimana
 n_mucche_comprate_a_settimana
 1.0
-100.0
+50.0
 0
 1.0
 1
@@ -1496,40 +1580,40 @@ NIL
 1
 
 MONITOR
-22
-294
-170
-343
+20
+274
+168
+323
 nuove mucche da comprare
 NIL
 3
 1
 
 MONITOR
-24
-172
-478
-221
+48
+157
+267
+206
 € costi totali a settimana
 NIL
 3
 1
 
 MONITOR
-290
-237
-480
-286
+269
+156
+459
+205
 € costo gestione mucche settimanale
 NIL
 3
 1
 
 TEXTBOX
-27
-149
-475
-167
+28
+331
+476
+349
 Ricordate di non spendere più di quanto guadagnato (€ guadagno totale)!
 13
 0.0
@@ -1576,10 +1660,10 @@ NIL
 1
 
 MONITOR
-19
-355
-476
-404
+20
+359
+477
+408
 Messaggio per voi:
 NIL
 3
