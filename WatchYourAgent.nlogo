@@ -318,7 +318,9 @@ end
 
 ;; colors patches according to amount of energia on the patch
 to color-patches  ;; patch procedure
-  set pcolor (scale-color green riserva-energetica -5 (2 * energia-max))
+  ifelse riserva-energetica < 50
+    [set pcolor (scale-color green riserva-energetica -5 (2 * energia-max))]
+    [set pcolor 55.23809523809524]
 end
 
 
@@ -519,8 +521,8 @@ to write_csv
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
     [ csv:to-file (word "data/" TURN CONDITION x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
   ]
-  csv:to-file (word "data/" TURN CONDITION "global_risenergtot.csv") (list totriserva_energetica-lst)
-  csv:to-file (word "data/" TURN CONDITION "giorno.csv") (list giorno-lst)
+  csv:to-file (word "data/global/" TURN CONDITION "global_risenergtot.csv") (list totriserva_energetica-lst)
+  csv:to-file (word "data/global/" TURN CONDITION "giorno.csv") (list giorno-lst)
 end
 
 to-report new_cows
@@ -565,10 +567,10 @@ ticks
 30.0
 
 BUTTON
-1175
-199
-1264
-232
+1170
+219
+1259
+252
 go
 go
 T
@@ -627,10 +629,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-1122
-162
-1211
-195
+1118
+174
+1207
+207
 NIL
 setup
 NIL
@@ -901,10 +903,10 @@ costo_gestione/unità
 HORIZONTAL
 
 BUTTON
-1084
-200
-1172
-233
+1078
+219
+1166
+252
 choice
 if giorno >= day_invest [invest_capital]\n\nif giorno >= day_contrcom [contributo_comune_refill]\nask farmers [ hubnet-broadcast \"Messaggio per voi:\" \"\"]\n 
 NIL
