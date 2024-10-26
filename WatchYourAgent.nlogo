@@ -48,6 +48,8 @@ farmers-own
   lost_cows
   lost_cows-lst
   units_to_buy
+  day_alive-lst
+  muccheslider-lst
 ]
 
 
@@ -136,7 +138,7 @@ tick
     if (ticks mod 7 = 0) [
         hubnet-broadcast "n_mucche_comprate_a_settimana" 1
         hubnet-broadcast "contributo_comune_rigenerazione" 0
-
+write_csv
         broadcast-system-info
         stop
 
@@ -205,7 +207,10 @@ to profit-units  ;; farmer procedure ex milk-plants
   set numero_mucche count my-units
   set numero_mucche-lst (lput (count my-units) numero_mucche-lst)
   set lost_cows-lst (lput lost_cows lost_cows-lst)
-
+  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
+  set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
+  set muccheslider-lst (lput n_mucche_comprate_a_settimana muccheslider-lst)
+  set day_alive-lst (lput giorno day_alive-lst)
   send-personal-info
   if capitale_totale <= 0 [
 hubnet-send user-id "Messaggio per voi:" "Ci dispiace, GAME OVER :("
@@ -226,8 +231,8 @@ to invest_capital
  ;       buy-units (n_mucche_comprate_a_settimana) ]
 ;    if n_mucche_comprate_a_settimana < 0
 ;      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
-    set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
-    set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
+;    set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
+;    set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
 ;    set guadagno_giornaliero 0
     send-personal-info
   ]
@@ -245,7 +250,7 @@ to buy-units [ num-units-desired ]  ;; farmer procedure
   ]
   let cost-of-purchase num-units-purchase * costo/nuove_unità
   set capitale_totale (capitale_totale - cost-of-purchase)
-  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
+ ; set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
   hatch num-units-purchase
     [ setup-units user-id ]
 end
@@ -424,6 +429,12 @@ to reset-farmers-vars  ;; farmer procedure
   set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
   set lost_cows-lst []
   set lost_cows-lst (lput lost_cows lost_cows-lst)
+  set day_alive-lst []
+  set day_alive-lst (lput giorno day_alive-lst)
+  set muccheslider-lst []
+  set muccheslider-lst (lput n_mucche_comprate_a_settimana muccheslider-lst)
+  set contrcom-lst []
+  set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
   set n_mucche_comprate_a_settimana 1
   set contributo_comune_rigenerazione 0
   set capitale_totale costo/nuove_unità
@@ -487,12 +498,27 @@ end
 to write_csv
 
 
-foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_muccheslider.csv") [n_mucche-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN CONDITION x "_lostcows.csv") [lost_cows-lst] of farmers with [user-id = x]]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+    [ csv:to-file (word "data/" TURN CONDITION x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+   [ csv:to-file (word "data/" TURN CONDITION x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+   [ csv:to-file (word "data/" TURN CONDITION x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
+    [csv:to-file (word "data/" TURN CONDITION x "_muccheslider.csv") [muccheslider-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
+    [csv:to-file (word "data/" TURN CONDITION x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
+    [csv:to-file (word "data/" TURN CONDITION x "_muccheperse.csv") [lost_cows-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+    [ csv:to-file (word "data/" TURN CONDITION x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
+  ]
   csv:to-file (word "data/" TURN CONDITION "global_risenergtot.csv") (list totriserva_energetica-lst)
   csv:to-file (word "data/" TURN CONDITION "giorno.csv") (list giorno-lst)
 end
@@ -539,10 +565,10 @@ ticks
 30.0
 
 BUTTON
-1119
-245
-1208
-278
+1175
+199
+1264
+232
 go
 go
 T
@@ -875,10 +901,10 @@ costo_gestione/unità
 HORIZONTAL
 
 BUTTON
-1173
-204
-1261
-237
+1084
+200
+1172
+233
 choice
 if giorno >= day_invest [invest_capital]\n\nif giorno >= day_contrcom [contributo_comune_refill]\nask farmers [ hubnet-broadcast \"Messaggio per voi:\" \"\"]\n 
 NIL
@@ -967,10 +993,10 @@ totale_riserva-energetica
 11
 
 BUTTON
-1088
-202
-1171
-235
+1240
+152
+1330
+185
 max_buying
 ask farmers [\n\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[ifelse contributo_comune_rigenerazione > capitale_totale\n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! L'acquisto di nuove mucche e capitale comune è superiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n]\n[ifelse contributo_comune_rigenerazione > capitale_totale \n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! Il contributo comune dovrebbe essere inferiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n]\n]\n
 T
