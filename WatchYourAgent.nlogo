@@ -50,6 +50,8 @@ farmers-own
   units_to_buy
   day_alive-lst
   muccheslider-lst
+  condition-lst
+  ccr_invested
 ]
 
 
@@ -211,6 +213,7 @@ to profit-units  ;; farmer procedure ex milk-plants
   set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
   set muccheslider-lst (lput n_mucche_comprate_a_settimana muccheslider-lst)
   set day_alive-lst (lput giorno day_alive-lst)
+  set condition-lst (lput condition condition-lst)
   send-personal-info
   if capitale_totale <= 0 [
 hubnet-send user-id "Messaggio per voi:" "Ci dispiace, GAME OVER :("
@@ -280,6 +283,7 @@ end
 
 to contributo_comune_refill
 ask farmers [
+set ccr_invested contributo_comune_rigenerazione
 set capitale_totale capitale_totale - contributo_comune_rigenerazione
 ; hubnet-send user-id "Guadagno totale, Euro:" capitale_totale
 ;if capitale_totale <= 0 [died_farmers die]
@@ -437,11 +441,14 @@ to reset-farmers-vars  ;; farmer procedure
   set muccheslider-lst (lput n_mucche_comprate_a_settimana muccheslider-lst)
   set contrcom-lst []
   set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
+  set condition-lst []
+  set condition-lst (lput condition condition-lst)
   set n_mucche_comprate_a_settimana 1
   set contributo_comune_rigenerazione 0
   set capitale_totale costo/nuove_unità
   set guadagno_giornaliero 0
   set lost_cows 0
+  set ccr_invested 0
   ;; get rid of existing units
   ask my-units
     [ die ]
@@ -501,28 +508,31 @@ to write_csv
 
 
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" TURN CONDITION x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" TURN x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-   [ csv:to-file (word "data/" TURN CONDITION x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
+   [ csv:to-file (word "data/" TURN  x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-   [ csv:to-file (word "data/" TURN CONDITION x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
+   [ csv:to-file (word "data/" TURN  x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
-    [csv:to-file (word "data/" TURN CONDITION x "_muccheslider.csv") [muccheslider-lst] of farmers with [user-id = x]]
+    [csv:to-file (word "data/" TURN  x "_muccheslider.csv") [muccheslider-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
-    [csv:to-file (word "data/" TURN CONDITION x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
+    [csv:to-file (word "data/" TURN  x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
-    [csv:to-file (word "data/" TURN CONDITION x "_muccheperse.csv") [lost_cows-lst] of farmers with [user-id = x]]
+    [csv:to-file (word "data/" TURN  x "_muccheperse.csv") [lost_cows-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" TURN CONDITION x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" TURN  x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
   ]
-  csv:to-file (word "data/global/" TURN CONDITION "global_risenergtot.csv") (list totriserva_energetica-lst)
-  csv:to-file (word "data/global/" TURN CONDITION "giorno.csv") (list giorno-lst)
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+    [ csv:to-file (word "data/" TURN  x "_condition.csv") [condition-lst] of farmers with [user-id = x]]
+  ]
+  csv:to-file (word "data/global/" TURN  "global_risenergtot.csv") (list totriserva_energetica-lst)
+  csv:to-file (word "data/global/" TURN  "giorno.csv") (list giorno-lst)
 end
 
 to-report new_cows
@@ -700,10 +710,10 @@ PENS
 "BLU" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
-1622
-126
-1844
-316
+1630
+22
+1852
+212
 Numero mucche perse
 NIL
 NIL
@@ -815,10 +825,10 @@ Contributo comune singoli gruppi
 1
 
 PLOT
-1629
-332
-1965
-504
+1637
+228
+1973
+400
 Risorse Ambientali 7 days
 NIL
 NIL
@@ -832,22 +842,11 @@ true
 PENS
 "" 1.0 0 -14333415 true "" "ifelse (ticks mod ritmo_cicli) != 0 [] [plot totale_riserva-energetica]"
 
-MONITOR
-1655
-458
-1753
-503
-risorse ambientali
-totale_riserva-energetica
-2
-1
-11
-
 PLOT
-1634
-131
-2025
-320
+1642
+27
+2033
+216
 Report mucche perse 7 days
 NIL
 NIL
@@ -1011,17 +1010,6 @@ NIL
 NIL
 1
 
-MONITOR
-1525
-148
-1610
-193
-NIL
-totriserva_energetica-lst
-17
-1
-11
-
 BUTTON
 1396
 295
@@ -1093,7 +1081,7 @@ day_contrcom
 day_contrcom
 0
 50
-14.0
+7.0
 1
 1
 NIL
@@ -1105,10 +1093,32 @@ INPUTBOX
 1199
 135
 CONDITION
-_pre_
+pre
 1
 0
 String
+
+PLOT
+1546
+410
+1857
+560
+Contributo comune
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"AZZURRO" 1.0 0 -11221820 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"azzurro\"]"
+"GIALLO" 1.0 0 -1184463 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"giallo\"]"
+"ROSA" 1.0 0 -2064490 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"rosa\"]"
+"ROSSO" 1.0 0 -2674135 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"rosso\"]"
+"BLU" 1.0 0 -13345367 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"blu\"]"
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
