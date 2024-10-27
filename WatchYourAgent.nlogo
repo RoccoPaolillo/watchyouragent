@@ -52,6 +52,8 @@ farmers-own
   muccheslider-lst
   condition-lst
   ccr_invested
+  energia_acquisita_tot
+  energia_acquisita_tot-lst
 ]
 
 
@@ -126,12 +128,14 @@ tick
     [
       ask units
         [ graze ]
+ ;     ask farmers [set energia_acquisita_tot energia_acquisita_tot + sum [energia_acquisita] of my-units]
     ]
     [
       set giorno giorno + 1
       set settimana ceiling (giorno / 7)
       ask farmers
-        [ profit-units ]
+        [set energia_acquisita_tot energia_acquisita_tot + sum [energia_acquisita] of my-units
+          profit-units ]
       set totriserva_energetica-lst (lput precision totale_riserva-energetica 2 totriserva_energetica-lst)
       set giorno-lst (lput giorno giorno-lst)
   ;    invest_capital ;; toene buy units
@@ -214,6 +218,7 @@ to profit-units  ;; farmer procedure ex milk-plants
   set muccheslider-lst (lput n_mucche_comprate_a_settimana muccheslider-lst)
   set day_alive-lst (lput giorno day_alive-lst)
   set condition-lst (lput condition condition-lst)
+  set energia_acquisita_tot-lst (lput energia_acquisita_tot energia_acquisita_tot-lst)
   send-personal-info
   if capitale_totale <= 0 [
 hubnet-send user-id "Messaggio per voi:" "Ci dispiace, GAME OVER :("
@@ -422,6 +427,13 @@ end
 ;; set farmer variables to initial values
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
+  set n_mucche_comprate_a_settimana 1
+  set contributo_comune_rigenerazione 0
+  set capitale_totale costo/nuove_unità
+  set guadagno_giornaliero 0
+  set lost_cows 0
+  set ccr_invested 0
+  set energia_acquisita_tot 0
   set revenue-lst []
   set revenue-lst (lput guadagno_giornaliero revenue-lst)
   set capitale_totale-lst []
@@ -443,12 +455,9 @@ to reset-farmers-vars  ;; farmer procedure
   set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
   set condition-lst []
   set condition-lst (lput condition condition-lst)
-  set n_mucche_comprate_a_settimana 1
-  set contributo_comune_rigenerazione 0
-  set capitale_totale costo/nuove_unità
-  set guadagno_giornaliero 0
-  set lost_cows 0
-  set ccr_invested 0
+  set energia_acquisita_tot-lst []
+  set energia_acquisita_tot-lst (lput energia_acquisita_tot energia_acquisita_tot-lst)
+
   ;; get rid of existing units
   ask my-units
     [ die ]
@@ -529,6 +538,9 @@ to write_csv
     [ csv:to-file (word "data/" TURN  x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+    [ csv:to-file (word "data/" TURN  x "_energiaaquisita.csv") [energia_acquisita_tot-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
     [ csv:to-file (word "data/" TURN  x "_condition.csv") [condition-lst] of farmers with [user-id = x]]
   ]
   csv:to-file (word "data/global/" TURN  "global_risenergtot.csv") (list totriserva_energetica-lst)
@@ -577,10 +589,10 @@ ticks
 30.0
 
 BUTTON
-1170
-219
-1259
-252
+1167
+243
+1256
+276
 go
 go
 T
@@ -594,10 +606,10 @@ NIL
 1
 
 SLIDER
-879
-594
-1007
-627
+882
+583
+1010
+616
 unità_iniziali/gruppo
 unità_iniziali/gruppo
 0
@@ -609,10 +621,10 @@ unità
 HORIZONTAL
 
 SLIDER
-477
-594
-602
-627
+480
+583
+605
+616
 costo/nuove_unità
 costo/nuove_unità
 1
@@ -624,10 +636,10 @@ costo/nuove_unità
 HORIZONTAL
 
 SLIDER
-743
-595
-870
-628
+746
+584
+873
+617
 ritmo_cicli
 ritmo_cicli
 2
@@ -639,10 +651,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-1118
-174
-1207
-207
+1115
+198
+1204
+231
 NIL
 setup
 NIL
@@ -656,10 +668,10 @@ NIL
 1
 
 BUTTON
-1240
-115
-1330
-148
+1107
+77
+1197
+110
 login
 listen-to-clients
 T
@@ -673,15 +685,15 @@ NIL
 1
 
 SLIDER
-606
-595
-733
-628
+609
+584
+736
+617
 rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.6
+0.0
 0.01
 1
 NIL
@@ -710,10 +722,10 @@ PENS
 "BLU" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
-1630
-22
-1852
-212
+1932
+35
+2154
+225
 Numero mucche perse
 NIL
 NIL
@@ -732,10 +744,10 @@ PENS
 "blu" 1.0 1 -13345367 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) - count units with [owner# = \"blu\"])]"
 
 BUTTON
-1238
-77
-1329
-110
+1108
+114
+1199
+147
 show_costs
 ask farmers [\nsend-personal-info\n\n]\n\n 
 T
@@ -749,9 +761,9 @@ NIL
 1
 
 MONITOR
-1066
+1061
 327
-1123
+1118
 372
 azzurro
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"azzurro\"]
@@ -760,10 +772,10 @@ azzurro
 11
 
 MONITOR
-1066
-376
-1123
-421
+1062
+374
+1119
+419
 giallo
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"giallo\"]
 2
@@ -771,9 +783,9 @@ giallo
 11
 
 MONITOR
-1066
+1062
 423
-1123
+1119
 468
 rosa
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosa\"]
@@ -782,10 +794,10 @@ rosa
 11
 
 MONITOR
-1066
-469
-1123
-514
+1062
+473
+1119
+518
 rosso
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosso\"]
 2
@@ -793,10 +805,10 @@ rosso
 11
 
 MONITOR
-1066
-516
-1123
-561
+1061
+521
+1118
+566
 blu
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"blu\"]
 2
@@ -815,20 +827,20 @@ settimana
 14
 
 TEXTBOX
-1061
-288
-1148
-316
+1064
+290
+1151
+318
 Contributo comune singoli gruppi
 10
 0.0
 1
 
 PLOT
-1637
-228
-1973
-400
+1939
+241
+2275
+413
 Risorse Ambientali 7 days
 NIL
 NIL
@@ -843,10 +855,10 @@ PENS
 "" 1.0 0 -14333415 true "" "ifelse (ticks mod ritmo_cicli) != 0 [] [plot totale_riserva-energetica]"
 
 PLOT
-1642
-27
-2033
-216
+1944
+40
+2335
+229
 Report mucche perse 7 days
 NIL
 NIL
@@ -876,10 +888,10 @@ giorno
 14
 
 INPUTBOX
-1071
-75
-1132
-135
+1284
+10
+1345
+70
 TURN
 RM01_
 1
@@ -887,10 +899,10 @@ RM01_
 String
 
 SLIDER
-1012
-593
-1184
-626
+1015
+582
+1187
+615
 costo_gestione/unità
 costo_gestione/unità
 0
@@ -902,10 +914,10 @@ costo_gestione/unità
 HORIZONTAL
 
 BUTTON
-1078
-219
-1166
-252
+1075
+243
+1163
+276
 choice
 if giorno >= day_invest [invest_capital]\n\nif giorno >= day_contrcom [contributo_comune_refill]\nask farmers [ hubnet-broadcast \"Messaggio per voi:\" \"\"]\n 
 NIL
@@ -919,17 +931,17 @@ NIL
 1
 
 OUTPUT
-1132
-335
-1505
-571
+1127
+415
+1484
+566
 10
 
 BUTTON
-1329
-295
-1392
-328
+1148
+370
+1211
+403
 rank
 clear-output\nask farmers [output-show (word user-id \" capitale \"  capitale_totale \" ccr \" contributo_comune_rigenerazione)]\n;foreach [\"rosso\" \"azzurro\" \"giallo\" \"rosa\" \"blu\"]  [ x -> output-print (word [user-id] of one-of farmers with [user-id = x]  \" capitale \"  \n;[capitale_totale] of one-of farmers with [user-id = x] \" ccr \" [contributo_comune_rigenerazione] of one-of farmers with [user-id = x])]
 NIL
@@ -994,10 +1006,10 @@ totale_riserva-energetica
 11
 
 BUTTON
-1240
-152
-1330
-185
+1111
+155
+1201
+188
 max_buying
 ask farmers [\n\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[ifelse contributo_comune_rigenerazione > capitale_totale\n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! L'acquisto di nuove mucche e capitale comune è superiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n]\n[ifelse contributo_comune_rigenerazione > capitale_totale \n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! Il contributo comune dovrebbe essere inferiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n]\n]\n
 T
@@ -1011,10 +1023,10 @@ NIL
 1
 
 BUTTON
-1396
-295
-1491
-328
+1215
+370
+1310
+403
 NIL
 clear-output
 NIL
@@ -1058,10 +1070,10 @@ RISORSE AMBIENTALI
 0
 
 SLIDER
-1348
-89
-1464
-122
+1287
+79
+1403
+112
 day_invest
 day_invest
 0
@@ -1073,25 +1085,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-1349
-126
-1464
-159
+1288
+116
+1403
+149
 day_contrcom
 day_contrcom
 0
 50
-7.0
+14.0
 1
 1
 NIL
 HORIZONTAL
 
 INPUTBOX
-1135
-75
-1199
-135
+1348
+10
+1412
+70
 CONDITION
 pre
 1
@@ -1099,10 +1111,10 @@ pre
 String
 
 PLOT
-1546
-410
-1857
-560
+1555
+10
+1900
+159
 Contributo comune
 NIL
 NIL
@@ -1119,6 +1131,28 @@ PENS
 "ROSA" 1.0 0 -2064490 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"rosa\"]"
 "ROSSO" 1.0 0 -2674135 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"rosso\"]"
 "BLU" 1.0 0 -13345367 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"blu\"]"
+
+PLOT
+1554
+164
+1904
+344
+Risorse consumate
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"AZZURRO" 1.0 0 -11221820 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"azzurro\"]"
+"GIALLO" 1.0 0 -1184463 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"giallo\"]"
+"ROSA" 1.0 0 -1664597 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"rosa\"]"
+"ROSSO" 1.0 0 -2674135 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"rosso\"]"
+"BLU" 1.0 0 -13345367 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"blu\"]"
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
@@ -1628,20 +1662,20 @@ NIL
 1
 
 MONITOR
-48
-157
-267
-206
+55
+158
+237
+207
 € costi totali a settimana
 NIL
 3
 1
 
 MONITOR
-269
-156
-459
-205
+240
+157
+456
+206
 € costo gestione mucche settimanale
 NIL
 3
