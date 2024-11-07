@@ -182,7 +182,13 @@ to graze  ;; goat procedure
  lt (random-float 360)
  fd 1
 
-  if settimana > 1 [if energia_acquisita <= 0 [ask farmers with [user-id = [owner#] of myself][set lost_cows lost_cows + 1] die]]
+  if settimana > 1 [if energia_acquisita <= 0 [
+    ask farmers with [user-id = [owner#] of myself][
+      set lost_cows lost_cows + 1
+      set capitale_totale capitale_totale - malus_amount
+    ]
+    die]
+  ]
 end
 
 
@@ -696,7 +702,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.6
+0.0
 0.01
 1
 NIL
@@ -1371,6 +1377,21 @@ RISORSE CONSUMATE\nsingoli gruppi
 13
 0.0
 1
+
+SLIDER
+1191
+582
+1363
+615
+malus_amount
+malus_amount
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
