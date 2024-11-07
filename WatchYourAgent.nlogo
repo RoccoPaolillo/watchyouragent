@@ -144,7 +144,7 @@ tick
     if (ticks mod 7 = 0) [
         hubnet-broadcast "n_mucche_comprate_a_settimana" 1
         hubnet-broadcast "contributo_comune_rigenerazione" 0
-write_csv
+ write_csv
         broadcast-system-info
         stop
 
@@ -515,36 +515,39 @@ end
 
 to write_csv
 
+  let l date-and-time
+  set l remove-item 14 remove-item 11 remove-item 6 remove-item 4 remove-item 2 word substring date-and-time 0 12 substring date-and-time 16 27
+; csv:to-file word l ".csv" [[1 "two" 3] [4 5]]
 
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" TURN x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" l TURN CONDITION x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-   [ csv:to-file (word "data/" TURN  x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
+   [ csv:to-file (word "data/" l TURN CONDITION x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-   [ csv:to-file (word "data/" TURN  x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
+   [ csv:to-file (word "data/" l TURN CONDITION x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
-    [csv:to-file (word "data/" TURN  x "_muccheslider.csv") [muccheslider-lst] of farmers with [user-id = x]]
+    [csv:to-file (word "data/" l TURN  CONDITION x "_muccheslider.csv") [muccheslider-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
-    [csv:to-file (word "data/" TURN  x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
+    [csv:to-file (word "data/" l TURN CONDITION x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
-    [csv:to-file (word "data/" TURN  x "_muccheperse.csv") [lost_cows-lst] of farmers with [user-id = x]]
+    [csv:to-file (word "data/" l TURN CONDITION x "_muccheperse.csv") [lost_cows-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" TURN  x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" l TURN CONDITION x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" TURN  x "_energiaaquisita.csv") [energia_acquisita_tot-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" l TURN CONDITION x "_energiaaquisita.csv") [energia_acquisita_tot-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" TURN  x "_condition.csv") [condition-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" l TURN CONDITION x "_condition.csv") [condition-lst] of farmers with [user-id = x]]
   ]
-  csv:to-file (word "data/global/" TURN  "global_risenergtot.csv") (list totriserva_energetica-lst)
-  csv:to-file (word "data/global/" TURN  "giorno.csv") (list giorno-lst)
+  csv:to-file (word "data/global/" l TURN CONDITION "global_risenergtot.csv") (list totriserva_energetica-lst)
+  csv:to-file (word "data/global/" l TURN CONDITION "giorno.csv") (list giorno-lst)
 end
 
 to-report new_cows
@@ -589,10 +592,10 @@ ticks
 30.0
 
 BUTTON
-1167
-243
-1256
-276
+1166
+173
+1255
+206
 go
 go
 T
@@ -651,10 +654,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-1115
-198
-1204
-231
+1114
+128
+1203
+161
 NIL
 setup
 NIL
@@ -668,9 +671,9 @@ NIL
 1
 
 BUTTON
-1107
+1054
 77
-1197
+1116
 110
 login
 listen-to-clients
@@ -693,16 +696,16 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.0
+0.6
 0.01
 1
 NIL
 HORIZONTAL
 
 PLOT
-23
+24
 10
-470
+471
 208
 Capitale Totale
 NIL
@@ -744,10 +747,10 @@ PENS
 "blu" 1.0 1 -13345367 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) - count units with [owner# = \"blu\"])]"
 
 BUTTON
-1108
-114
-1199
-147
+1118
+77
+1201
+110
 show_costs
 ask farmers [\nsend-personal-info\n\n]\n\n 
 T
@@ -761,59 +764,59 @@ NIL
 1
 
 MONITOR
-1061
-327
-1118
-372
+1530
+264
+1601
+317
 azzurro
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"azzurro\"]
 2
 1
-11
+13
 
 MONITOR
-1062
-374
-1119
-419
+1529
+319
+1600
+372
 giallo
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"giallo\"]
 2
 1
-11
+13
 
 MONITOR
-1062
-423
-1119
-468
+1530
+375
+1600
+428
 rosa
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosa\"]
 2
 1
-11
+13
 
 MONITOR
-1062
-473
-1119
-518
+1531
+431
+1601
+484
 rosso
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosso\"]
 2
 1
-11
+13
 
 MONITOR
-1061
-521
-1118
-566
+1532
+489
+1601
+542
 blu
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"blu\"]
 2
 1
-11
+13
 
 MONITOR
 1153
@@ -828,11 +831,11 @@ settimana
 
 TEXTBOX
 1064
-290
-1151
-318
-Contributo comune singoli gruppi
-10
+234
+1156
+285
+CONTRIBUTO COMUNE \nsingoli gruppi
+13
 0.0
 1
 
@@ -893,7 +896,7 @@ INPUTBOX
 1345
 70
 TURN
-RM01_
+_rnd_
 1
 0
 String
@@ -914,10 +917,10 @@ costo_gestione/unità
 HORIZONTAL
 
 BUTTON
-1075
-243
-1163
-276
+1074
+173
+1162
+206
 choice
 if giorno >= day_invest [invest_capital]\n\nif giorno >= day_contrcom [contributo_comune_refill]\nask farmers [ hubnet-broadcast \"Messaggio per voi:\" \"\"]\n 
 NIL
@@ -931,17 +934,17 @@ NIL
 1
 
 OUTPUT
-1127
-415
-1484
-566
+1603
+312
+1890
+374
 10
 
 BUTTON
-1148
-370
-1211
-403
+1736
+268
+1799
+301
 rank
 clear-output\nask farmers [output-show (word user-id \" capitale \"  capitale_totale \" ccr \" contributo_comune_rigenerazione)]\n;foreach [\"rosso\" \"azzurro\" \"giallo\" \"rosa\" \"blu\"]  [ x -> output-print (word [user-id] of one-of farmers with [user-id = x]  \" capitale \"  \n;[capitale_totale] of one-of farmers with [user-id = x] \" ccr \" [contributo_comune_rigenerazione] of one-of farmers with [user-id = x])]
 NIL
@@ -1006,10 +1009,10 @@ totale_riserva-energetica
 11
 
 BUTTON
-1111
-155
-1201
-188
+1202
+78
+1271
+111
 max_buying
 ask farmers [\n\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[ifelse contributo_comune_rigenerazione > capitale_totale\n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! L'acquisto di nuove mucche e capitale comune è superiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n]\n[ifelse contributo_comune_rigenerazione > capitale_totale \n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! Il contributo comune dovrebbe essere inferiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n]\n]\n
 T
@@ -1023,10 +1026,10 @@ NIL
 1
 
 BUTTON
-1215
-370
-1310
-403
+1637
+269
+1732
+302
 NIL
 clear-output
 NIL
@@ -1040,11 +1043,11 @@ NIL
 1
 
 TEXTBOX
-180
+181
 10
-302
+303
 41
- GUADAGNO
+   CAPITALE
 20
 0.0
 0
@@ -1054,7 +1057,7 @@ TEXTBOX
 208
 316
 234
-MUCCHE PERSE
+ MUCCHE PERSE
 20
 0.0
 0
@@ -1064,7 +1067,7 @@ TEXTBOX
 400
 340
 424
-RISORSE AMBIENTALI
+ RISORSE AMBIENTALI
 20
 0.0
 0
@@ -1105,16 +1108,16 @@ INPUTBOX
 1412
 70
 CONDITION
-pre
+_post_
 1
 0
 String
 
 PLOT
-1555
-10
-1900
-159
+1584
+17
+1796
+179
 Contributo comune
 NIL
 NIL
@@ -1133,10 +1136,10 @@ PENS
 "BLU" 1.0 0 -13345367 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
-1554
-164
-1904
-344
+1524
+213
+1776
+382
 Risorse consumate
 NIL
 NIL
@@ -1153,6 +1156,221 @@ PENS
 "ROSA" 1.0 0 -1664597 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"rosa\"]"
 "ROSSO" 1.0 0 -2674135 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"rosso\"]"
 "BLU" 1.0 0 -13345367 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"blu\"]"
+
+MONITOR
+1173
+289
+1240
+342
+azzurro
+[capitale_totale] of one-of farmers with [user-id = \"azzurro\"]
+2
+1
+13
+
+MONITOR
+1174
+345
+1241
+398
+giallo
+[capitale_totale] of one-of farmers with [user-id = \"giallo\"]
+2
+1
+13
+
+MONITOR
+1175
+402
+1241
+455
+rosa
+[capitale_totale] of one-of farmers with [user-id = \"rosa\"]
+2
+1
+13
+
+MONITOR
+1173
+458
+1239
+511
+rosso
+[capitale_totale] of one-of farmers with [user-id = \"rosso\"]
+2
+1
+13
+
+MONITOR
+1174
+513
+1240
+566
+blu
+[capitale_totale] of one-of farmers with [user-id = \"blu\"]
+2
+1
+13
+
+TEXTBOX
+1173
+234
+1266
+272
+CAPITALE\nsingoli gruppi
+13
+0.0
+1
+
+TEXTBOX
+1154
+236
+1169
+561
+I\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI
+10
+0.0
+1
+
+MONITOR
+1064
+458
+1133
+511
+rosso
+last item 0 [contrcom-lst] of farmers with [user-id = \"rosso\"]
+2
+1
+13
+
+MONITOR
+1064
+346
+1130
+399
+giallo
+last item 0 [contrcom-lst] of farmers with [user-id = \"giallo\"]
+17
+1
+13
+
+MONITOR
+1065
+403
+1132
+456
+rosa
+last item 0 [contrcom-lst] of farmers with [user-id = \"rosa\"]
+17
+1
+13
+
+MONITOR
+1065
+289
+1131
+342
+azzurro
+last item 0 [contrcom-lst] of farmers with [user-id = \"azzurro\"]
+17
+1
+13
+
+MONITOR
+1064
+514
+1133
+567
+blu
+last item 0 [contrcom-lst] of farmers with [user-id = \"blu\"]
+17
+1
+13
+
+TEXTBOX
+1525
+229
+1675
+255
+CONTRIBUTO COMUNE\ndurante la scelta
+10
+0.0
+1
+
+MONITOR
+1286
+285
+1359
+338
+azzurro
+[energia_acquisita_tot] of one-of farmers with [user-id = \"azzurro\"]
+17
+1
+13
+
+MONITOR
+1289
+343
+1359
+396
+giallo
+[energia_acquisita_tot] of one-of farmers with [user-id = \"giallo\"]
+17
+1
+13
+
+MONITOR
+1289
+399
+1360
+452
+rosa
+[energia_acquisita_tot] of one-of farmers with [user-id = \"rosa\"]
+17
+1
+13
+
+MONITOR
+1289
+455
+1359
+508
+rosso
+[energia_acquisita_tot] of one-of farmers with [user-id = \"rosso\"]
+17
+1
+13
+
+MONITOR
+1287
+514
+1358
+567
+blu
+[energia_acquisita_tot] of one-of farmers with [user-id = \"blu\"]
+17
+1
+13
+
+TEXTBOX
+1267
+235
+1282
+560
+I\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI\nI
+10
+0.0
+1
+
+TEXTBOX
+1276
+231
+1374
+282
+RISORSE CONSUMATE\nsingoli gruppi
+13
+0.0
+1
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
