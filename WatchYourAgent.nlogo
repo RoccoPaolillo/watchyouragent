@@ -6,11 +6,13 @@ extensions [csv]
 globals
 [
   giorno                ;; number of days so far
+  giorno-lst
   energia-max          ;; energia capacity
   food-max           ;; energia collection capacity
   energia_richiesta          ;; amount of energia collected at each move
   refilling
   settimana
+  totriserva_energetica-lst
 ]
 
 patches-own
@@ -43,6 +45,15 @@ farmers-own
   numero_mucche-lst
   n_mucche-lst
   contrcom-lst
+  lost_cows
+  lost_cows-lst
+  units_to_buy
+  day_alive-lst
+  muccheslider-lst
+  condition-lst
+  ccr_invested
+  energia_acquisita_tot
+  energia_acquisita_tot-lst
 ]
 
 
@@ -64,9 +75,10 @@ to setup
   clear-all-plots
   ask farmers
     [ reset-farmers-vars ]
-  hubnet-broadcast "n_mucche_comprate_a_settimana" 7
+   hubnet-broadcast "n_mucche_comprate_a_settimana" 1
    hubnet-broadcast "contributo_comune_rigenerazione" 0
   broadcast-system-info
+  write_csv
 end
 
 ;; initialize global variables
@@ -77,6 +89,10 @@ to setup-globals
   set energia-max 50
   set food-max 50
   set energia_richiesta (round (100 / (ritmo_cicli - 1)))
+  set totriserva_energetica-lst []
+  set totriserva_energetica-lst (lput precision totale_riserva-energetica 2 totriserva_energetica-lst)
+  set giorno-lst []
+  set giorno-lst (lput giorno giorno-lst)
 end
 
 ;; initialize energia supply for each patch
@@ -105,31 +121,48 @@ to go
       stop
     ]
 
-    tick
+tick
 
     ;; when not milking time
     ifelse (ticks mod ritmo_cicli) != 0
     [
       ask units
         [ graze ]
+ ;     ask farmers [set energia_acquisita_tot energia_acquisita_tot + sum [energia_acquisita] of my-units]
     ]
     [
       set giorno giorno + 1
       set settimana ceiling (giorno / 7)
       ask farmers
-        [ profit-units ]
-      invest_capital ;; toene buy units
+        [set energia_acquisita_tot energia_acquisita_tot + sum [energia_acquisita] of my-units
+          profit-units ]
+      set totriserva_energetica-lst (lput precision totale_riserva-energetica 2 totriserva_energetica-lst)
+      set giorno-lst (lput giorno giorno-lst)
+  ;    invest_capital ;; toene buy units
  ;     update-plots
     ;  ask farmers [set total-lst (lput revenue-lst total-lst)]
+    if (ticks mod 7 = 0) [
+        hubnet-broadcast "n_mucche_comprate_a_settimana" 1
+        hubnet-broadcast "contributo_comune_rigenerazione" 0
+write_csv
+        broadcast-system-info
+        stop
+
+        ]
     ]
 
     reset-patches
+
+
   ]
 
- ask farmers [if capitale_totale <= 0 [die]]
+
 
  broadcast-system-info
-  write_csv
+
+;  if (giorno != 0 and giorno mod 7 = 0) [stop]
+
+ write_csv
 end
 
 ;; goat move along the common looking for best patch of energia
@@ -140,10 +173,16 @@ to graze  ;; goat procedure
     let new-food-amt (energia_acquisita + get-amt-eaten );
     if (new-food-amt < food-max)
       [ set energia_acquisita new-food-amt ]
+;       if (new-food-amt < food-max)
+ ;     set energia_acquisita new-food-amt
      ; [ set energia_acquisita food-max ]
   ]
 
-  if energia_acquisita = 0 [die]
+ rt (random-float 360)
+ lt (random-float 360)
+ fd 1
+
+  if settimana > 1 [if energia_acquisita <= 0 [ask farmers with [user-id = [owner#] of myself][set lost_cows lost_cows + 1] die]]
 end
 
 
@@ -151,7 +190,7 @@ end
 ;; sets the patch energia amount accordingly
 to-report get-amt-eaten  ;; goat procedure
   let reduced-amt (riserva-energetica - energia_richiesta)
-  ifelse (reduced-amt < 0)
+  ifelse (reduced-amt <= 0)
   [
     set riserva-energetica 0
     report riserva-energetica
@@ -169,24 +208,40 @@ to profit-units  ;; farmer procedure ex milk-plants
   ask my-units
     [ set energia_acquisita 0 ]
   set revenue-lst (lput guadagno_giornaliero revenue-lst)
-  set capitale_totale capitale_totale + guadagno_giornaliero
+  set capitale_totale capitale_totale + guadagno_giornaliero - (costo_gestione/unità * n_mucche_comprate_a_settimana) ; - costo/nuove_unità
 ;  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
   set numero_mucche count my-units
   set numero_mucche-lst (lput (count my-units) numero_mucche-lst)
-
+  set lost_cows-lst (lput lost_cows lost_cows-lst)
+  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
+  set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
+  set muccheslider-lst (lput n_mucche_comprate_a_settimana muccheslider-lst)
+  set day_alive-lst (lput giorno day_alive-lst)
+  set condition-lst (lput condition condition-lst)
+  set energia_acquisita_tot-lst (lput energia_acquisita_tot energia_acquisita_tot-lst)
   send-personal-info
+  if capitale_totale <= 0 [
+hubnet-send user-id "Messaggio per voi:" "Ci dispiace, GAME OVER :("
+ask my-units [die]
+    die]
 end
 
 ;; the goat market setup
 to invest_capital
   ask farmers
   [
-    if n_mucche_comprate_a_settimana > 0
-      [ buy-units (n_mucche_comprate_a_settimana / 7) ]
-    if n_mucche_comprate_a_settimana < 0
-      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
-    set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
-    set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
+    if n_mucche_comprate_a_settimana > count my-units
+      [set units_to_buy (n_mucche_comprate_a_settimana - count my-units)
+        buy-units units_to_buy ]; (n_mucche_comprate_a_settimana - count my-units) ]
+   if n_mucche_comprate_a_settimana < count my-units
+        [ set units_to_buy (count my-units - n_mucche_comprate_a_settimana)
+            ask n-of units_to_buy my-units [die]] ; (count my-units - n_mucche_comprate_a_settimana) my-units [die]]
+ ;       buy-units (n_mucche_comprate_a_settimana) ]
+;    if n_mucche_comprate_a_settimana < 0
+;      [ lose-units (- n_mucche_comprate_a_settimana / 7) ]
+;    set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
+;    set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
+;    set guadagno_giornaliero 0
     send-personal-info
   ]
 end
@@ -203,18 +258,18 @@ to buy-units [ num-units-desired ]  ;; farmer procedure
   ]
   let cost-of-purchase num-units-purchase * costo/nuove_unità
   set capitale_totale (capitale_totale - cost-of-purchase)
-  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
+ ; set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
   hatch num-units-purchase
     [ setup-units user-id ]
 end
 
 ;; farmers eliminate some of their units (with no gain in assets)
-to lose-units [ num-to-lose ]  ;; farmer procedure
-  if ((count my-units) < num-to-lose)
-    [ set num-to-lose (count my-units) ]
-  ask (n-of num-to-lose my-units)
-    [ die ]
-end
+;to lose-units [ num-to-lose ]  ;; farmer procedure
+;  if ((count my-units) < num-to-lose)
+;    [ set num-to-lose (count my-units) ]
+;  ask (n-of num-to-lose my-units)
+;    [ die ]
+;end
 
 ;; initializes goat variables
 to setup-units [ farmer# ]  ;; turtle procedure
@@ -230,6 +285,27 @@ to setup-units [ farmer# ]  ;; turtle procedure
   set riserve_unità 0
   show-turtle
 end
+
+to contributo_comune_refill
+ask farmers [
+set ccr_invested contributo_comune_rigenerazione
+set capitale_totale capitale_totale - contributo_comune_rigenerazione
+; hubnet-send user-id "Guadagno totale, Euro:" capitale_totale
+;if capitale_totale <= 0 [died_farmers die]
+;    send-personal-info
+]
+
+set refilling (sum [(contributo_comune_rigenerazione * 10)] of farmers  / count patches with [riserva-energetica < 50])
+ask patches with [riserva-energetica < 50]
+[
+set riserva-energetica riserva-energetica + refilling
+color-patches
+if riserva-energetica >= 50 [set riserva-energetica 50]
+]
+plot-value "Risorse Ambientali" totale_riserva-energetica
+
+end
+
 
 ;; updates patches' color and increase energia supply with growth rate
 to reset-patches
@@ -251,7 +327,9 @@ end
 
 ;; colors patches according to amount of energia on the patch
 to color-patches  ;; patch procedure
-  set pcolor (scale-color green riserva-energetica -5 (2 * energia-max))
+  ifelse riserva-energetica < 50
+    [set pcolor (scale-color green riserva-energetica -5 (2 * energia-max))]
+    [set pcolor 55.23809523809524]
 end
 
 
@@ -349,16 +427,36 @@ end
 ;; set farmer variables to initial values
 to reset-farmers-vars  ;; farmer procedure
   ;; reset the farmer variable to initial values
-  set revenue-lst []
-  set capitale_totale-lst []
-  ;set total-lst []
-  set numero_mucche-lst []
-  set contrcom-lst []
-  set n_mucche-lst[]
-  set n_mucche_comprate_a_settimana 7
+  set n_mucche_comprate_a_settimana 1
   set contributo_comune_rigenerazione 0
   set capitale_totale costo/nuove_unità
   set guadagno_giornaliero 0
+  set lost_cows 0
+  set ccr_invested 0
+  set energia_acquisita_tot 0
+  set revenue-lst []
+  set revenue-lst (lput guadagno_giornaliero revenue-lst)
+  set capitale_totale-lst []
+  set capitale_totale-lst (lput capitale_totale capitale_totale-lst)
+  ;set total-lst []
+  set numero_mucche-lst []
+  set numero_mucche-lst (lput (count my-units) numero_mucche-lst)
+  set contrcom-lst []
+  set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
+  set n_mucche-lst[]
+  set n_mucche-lst (lput n_mucche_comprate_a_settimana n_mucche-lst)
+  set lost_cows-lst []
+  set lost_cows-lst (lput lost_cows lost_cows-lst)
+  set day_alive-lst []
+  set day_alive-lst (lput giorno day_alive-lst)
+  set muccheslider-lst []
+  set muccheslider-lst (lput n_mucche_comprate_a_settimana muccheslider-lst)
+  set contrcom-lst []
+  set contrcom-lst (lput contributo_comune_rigenerazione contrcom-lst)
+  set condition-lst []
+  set condition-lst (lput condition condition-lst)
+  set energia_acquisita_tot-lst []
+  set energia_acquisita_tot-lst (lput energia_acquisita_tot energia_acquisita_tot-lst)
 
   ;; get rid of existing units
   ask my-units
@@ -376,9 +474,13 @@ to send-personal-info  ;; farmer procedure
   hubnet-send user-id "Voi allevate la mandria di colore:" user-id
   hubnet-send user-id "€ guadagno giornaliero" guadagno_giornaliero
   hubnet-send user-id "€ guadagno totale" capitale_totale
-  hubnet-send user-id "€ costo settimanale mucche" (costo/nuove_unità * n_mucche_comprate_a_settimana)
-  hubnet-send user-id "€ costi totali a settimana" ((costo/nuove_unità * n_mucche_comprate_a_settimana) +  contributo_comune_rigenerazione)
-  hubnet-send user-id "numero mucche al giorno" (n_mucche_comprate_a_settimana / 7)
+  hubnet-send user-id "€ costo nuove mucche" (costo/nuove_unità * new_cows)
+  hubnet-send user-id "€ costo gestione mucche settimanale" ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7)
+  hubnet-send user-id "€ costi totali a settimana" ((new_cows * costo/nuove_unità)  +  contributo_comune_rigenerazione + ((n_mucche_comprate_a_settimana * costo_gestione/unità) * 7))
+;  hubnet-send user-id "€ costi totali a settimana" (((costo/nuove_unità * n_mucche_comprate_a_settimana))  +  contributo_comune_rigenerazione + ((costo_gestione/unità * n_mucche_comprate_a_settimana) * 7)) - 10
+  hubnet-send user-id "nuove mucche da comprare" new_cows
+  hubnet-send user-id "mucche in vita" count my-units
+  hubnet-send user-id "mucche perse" lost_cows
  ; hubnet-send user-id "c.c.r." contributo_comune_rigenerazione
 ;  hubnet-send user-id "costo settimanale mucche" ((n_mucche_comprate_a_settimana * costo/nuove_unità))
 ;  hubnet-send user-id "costo contributo comune" contributo_comune_rigenerazione
@@ -387,14 +489,13 @@ end
 
 ;; sends the appropriate monitor information back to one client
 to send-system-info  ;; farmer procedure
-  hubnet-send user-id "€ costo giornaliero mucche" costo/nuove_unità
   hubnet-send user-id "Giorno" giorno
   hubnet-send user-id "Settimana" settimana
 end
 
 ;; broadcasts the appropriate monitor information back to all clients
 to broadcast-system-info
-  hubnet-broadcast "€ costo giornaliero mucche" costo/nuove_unità
+;  hubnet-broadcast "€ costo gestione mucche" costo/nuove_unità
   hubnet-broadcast "Giorno" giorno
   hubnet-broadcast "Settimana" settimana
 end
@@ -415,22 +516,56 @@ end
 to write_csv
 
 
-foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_muccheslider.csv") [n_mucche-lst] of farmers with [user-id = x]]
-  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> csv:to-file (word "data/" TURN x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
-
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+    [ csv:to-file (word "data/" TURN x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+   [ csv:to-file (word "data/" TURN  x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+   [ csv:to-file (word "data/" TURN  x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
+    [csv:to-file (word "data/" TURN  x "_muccheslider.csv") [muccheslider-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
+    [csv:to-file (word "data/" TURN  x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
+    [csv:to-file (word "data/" TURN  x "_muccheperse.csv") [lost_cows-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+    [ csv:to-file (word "data/" TURN  x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+    [ csv:to-file (word "data/" TURN  x "_energiaaquisita.csv") [energia_acquisita_tot-lst] of farmers with [user-id = x]]
+  ]
+  foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
+    [ csv:to-file (word "data/" TURN  x "_condition.csv") [condition-lst] of farmers with [user-id = x]]
+  ]
+  csv:to-file (word "data/global/" TURN  "global_risenergtot.csv") (list totriserva_energetica-lst)
+  csv:to-file (word "data/global/" TURN  "giorno.csv") (list giorno-lst)
 end
+
+to-report new_cows
+  ifelse (n_mucche_comprate_a_settimana > count my-units)
+  [report (n_mucche_comprate_a_settimana - count my-units)][report 0]
+end
+
+;to died_farmers
+;hubnet-send user-id "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
+;  hubnet-broadcast "Messaggio per voi:" "Ci dispiace, siete fuori dal mercato :("
+;ask my-units [die]
+;end
 
 ; Copyright 2002 Uri Wilensky.
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-696
-26
-1257
-588
+492
+10
+1053
+572
 -1
 -1
 26.333333333333332
@@ -440,8 +575,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-0
-0
+1
+1
 1
 -10
 10
@@ -454,11 +589,11 @@ ticks
 30.0
 
 BUTTON
-1292
-218
-1381
-251
-NIL
+1167
+243
+1256
+276
+go
 go
 T
 1
@@ -471,10 +606,10 @@ NIL
 1
 
 SLIDER
-1100
-599
-1228
-632
+882
+583
+1010
+616
 unità_iniziali/gruppo
 unità_iniziali/gruppo
 0
@@ -486,10 +621,10 @@ unità
 HORIZONTAL
 
 SLIDER
-698
-599
-823
-632
+480
+583
+605
+616
 costo/nuove_unità
 costo/nuove_unità
 1
@@ -501,10 +636,10 @@ costo/nuove_unità
 HORIZONTAL
 
 SLIDER
-964
-600
-1091
-633
+746
+584
+873
+617
 ritmo_cicli
 ritmo_cicli
 2
@@ -516,10 +651,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-1292
-182
-1381
-215
+1115
+198
+1204
+231
 NIL
 setup
 NIL
@@ -533,10 +668,10 @@ NIL
 1
 
 BUTTON
-1291
-132
-1381
-165
+1107
+77
+1197
+110
 login
 listen-to-clients
 T
@@ -550,15 +685,15 @@ NIL
 1
 
 SLIDER
-827
-600
-954
-633
+609
+584
+736
+617
 rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.01
+0.0
 0.01
 1
 NIL
@@ -580,17 +715,17 @@ true
 true
 "" ""
 PENS
-"azzurro" 1.0 0 -11221820 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"azzurro\"]"
-"giallo" 1.0 0 -1184463 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"giallo\"]"
-"rosa" 1.0 0 -1664597 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"rosa\"]"
-"rosso" 1.0 0 -2674135 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"rosso\"]"
-"blu" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
+"AZZURRO" 1.0 0 -11221820 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"azzurro\"]"
+"GIALLO" 1.0 0 -1184463 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"giallo\"]"
+"ROSA" 1.0 0 -1664597 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"rosa\"]"
+"ROSSO" 1.0 0 -2674135 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"rosso\"]"
+"BLU" 1.0 0 -13345367 true "" "plot [capitale_totale] of one-of farmers with [user-id = \"blu\"]"
 
 PLOT
-1532
-117
-1754
-307
+1932
+35
+2154
+225
 Numero mucche perse
 NIL
 NIL
@@ -609,29 +744,12 @@ PENS
 "blu" 1.0 1 -13345367 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) - count units with [owner# = \"blu\"])]"
 
 BUTTON
-1293
-282
-1382
-315
-rinnovo_risorse
-ask farmers [\nset capitale_totale capitale_totale - contributo_comune_rigenerazione\n; hubnet-send user-id \"Guadagno totale, Euro:\" capitale_totale\n]\n\nset refilling (sum [contributo_comune_rigenerazione] of farmers / count patches with [riserva-energetica < 50])\nask patches with [riserva-energetica < 50]\n[\nset riserva-energetica riserva-energetica + refilling\ncolor-patches\nif riserva-energetica >= 50 [set riserva-energetica 50]\n]\nplot-value \"Risorse Ambientali\" totale_riserva-energetica\n\n;hubnet-broadcast \"Istruzioni\" (word \"Energia ricevuta da ogni cella dal contributo comune: \" round refilling \" unità\")\n\n;write \"Energia ricevuta da ogni cella dal contributo comune: \" print refilling\n
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1291
-97
-1382
-130
+1108
+114
+1199
+147
 show_costs
-ask farmers [\nsend-personal-info\n; if any? farmers with [user-id = \"viola\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"viola\"] ]\n; if any? farmers with [user-id = \"marrone\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"marrone\"] ]\n; if any? farmers with [user-id = \"rosso\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"rosso\"] ]\n; if any? farmers with [user-id = \"azzurro\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"azzurro\"] ]\n; if any? farmers with [user-id = \"blu\"] [plot-value \"Contributo comune investito\"  [contributo_comune] of one-of farmers with [user-id = \"blu\"] ]\n]
+ask farmers [\nsend-personal-info\n\n]\n\n 
 T
 1
 T
@@ -643,10 +761,10 @@ NIL
 1
 
 MONITOR
-1307
-361
-1364
-406
+1061
+327
+1118
+372
 azzurro
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"azzurro\"]
 2
@@ -654,10 +772,10 @@ azzurro
 11
 
 MONITOR
-1307
-410
-1364
-455
+1062
+374
+1119
+419
 giallo
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"giallo\"]
 2
@@ -665,10 +783,10 @@ giallo
 11
 
 MONITOR
-1307
-457
-1364
-502
+1062
+423
+1119
+468
 rosa
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosa\"]
 2
@@ -676,10 +794,10 @@ rosa
 11
 
 MONITOR
-1307
-503
-1364
-548
+1062
+473
+1119
+518
 rosso
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"rosso\"]
 2
@@ -687,10 +805,10 @@ rosso
 11
 
 MONITOR
-1307
-550
-1364
-595
+1061
+521
+1118
+566
 blu
 [contributo_comune_rigenerazione] of one-of farmers with [user-id = \"blu\"]
 2
@@ -698,10 +816,10 @@ blu
 11
 
 MONITOR
-1357
-26
-1469
-83
+1153
+10
+1265
+67
 Settimana
 settimana
 17
@@ -709,21 +827,21 @@ settimana
 14
 
 TEXTBOX
-1293
-322
-1380
-350
+1064
+290
+1151
+318
 Contributo comune singoli gruppi
 10
 0.0
 1
 
 PLOT
-23
-405
-467
-585
-Risorse Ambientali
+1939
+241
+2275
+413
+Risorse Ambientali 7 days
 NIL
 NIL
 0.0
@@ -734,25 +852,14 @@ true
 true
 "" ""
 PENS
-"" 1.0 0 -14333415 true "" "plot totale_riserva-energetica"
-
-MONITOR
-23
-536
-121
-581
-risorse ambientali
-totale_riserva-energetica
-2
-1
-11
+"" 1.0 0 -14333415 true "" "ifelse (ticks mod ritmo_cicli) != 0 [] [plot totale_riserva-energetica]"
 
 PLOT
-24
-211
-471
-404
-Mucche in vita
+1944
+40
+2335
+229
+Report mucche perse 7 days
 NIL
 NIL
 0.0
@@ -763,17 +870,17 @@ true
 true
 "" ""
 PENS
-"azzurro" 2.0 1 -11221820 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"azzurro\"]]"
-"giallo" 2.0 1 -1184463 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"giallo\"]]"
-"rosa" 2.0 0 -1664597 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"rosa\"]]"
-"rosso" 2.0 0 -2674135 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"rosso\"]]"
-"blu" 2.0 1 -13345367 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [numero_mucche] of one-of farmers with [user-id = \"blu\"]]"
+"azzurro" 1.0 0 -11221820 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [lost_cows] of one-of farmers with [user-id = \"azzurro\"]]"
+"giallo" 1.0 0 -1184463 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [lost_cows] of one-of farmers with [user-id = \"giallo\"]]"
+"rosa" 1.0 0 -1664597 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [lost_cows] of one-of farmers with [user-id = \"rosa\"]]"
+"rosso" 1.0 0 -2674135 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [lost_cows] of one-of farmers with [user-id = \"rosso\"]]"
+"blu" 1.0 0 -13345367 true "" "ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot [lost_cows] of one-of farmers with [user-id = \"blu\"]]"
 
 MONITOR
-1272
-26
-1353
-83
+1068
+10
+1149
+67
 Giorno
 giorno
 17
@@ -781,15 +888,271 @@ giorno
 14
 
 INPUTBOX
-1418
-329
-1494
-389
+1284
+10
+1345
+70
 TURN
-GE_12_
+RM01_
 1
 0
 String
+
+SLIDER
+1015
+582
+1187
+615
+costo_gestione/unità
+costo_gestione/unità
+0
+100
+10.0
+1
+1
+€
+HORIZONTAL
+
+BUTTON
+1075
+243
+1163
+276
+choice
+if giorno >= day_invest [invest_capital]\n\nif giorno >= day_contrcom [contributo_comune_refill]\nask farmers [ hubnet-broadcast \"Messaggio per voi:\" \"\"]\n 
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+OUTPUT
+1127
+415
+1484
+566
+10
+
+BUTTON
+1148
+370
+1211
+403
+rank
+clear-output\nask farmers [output-show (word user-id \" capitale \"  capitale_totale \" ccr \" contributo_comune_rigenerazione)]\n;foreach [\"rosso\" \"azzurro\" \"giallo\" \"rosa\" \"blu\"]  [ x -> output-print (word [user-id] of one-of farmers with [user-id = x]  \" capitale \"  \n;[capitale_totale] of one-of farmers with [user-id = x] \" ccr \" [contributo_comune_rigenerazione] of one-of farmers with [user-id = x])]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+22
+212
+471
+402
+Report mucche perse
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"AZZURRO" 1.0 0 -11221820 true "" "plot [lost_cows] of one-of farmers with [user-id = \"azzurro\"]"
+"GIALLO" 1.0 0 -1184463 true "" "plot [lost_cows] of one-of farmers with [user-id = \"giallo\"]"
+"ROSA" 1.0 0 -1664597 true "" "plot [lost_cows] of one-of farmers with [user-id = \"rosa\"]"
+"ROSSO" 1.0 0 -2674135 true "" "plot [lost_cows] of one-of farmers with [user-id = \"rosso\"]"
+"BLU" 1.0 0 -13345367 true "" "plot [lost_cows] of one-of farmers with [user-id = \"blu\"]"
+
+PLOT
+23
+403
+472
+587
+Risorse Ambientali
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot totale_riserva-energetica"
+
+MONITOR
+22
+543
+130
+588
+risorse ambientali
+totale_riserva-energetica
+2
+1
+11
+
+BUTTON
+1111
+155
+1201
+188
+max_buying
+ask farmers [\n\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[ifelse contributo_comune_rigenerazione > capitale_totale\n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! L'acquisto di nuove mucche e capitale comune è superiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n]\n[ifelse contributo_comune_rigenerazione > capitale_totale \n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! Il contributo comune dovrebbe essere inferiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n]\n]\n
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1215
+370
+1310
+403
+NIL
+clear-output
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+TEXTBOX
+180
+10
+302
+41
+ GUADAGNO
+20
+0.0
+0
+
+TEXTBOX
+161
+208
+316
+234
+MUCCHE PERSE
+20
+0.0
+0
+
+TEXTBOX
+131
+400
+340
+424
+RISORSE AMBIENTALI
+20
+0.0
+0
+
+SLIDER
+1287
+79
+1403
+112
+day_invest
+day_invest
+0
+50
+7.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1288
+116
+1403
+149
+day_contrcom
+day_contrcom
+0
+50
+14.0
+1
+1
+NIL
+HORIZONTAL
+
+INPUTBOX
+1348
+10
+1412
+70
+CONDITION
+pre
+1
+0
+String
+
+PLOT
+1555
+10
+1900
+159
+Contributo comune
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"AZZURRO" 1.0 0 -11221820 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"azzurro\"]"
+"GIALLO" 1.0 0 -1184463 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"giallo\"]"
+"ROSA" 1.0 0 -2064490 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"rosa\"]"
+"ROSSO" 1.0 0 -2674135 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"rosso\"]"
+"BLU" 1.0 0 -13345367 true "" "plot [ccr_invested] of one-of farmers with [user-id = \"blu\"]"
+
+PLOT
+1554
+164
+1904
+344
+Risorse consumate
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"AZZURRO" 1.0 0 -11221820 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"azzurro\"]"
+"GIALLO" 1.0 0 -1184463 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"giallo\"]"
+"ROSA" 1.0 0 -1664597 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"rosa\"]"
+"ROSSO" 1.0 0 -2674135 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"rosso\"]"
+"BLU" 1.0 0 -13345367 true "" "plot [energia_acquisita_tot] of one-of farmers with [user-id = \"blu\"]"
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
@@ -1187,10 +1550,10 @@ need-to-manually-make-preview-for-this-model
 @#$#@#$#@
 @#$#@#$#@
 VIEW
-497
-11
-1006
-477
+493
+10
+956
+459
 0
 0
 0
@@ -1209,46 +1572,46 @@ VIEW
 10
 
 MONITOR
-106
-90
-241
-139
+210
+91
+345
+140
 € guadagno giornaliero
 NIL
 3
 1
 
 MONITOR
-27
-281
-181
-330
-€ costo settimanale mucche
+176
+275
+317
+324
+€ costo nuove mucche
 NIL
 3
 1
 
 MONITOR
-244
-91
-379
-140
+348
+92
+483
+141
 € guadagno totale
 NIL
 3
 1
 
 SLIDER
-27
-244
-476
-277
+23
+230
+477
+263
 n_mucche_comprate_a_settimana
 n_mucche_comprate_a_settimana
-7.0
-140.0
+1.0
+50.0
 0
-7.0
+1.0
 1
 NIL
 HORIZONTAL
@@ -1264,18 +1627,18 @@ NIL
 1
 
 SLIDER
-20
-444
-468
-477
+22
+425
+478
+458
 contributo_comune_rigenerazione
 contributo_comune_rigenerazione
 0.0
 1000.0
 0
-1.0
+10.0
 1
-NIL
+€
 HORIZONTAL
 
 MONITOR
@@ -1289,40 +1652,40 @@ NIL
 1
 
 MONITOR
-336
-282
-476
-331
-numero mucche al giorno
+20
+274
+168
+323
+nuove mucche da comprare
 NIL
 3
 1
 
 MONITOR
-24
-172
-478
-221
+55
+158
+237
+207
 € costi totali a settimana
 NIL
 3
 1
 
 MONITOR
-183
-282
-334
-331
-€ costo giornaliero mucche
+240
+157
+456
+206
+€ costo gestione mucche settimanale
 NIL
 3
 1
 
 TEXTBOX
-27
-149
-475
-167
+28
+331
+476
+349
 Ricordate di non spendere più di quanto guadagnato (€ guadagno totale)!
 13
 0.0
@@ -1339,23 +1702,63 @@ NIL
 1
 
 TEXTBOX
-1010
-17
-1025
-35
+968
+16
+983
+34
 NIL
 10
 0.0
 1
 
 TEXTBOX
-1012
-17
-1027
-35
+970
+16
+985
+34
 NIL
 10
 0.0
+1
+
+TEXTBOX
+499
+456
+527
+474
+NIL
+10
+0.0
+1
+
+MONITOR
+20
+359
+477
+408
+Messaggio per voi:
+NIL
+3
+1
+
+MONITOR
+111
+92
+198
+141
+mucche perse
+NIL
+3
+1
+
+MONITOR
+26
+92
+108
+141
+mucche in vita
+NIL
+3
 1
 
 @#$#@#$#@
