@@ -13,6 +13,7 @@ globals
   refilling
   settimana
   totriserva_energetica-lst
+  string_dataset
 ]
 
 patches-own
@@ -78,6 +79,7 @@ to setup
    hubnet-broadcast "n_mucche_comprate_a_settimana" 1
    hubnet-broadcast "contributo_comune_rigenerazione" 0
   broadcast-system-info
+  set string_dataset remove-item 14 remove-item 11 remove-item 6 remove-item 4 remove-item 2 word substring date-and-time 0 12 substring date-and-time 16 27
   write_csv
 end
 
@@ -521,39 +523,39 @@ end
 
 to write_csv
 
-  let l date-and-time
-  set l remove-item 14 remove-item 11 remove-item 6 remove-item 4 remove-item 2 word substring date-and-time 0 12 substring date-and-time 16 27
+ ; let l date-and-time
+ ; let l remove-item 14 remove-item 11 remove-item 6 remove-item 4 remove-item 2 word substring string_dataset 0 12 substring date-and-time 16 27
 ; csv:to-file word l ".csv" [[1 "two" 3] [4 5]]
 
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" l TURN CONDITION x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" string_dataset "_"  TURN "_" CONDITION "_" x "_capital.csv") [capitale_totale-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-   [ csv:to-file (word "data/" l TURN CONDITION x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
+   [ csv:to-file (word "data/" string_dataset "_"  TURN "_" CONDITION "_" x "_giornaliero.csv") [revenue-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-   [ csv:to-file (word "data/" l TURN CONDITION x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
+   [ csv:to-file (word "data/" string_dataset "_"   TURN "_" CONDITION "_" x "_mucche.csv") [numero_mucche-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
-    [csv:to-file (word "data/" l TURN  CONDITION x "_muccheslider.csv") [muccheslider-lst] of farmers with [user-id = x]]
+    [csv:to-file (word "data/" string_dataset "_"   TURN "_" CONDITION "_" x "_muccheslider.csv") [muccheslider-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
-    [csv:to-file (word "data/" l TURN CONDITION x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
+    [csv:to-file (word "data/" string_dataset "_"   TURN "_" CONDITION "_" x "_ccr.csv") [contrcom-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x ->  if any? farmers with [user-id = x]
-    [csv:to-file (word "data/" l TURN CONDITION x "_muccheperse.csv") [lost_cows-lst] of farmers with [user-id = x]]
+    [csv:to-file (word "data/" string_dataset "_"   TURN "_" CONDITION "_" x "_muccheperse.csv") [lost_cows-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" l TURN CONDITION x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" string_dataset "_"   TURN "_" CONDITION "_" x "_daysurvived.csv") [day_alive-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" l TURN CONDITION x "_energiaaquisita.csv") [energia_acquisita_tot-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" string_dataset "_"   TURN "_" CONDITION "_" x "_energiaaquisita.csv") [energia_acquisita_tot-lst] of farmers with [user-id = x]]
   ]
   foreach ["rosso" "azzurro" "giallo" "rosa" "blu"]  [ x -> if any? farmers with [user-id = x]
-    [ csv:to-file (word "data/" l TURN CONDITION x "_condition.csv") [condition-lst] of farmers with [user-id = x]]
+    [ csv:to-file (word "data/" string_dataset "_"   TURN "_" CONDITION "_" x "_condition.csv") [condition-lst] of farmers with [user-id = x]]
   ]
-  csv:to-file (word "data/global/" l TURN CONDITION "global_risenergtot.csv") (list totriserva_energetica-lst)
-  csv:to-file (word "data/global/" l TURN CONDITION "giorno.csv") (list giorno-lst)
+  csv:to-file (word "data/" string_dataset "_"   TURN "_"  CONDITION "_" "global_risenergtot.csv") (list totriserva_energetica-lst)
+  csv:to-file (word "data/" string_dataset "_"   TURN "_"  CONDITION "_" "giorno.csv") (list giorno-lst)
 end
 
 to-report new_cows
@@ -598,10 +600,10 @@ ticks
 30.0
 
 BUTTON
-1166
-173
-1255
-206
+1207
+142
+1271
+175
 go
 go
 T
@@ -660,10 +662,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-1114
-128
-1203
-161
+1217
+90
+1281
+123
 NIL
 setup
 NIL
@@ -677,10 +679,10 @@ NIL
 1
 
 BUTTON
-1054
-77
-1116
-110
+1064
+90
+1126
+123
 login
 listen-to-clients
 T
@@ -702,7 +704,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.0
+0.6
 0.01
 1
 NIL
@@ -753,10 +755,10 @@ PENS
 "blu" 1.0 1 -13345367 true "" " ifelse (ticks mod ritmo_cicli) != 0\n []\n [plot (([n_mucche_comprate_a_settimana] of one-of farmers with [user-id = \"blu\"] / 7) - count units with [owner# = \"blu\"])]"
 
 BUTTON
-1118
-77
-1201
-110
+1128
+90
+1211
+123
 show_costs
 ask farmers [\nsend-personal-info\n\n]\n\n 
 T
@@ -902,7 +904,7 @@ INPUTBOX
 1345
 70
 TURN
-_rnd_
+BR01
 1
 0
 String
@@ -923,10 +925,10 @@ costo_gestione/unità
 HORIZONTAL
 
 BUTTON
-1074
-173
-1162
-206
+1136
+143
+1202
+176
 choice
 if giorno >= day_invest [invest_capital]\n\nif giorno >= day_contrcom [contributo_comune_refill]\nask farmers [ hubnet-broadcast \"Messaggio per voi:\" \"\"]\n 
 NIL
@@ -1015,12 +1017,12 @@ totale_riserva-energetica
 11
 
 BUTTON
-1202
-78
-1271
-111
+1060
+144
+1129
+177
 max_buying
-ask farmers [\n\nifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n[ifelse contributo_comune_rigenerazione > capitale_totale\n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! L'acquisto di nuove mucche e capitale comune è superiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n]\n[ifelse contributo_comune_rigenerazione > capitale_totale \n[hubnet-send user-id \"Messaggio per voi:\" \"Attenti! Il contributo comune dovrebbe essere inferiore al vostro capitale!\"]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n]\n]\n
+ask farmers [\n\nifelse ((n_mucche_comprate_a_settimana * costo/nuove_unità) + contributo_comune_rigenerazione) > capitale_totale\n [ifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n [hubnet-send user-id \"Messaggio per voi:\" (word \"Attenzione! Spesa superiore al vostro capitale! Saranno assegnate \" int (capitale_totale / costo/nuove_unità) \" nuove mucche!\")]\n [hubnet-send user-id \"Messaggio per voi:\" \"Attenzione! Spesa superiore al vostro capitale!\"]\n]\n[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n]\n\n;ifelse ((n_mucche_comprate_a_settimana * costo/nuove_unità) + contributo_comune_rigenerazione) > capitale_totale\n;[hubnet-send user-id \"Messaggio per voi:\" \"Attenzione! Spesa superiore al vostro capitale!\"]\n;[hubnet-send user-id \"Messaggio per voi:\" \"\"]\n\n\n\n; ]\n\n; ask farmers [\n\n; ifelse n_mucche_comprate_a_settimana > int (capitale_totale / costo/nuove_unità)\n; [ifelse contributo_comune_rigenerazione > capitale_totale\n; [hubnet-send user-id \"Messaggio per voi:\" \"Attenti! L'acquisto di nuove mucche e capitale comune è superiore al vostro capitale!\"]\n; [hubnet-send user-id \"Messaggio per voi:\" (word \"Attenti! Con il vostro capitale potete comprare solo fino a \" int (capitale_totale / costo/nuove_unità) \" mucche!\")]\n; ]\n; [ifelse contributo_comune_rigenerazione > capitale_totale \n; [hubnet-send user-id \"Messaggio per voi:\" \"Attenti! Il contributo comune dovrebbe essere inferiore al vostro capitale!\"]\n; [hubnet-send user-id \"Messaggio per voi:\" \"\"]\n; ]\n; ]\n
 T
 1
 T
@@ -1102,7 +1104,7 @@ day_contrcom
 day_contrcom
 0
 50
-14.0
+0.0
 1
 1
 NIL
@@ -1114,7 +1116,7 @@ INPUTBOX
 1412
 70
 CONDITION
-_post_
+post
 1
 0
 String
@@ -1387,11 +1389,22 @@ malus_amount
 malus_amount
 0
 100
-50.0
+100.0
 1
 1
 NIL
 HORIZONTAL
+
+MONITOR
+1289
+157
+1428
+202
+turnclass
+string_dataset
+17
+1
+11
 
 @#$#@#$#@
 ## Setting per laboratorio (vedi calculations)
