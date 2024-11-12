@@ -1,0 +1,234 @@
+---
+title: "Questionari studenti Genova"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include=FALSE}
+library(tidyverse)
+library(knitr)
+library(conflicted)
+library(readxl)
+library(sjPlot)
+```
+```{r read_data, include=FALSE}
+setwd("/Users/eva/Documents/Work/LABSS/WatchYourAgent/")
+dat <- read_xlsx("genova24_studenti.xlsx")
+```
+
+Riassunto delle risposte degli 81 studenti che hanno partecipato ai 4 laboratori 'Watch Your Agent' al Festival della Scienza, Genova
+
+## Valutazione del gioco
+
+```{r plot_sim,  echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=3}
+sum <- dat %>% select(sim_facile, sim_interessante) %>% 
+  pivot_longer(cols = 1:2, names_to = "label", names_prefix = "sim_") %>% dplyr::filter(!is.na(value)) %>%
+  count(label, value) %>% group_by(label) %>% mutate(freq = n / sum(n) * 100, value = as.factor(value),
+                                                     cumfreq = cumsum(freq))
+                                                     
+xlabels <- c("Quanto è stato facile comprendere \nle regole della simulazione?",
+            "Quanto hai trovato interessante \nla simulazione?")
+answercats <- c("Per niente", "Poco", "Abbastanza", "Molto", "Moltissimo")
+
+ggplot(sum) + geom_col(aes(x = label, y = freq, fill = value), 
+                       position = position_fill(reverse = TRUE)) + 
+  coord_flip() + labs(x = "", y= "% degli studenti", fill = "") +
+  theme_bw() + theme(legend.position="bottom") + 
+  scale_x_discrete(labels= xlabels) +scale_y_continuous(labels=scales::percent)+
+  scale_fill_brewer(palette = "Accent", labels=answercats)+
+  geom_text(
+    aes(x = label, y = cumfreq/100, label = paste0(round(freq,0),"%"), group = value),
+    vjust = -0.5, size = 4
+  )
+```
+```{r plot_sim2,  echo=FALSE, message=FALSE, warning=FALSE, comment=NA, fig.width=12, fig.height=2}
+sum <- dat %>% select(sim_imparato) %>% 
+  pivot_longer(cols = 1, names_to = "label", names_prefix = "sim_") %>% dplyr::filter(!is.na(value)) %>%
+  count(value) %>% mutate(freq = n / sum(n) * 100, value = as.factor(value), label = "label",
+                                                     cumfreq = cumsum(freq))
+
+xlabels <- c("Hai imparato cose nuove giocando?")
+answercats <- c("Sì", "No")
+
+ggplot(sum) + geom_col(aes(x = label, y = freq, fill = value), 
+                       position = position_fill(reverse = TRUE)) + 
+  coord_flip() + labs(x = "", y= "% degli studenti", fill = "") +
+  theme_bw() + theme(legend.position="bottom") + 
+  scale_x_discrete(labels= xlabels) +scale_y_continuous(labels=scales::percent)+
+  scale_fill_brewer(palette = "Accent", labels=answercats)+
+  geom_text(
+    aes(x = label, y = cumfreq/100, label = paste0(round(freq,0),"%"), group = value),
+    vjust = -0.5, size = 4
+  )
+
+```
+
+## Collaborazione durante il gioco
+
+```{r plot_collab,  echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=4}
+sum <- dat %>% select(collab_gruppo_1, collab_gruppo_2, collab_gruppo_3) %>% 
+  pivot_longer(cols = 1:3, names_to = "label") %>% dplyr::filter(!is.na(value)) %>%
+  count(label, value) %>% group_by(label) %>% mutate(freq = n / sum(n) * 100, value = as.factor(value),
+                                                     cumfreq = cumsum(freq))
+
+xlabels <- c("Il mio gruppo ha collaborato bene per \nfavorire la rigenerazione del pascolo",
+            "La competizione tra i gruppi ha \nportato a decisioni meno sostenibili",
+            "La simulazione ha mostrato l'importanza \ndella cooperazione tra i vari gruppi")
+answercats <- c("1 Per nulla d'accordo", "2", "3", "4", "5 Completamente d'accordo")
+
+ggplot(sum %>% dplyr::filter(!is.na(value))) + geom_col(aes(x = label, y = freq, fill = value), 
+                       position = position_fill(reverse = TRUE)) + 
+  coord_flip() + labs(x = "", y= "% degli studenti", fill = "") +
+  theme_bw() + theme(legend.position="bottom") + 
+  scale_x_discrete(labels= xlabels) +scale_y_continuous(labels=scales::percent)+
+  scale_fill_brewer(palette = "Accent", labels=answercats)+
+  geom_text(
+    aes(x = label, y = cumfreq/100, label = paste0(round(freq,0),"%"), group = value),
+    vjust = -0.5, size = 4
+  )
+```
+
+## Sostenibilità
+
+Come descriveresti un comportamento sostenibile? 
+```{r plot_sost1,  echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=6}
+sum <- dat %>% select(comp_sost_1, comp_sost_2, comp_sost_3, comp_sost_4, comp_sost_5, comp_sost_6) %>% 
+  mutate(comp_sost_2 = 6 - comp_sost_2, # reverse code two items
+         comp_sost_6 = 6 - comp_sost_6) %>%
+  pivot_longer(cols = 1:6, names_to = "label", names_prefix = "comp_sost_") %>% dplyr::filter(!is.na(value)) %>%
+  count(label, value) %>% group_by(label) %>% mutate(freq = n / sum(n) * 100, value = as.factor(value),
+                                                     cumfreq = cumsum(freq))
+  
+xlabels <- c("Irrilevante", 
+             "Irresponsabile", # reverse coded
+             "Conveniente", 
+             "Semplice", 
+             "Passivo",
+             "Irrispettoso") # reverse coded
+xlabels2 <- c("Fondamentale", "Responsabile", "Non conveniente", "Complicato", "Proattivo", "Rispettoso")
+answercats <- c("1", "2", "3", "4", "5")
+
+ggplot(sum %>% dplyr::filter(!is.na(value))) + 
+  geom_col(aes(x = as.numeric(label), y = n, fill = value), position = position_fill(reverse = TRUE)) + 
+  coord_flip() + labs(x = "", y= "% degli studenti", fill = "") +
+  theme_bw() + theme(legend.position="bottom") + 
+  scale_x_continuous(breaks = 1:length(xlabels), # make continuous to duplicate axis
+                     labels= xlabels, 
+                     sec.axis = sec_axis(~., breaks = 1:length(xlabels2),
+                                         labels = xlabels2)) +
+  scale_y_continuous(labels=scales::percent)+
+  scale_fill_brewer(palette = "Accent", labels=answercats)  +
+  geom_text(
+    aes(x = as.numeric(label), y = cumfreq/100, label = paste0(round(freq,0),"%"), group = value),
+    vjust = -0.5, size = 4
+  )
+```
+```{r plot_sost2,  echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=4}
+sum <- dat %>% select(comp_sost2_1, comp_sost2_2, comp_sost2_3) %>% 
+  pivot_longer(cols = 1:3, names_to = "label") %>% dplyr::filter(!is.na(value)) %>%
+  count(label, value) %>% group_by(label) %>% mutate(freq = n / sum(n) * 100, value = as.factor(value),
+                                                     cumfreq = cumsum(freq))
+
+xlabels <- c("Le nostre scelte quotidiane possono \ninfluenzare la qualità dell’ambiente ",
+            "Le azioni collettive possono fare \nla differenza per l’ambiente",
+            "Sono disposto/a a cambiare le mie \nabitudini per ridurre l'impatto ambientale")
+answercats <- c("1 Per nulla d'accordo", "2", "3", "4", "5 Completamente d'accordo")
+
+ggplot(sum %>% dplyr::filter(!is.na(value))) + geom_col(aes(x = label, y = freq, fill = value), 
+                       position = position_fill(reverse = TRUE)) + 
+  coord_flip() + labs(x = "", y= "% degli studenti", fill = "") +
+  theme_bw() + theme(legend.position="bottom") + 
+  scale_x_discrete(labels= xlabels) + scale_y_continuous(labels=scales::percent)+
+  scale_fill_brewer(palette = "Accent", labels=answercats) +
+  geom_text(
+    aes(x = label, y = cumfreq/100, label = paste0(round(freq,0),"%"), group = value),
+    vjust = -0.5, size = 4
+  )
+```
+
+## Collaborazione in classe
+
+Di seguito sono indicati alcuni comportamenti, puoi indicare per ciascuno di essi con quale frequenza li metti in atto?
+```{r plot_col1,  echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=6}
+sum <- dat %>% select(collab_classe1_1, collab_classe1_2, collab_classe1_3, collab_classe1_4, collab_classe1_5) %>% 
+  pivot_longer(cols = 1:5, names_to = "label") %>% dplyr::filter(!is.na(value)) %>%
+  count(label, value) %>% group_by(label) %>% mutate(freq = n / sum(n) * 100, value = as.factor(value),
+                                                     cumfreq = cumsum(freq))
+
+xlabels <- c("Collaboro con i miei compagni di classe",
+            "Cerco di aiutare le persone in difficoltà",
+            "Competo con gli altri per ottenere un miglior risultato",
+            "Condivido le mie idee o materiali di studio",
+            "Lavoro da solo/a per raggiungere i miei obiettivi")
+answercats <- c("Mai", "Raramente", "Qualche volta", "Spesso", "Molto spesso")
+
+ggplot(sum %>% dplyr::filter(!is.na(value))) + geom_col(aes(x = label, y = freq, fill = value), 
+                       position = position_fill(reverse = TRUE)) + 
+  coord_flip() + labs(x = "", y= "% degli studenti", fill = "") +
+  theme_bw() + theme(legend.position="bottom") + 
+  scale_x_discrete(labels= xlabels) + scale_y_continuous(labels=scales::percent)+
+  scale_fill_brewer(palette = "Accent", labels=answercats)+
+  geom_text(
+    aes(x = label, y = cumfreq/100, label = paste0(round(freq,0),"%"), group = value),
+    vjust = -0.5, size = 4
+  )
+```
+Come percepisci la collaborazione nella tua classe?
+```{r plot_col2,  echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=6}
+sum <- dat %>% select(collab_classe2_1, collab_classe2_2, collab_classe2_3, collab_classe2_4, collab_classe2_5, collab_classe2_6) %>% 
+  mutate(collab_classe2_2 = 6 - collab_classe2_2, # reverse code two items
+         collab_classe2_5 = 6 - collab_classe2_5) %>%
+  pivot_longer(cols = 1:6, names_to = "label", names_prefix = "collab_classe2_") %>% 
+  dplyr::filter(!is.na(value)) %>%
+  count(label, value) %>% group_by(label) %>% mutate(freq = n / sum(n) * 100, value = as.factor(value),
+                                                     cumfreq = cumsum(freq))
+
+xlabels <- c("Noiosa", 
+             "Inutile", # reverse coded
+             "Faticosa", 
+             "Conflittuale", 
+             "Competitiva", # reverse coded
+             "Semplice") 
+xlabels2 <- c("Interessante", "Utile", "Agevole", "Armoniosa", "Cooperativa", "Complessa")
+answercats <- c("1", "2", "3", "4", "5")
+
+ggplot(sum %>% dplyr::filter(!is.na(value))) + 
+  geom_col(aes(x = as.numeric(label), y = n, fill = value), position = position_fill(reverse = TRUE)) + 
+  coord_flip() + labs(x = "", y= "% degli studenti", fill = "") +
+  theme_bw() + theme(legend.position="bottom") + 
+  scale_x_continuous(breaks = 1:length(xlabels), # make continuous to duplicate axis
+                     labels= xlabels, 
+                     sec.axis = sec_axis(~., breaks = 1:length(xlabels2),
+                                         labels = xlabels2)) +
+  scale_fill_brewer(palette = "Accent", labels=answercats)+
+  geom_text(
+    aes(x = as.numeric(label), y = cumfreq/100, label = paste0(round(freq,0),"%"), group = value),
+    vjust = -0.5, size = 4
+  )
+```
+
+## Domande aperte 
+
+```{r dom_aperte, warning=FALSE, message=FALSE, echo=FALSE, comment=NA}
+print ("Cosa hai imparato giocando")
+openResponse <- select (dat, sim_imparato2) %>%
+  dplyr::filter (sim_imparato2 != "NA")
+openResponse %>% print(n = nrow(.), width = Inf)
+
+print ("Puoi darmi la tua definizione di sostenibilità?")
+openResponse <- select (dat, sostenibilita) %>%
+  dplyr::filter (sostenibilita != "NA")
+openResponse %>% print(n = nrow(.), width = Inf)
+
+print ("Cosa ti piacerebbe studiare con il metodo dell’agent-based modelling (simulazione ad agenti)?")
+openResponse <- select (dat, Q31) %>%
+  dplyr::filter (Q31 != "NA")
+openResponse %>% print(n = nrow(.), width = Inf)
+
+
+
+```
