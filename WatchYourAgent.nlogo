@@ -1821,10 +1821,10 @@ NIL
 1
 
 MONITOR
-176
-275
-317
+183
+371
 324
+420
 € costo nuove mucche
 NIL
 3
@@ -1841,10 +1841,10 @@ NIL
 1
 
 SLIDER
-23
-230
-477
-263
+28
+324
+482
+357
 n_mucche_comprate_a_settimana
 n_mucche_comprate_a_settimana
 1.0
@@ -1866,9 +1866,9 @@ NIL
 1
 
 SLIDER
-22
+25
 425
-478
+481
 458
 contributo_comune_rigenerazione
 contributo_comune_rigenerazione
@@ -1891,10 +1891,10 @@ NIL
 1
 
 MONITOR
-20
-274
-168
-323
+27
+370
+175
+419
 nuove mucche da comprare
 NIL
 3
@@ -1921,10 +1921,10 @@ NIL
 1
 
 TEXTBOX
-28
-331
-476
-349
+31
+225
+479
+243
 Ricordate di non spendere più di quanto guadagnato (€ guadagno totale)!
 13
 0.0
@@ -1971,10 +1971,10 @@ NIL
 1
 
 MONITOR
-20
-359
-477
-408
+25
+248
+482
+297
 Messaggio per voi:
 NIL
 3
