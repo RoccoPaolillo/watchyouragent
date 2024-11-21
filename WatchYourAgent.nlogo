@@ -187,7 +187,7 @@ to graze  ;; goat procedure
   if settimana > 1 [if energia_acquisita <= 0 [
     ask farmers with [user-id = [owner#] of myself][
       set lost_cows lost_cows + 1
-      set capitale_totale capitale_totale - malus_amount
+      set capitale_totale capitale_totale - ((capitale_totale / 100) * malus_amount)
     ]
     die]
   ]
@@ -704,7 +704,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.6
+0.25
 0.01
 1
 NIL
@@ -1389,7 +1389,7 @@ malus_amount
 malus_amount
 0
 100
-100.0
+0.0
 1
 1
 NIL
