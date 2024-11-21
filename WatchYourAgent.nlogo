@@ -704,7 +704,7 @@ rinnovo_energetico
 rinnovo_energetico
 0
 10
-0.25
+0.35
 0.01
 1
 NIL
