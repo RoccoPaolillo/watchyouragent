@@ -10,7 +10,7 @@ library(readxl)
 
 ## ABM preprocess data####
 
-setwd("C:/Users/rocpa/OneDrive/Desktop/BR02_20_11_2024/data/upload/")
+setwd("C:/Users/rocpa/OneDrive/Desktop/BR02_20_11_2024/data/upload")
 
 # farmers
 
@@ -57,24 +57,24 @@ for (i in c(1:29)) {
   print(i - 1)
 }
 
-# names(df)[34] <-  29 in case the 2 simulations have different number of days
-# names(df)[35] <-  30
-# names(df)[36] <-  31
-# names(df)[37] <-  32
-# names(df)[38] <-  33
-# names(df)[39] <-  34
-# names(df)[40] <-  35
+names(df)[34] <-  29  #in case the 2 simulations have different number of days
+names(df)[35] <-  30
+names(df)[36] <-  31
+names(df)[37] <-  32
+names(df)[38] <-  33
+names(df)[39] <-  34
+names(df)[40] <-  35
 
-long_df <- pivot_longer(df,cols = c(1:upcol), names_to = c("time"), values_to = "score")
+long_df <- pivot_longer(df,cols = c((1:29),(34:40)), names_to = c("time"), values_to = "score")
 
 
 
 # check for names correction
 #long_df[long_df$condition == "post3",]$condition <- "post"
-long_df$note <- "rinnovo energetico 0.35"
-write.csv(long_df,file = "final/BR02_20_11_2024.csv", row.names = FALSE)
+long_df$note <- "no malus, rinnovo energetico 0.35"
+write.csv(long_df,file = "final/BR02_simulations.csv", row.names = FALSE)
 
-BR02 <- read.csv("final/BR02_20_11_2024.csv", sep=",")
+BR02 <- read.csv("final/BR02_simulations.csv", sep=",")
 
 # Questionari preprocess data ####
 

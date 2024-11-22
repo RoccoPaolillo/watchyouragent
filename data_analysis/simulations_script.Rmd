@@ -1,7 +1,7 @@
 ---
-title: "simulations_genova24"
+title: "simulations_BR02"
 output: word_document
-date: "2024-11-11"
+date: "2024-11-20"
 ---
 
 ```{r setup, include=FALSE}
@@ -16,32 +16,26 @@ library(writexl)
 library(stringr)
 library(ggplot2)
 
-long_dfGE <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/simulationsGE24.csv",sep=",")
+long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations.csv",sep=",")
 
-long_dfGE[long_dfGE$output == "capital",]$output <- "Capitale totale"
-long_dfGE[long_dfGE$output == "ccr",]$output <- "Contributo comune rigenerazione"
-long_dfGE[long_dfGE$output == "daysurvived",]$output <- "Giorni in vita farmers"
-long_dfGE[long_dfGE$output == "energiaaquisita",]$output <- "Energia acquisita"
-long_dfGE[long_dfGE$output == "giornaliero",]$output <- "Guadagno giornaliero"
-long_dfGE[long_dfGE$output == "mucche",]$output <- "Mucche in vita"
-long_dfGE[long_dfGE$output == "muccheperse",]$output <- "Mucche perse"
-long_dfGE[long_dfGE$output == "muccheslider",]$output <- "Mucche acquisite a settimana"
-long_dfGE[long_dfGE$output == "giorno",]$output <- "Giorno"
-long_dfGE[long_dfGE$output == "risenergtot",]$output <- "Risorse ambientali"
-long_dfGE[long_dfGE$condition == "pre",]$condition <- "Prima simulazione"
-long_dfGE[long_dfGE$condition == "post",]$condition <- "Seconda simulazione"
+long_df[long_df$output == "capital",]$output <- "Capitale totale"
+long_df[long_df$output == "ccr",]$output <- "Contributo comune rigenerazione"
+long_df[long_df$output == "daysurvived",]$output <- "Giorni in vita farmers"
+long_df[long_df$output == "energiaaquisita",]$output <- "Energia acquisita"
+long_df[long_df$output == "giornaliero",]$output <- "Guadagno giornaliero"
+long_df[long_df$output == "mucche",]$output <- "Mucche in vita"
+long_df[long_df$output == "muccheperse",]$output <- "Mucche perse"
+long_df[long_df$output == "muccheslider",]$output <- "Mucche acquisite a settimana"
+long_df[long_df$output == "giorno",]$output <- "Giorno"
+long_df[long_df$output == "risenergtot",]$output <- "Risorse ambientali"
+long_df[long_df$condition == "pre",]$condition <- "Prima simulazione"
+long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
 
 ```
 
 ## Explorative by groups
 
-Note random:
-
-- Come definiamo i comportamenti più cooperativi/competitivi?Credo il distacco tra "contributo comune rigenerazione" e "mucche acquisite a settimana", focalizzandoci su capitale totale, mucche perse ed energia acquisita.
-
-- Di fatto anche se inizialmente hanno investito (settimana 14 nella seconda simulazione), nelle settimane succesive molti gruppi tornano ad acrescere le proprie mucche.
-
-- Da matchare medie dei gruppi ai questionari con scelte ed output simulazione, e discussione gruppi
+- Here used rinnovo energetico 0.32, not malus
 
 ```{r read_data, echo=FALSE}
 
