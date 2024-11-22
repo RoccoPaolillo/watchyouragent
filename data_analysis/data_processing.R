@@ -8,27 +8,28 @@ library(writexl)
 library(stringr)
 library(readxl)
 
-# data preparation ####
+# data preparation questionari ####
 
 setwd("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/")
 
-BR02 <- read_xlsx("data_upload/Questionario_20241120_RM02.xlsx")
+BR02_studenti <- read_xlsx("data_upload/Docenti_20241120_RM02.xlsx")
 
-BR02$turn <- "BR02"
-BR02$smartphone <- 1
-BR02$colore_stringa <- "colorestringa"
-BR02[BR02$colore == 1,]$colore_stringa <- "azzurro"
-BR02[BR02$colore == 2,]$colore_stringa <- "blu"
-BR02[BR02$colore == 3,]$colore_stringa <- "giallo"
-BR02[BR02$colore == 4,]$colore_stringa <- "rosa"
-BR02[BR02$colore == 5,]$colore_stringa <- "rosso"
-BR02[BR02$colore == 0,]$colore_stringa <- "nullo"
+BR02_studenti$turn <- "BR02"
+BR02_studenti$smartphone <- 1
+BR02_studenti$colore_stringa <- "colorestringa"
+BR02_studenti[BR02_studenti$colore == 1,]$colore_stringa <- "azzurro"
+BR02_studenti[BR02_studenti$colore == 2,]$colore_stringa <- "blu"
+BR02_studenti[BR02_studenti$colore == 3,]$colore_stringa <- "giallo"
+BR02_studenti[BR02_studenti$colore == 4,]$colore_stringa <- "rosa"
+BR02_studenti[BR02_studenti$colore == 5,]$colore_stringa <- "rosso"
+BR02_studenti[BR02_studenti$colore == 0,]$colore_stringa <- "nullo"
 
 writexl::write_xlsx(BR02, "Roma_BR/BR02/BR02_studenti.xlsx")
 
+BR02_docenti <- read_xlsx("data_upload/Docenti_20241120_RM02.xlsx")
+BR02_docenti$turn <- "BR02"
 
-
-
+writexl::write_xlsx(BR02_docenti, "Roma_BR/BR02/BR02_docenti.xlsx")
 
 # data preparation Genova ###########
 
