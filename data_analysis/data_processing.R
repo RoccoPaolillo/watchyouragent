@@ -7,7 +7,6 @@ library(readr)
 library(writexl)
 library(stringr)
 library(readxl)
-library("xlsx")
 
 # data preparation ####
 
