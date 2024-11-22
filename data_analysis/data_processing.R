@@ -8,7 +8,63 @@ library(writexl)
 library(stringr)
 library(readxl)
 
-# data preparation questionari ####
+## ABM preprocess data####
+
+setwd("C:/Users/rocpa/OneDrive/Desktop/BR02_20_11_2024/data/upload/")
+
+# farmers
+
+files <- list.files(pattern = ".*csv")
+
+results = list()
+for (t in files) {
+  p <- read.csv(t, header=FALSE, sep=",")
+  
+  p$turn <- str_split(t, "_")[[1]][2]
+  p$color <- str_split(t, "_")[[1]][4]
+  p$output <- str_remove(str_split(t, "_")[[1]][5],".csv")
+  p$condition <- str_split(t,"_")[[1]][3]
+  results[[t]] = p
+}
+results
+df <- bind_rows(results)
+
+# df$condition = "post"
+
+filesglb <- list.files(path = "global", pattern = ".*csv")
+
+resultglb = list()
+for (glb in filesglb) {
+  pglb <- read.csv(paste0("global/",glb), header=FALSE, sep=",")
+  pglb$turn <- str_split(glb, "_")[[1]][2]
+  pglb$color <- NA
+  pglb$output <- str_remove(str_split(glb, "_")[[1]][4],".csv")
+  pglb$condition <- str_split(glb, "_")[[1]][3]
+  resultglb[[glb]] = pglb
+}
+resultglb
+dfglb <- bind_rows(resultglb)
+# dfglb$color <- NA
+# dfglb$condition <- "post"
+
+# merging farmers and globals
+df <- rbind(df,dfglb)
+upcol <- ncol(df) - 4
+
+for (i in c(1:upcol)) {
+  #  names(df)[i] <- paste0("day_", (i - 1))
+  names(df)[i] <-  (i - 1)
+  print(i - 1)
+}
+
+long_df <- pivot_longer(df,cols = c(1:(ncol(df) - 4)), names_to = c("time"), values_to = "score")
+
+# check for names correction
+#long_df[long_df$condition == "post3",]$condition <- "post"
+long_df$note <- "used malus 100 Euro costante"
+write.csv(long_df,file = "final/BR01_13_11_2024.csv", row.names = FALSE)
+
+# Questionari preprocess data ####
 
 setwd("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/")
 
@@ -30,6 +86,11 @@ BR02_docenti <- read_xlsx("data_upload/Docenti_20241120_RM02.xlsx")
 BR02_docenti$turn <- "BR02"
 
 writexl::write_xlsx(BR02_docenti, "Roma_BR/BR02/BR02_docenti.xlsx")
+
+
+
+
+
 
 # data preparation Genova ###########
 
@@ -68,7 +129,7 @@ GEcartaceo <- GEcartaceo[-c(1,2), ]
 GEcartaceo$turn <- "GE00"
 GEcartaceo[GEcartaceo$ResponseId == "R_cartaceo_1",]$turn <- "GE02"
 GEcartaceo[GEcartaceo$ResponseId == "R_cartaceo_3",]$turn <- "GE02"
- 
+
 # risposta collezionata tramite smartphone (1) o cartaceo (0)
 GEcartaceo$smartphone <- 0
 
@@ -139,65 +200,7 @@ writexl::write_xlsx(ROMEpost, "ROMEpost_pilot.xlsx")
 
 
 
-## ABM ####
-
-# For GE01 and GE02 to recover, not pretest
-
-setwd("C:/Users/rocpa/OneDrive/Desktop/BR_13_11_wya/tragedyclimate-main/data/data_upload")
-
-# farmers
-
-files <- list.files(pattern = ".*csv")
-
-results = list()
-for (t in files) {
- p <- read.csv(t, header=FALSE, sep=",")
- 
- p$turn <- str_split(t, "_")[[1]][2]
- p$color <- str_split(t, "_")[[1]][4]
- p$output <- str_remove(str_split(t, "_")[[1]][5],".csv")
- p$condition <- str_split(t,"_")[[1]][3]
- results[[t]] = p
-}
-results
-df <- bind_rows(results)
-
-# df$condition = "post"
-
-filesglb <- list.files(path = "global", pattern = ".*csv")
-  
-resultglb = list()
-for (glb in filesglb) {
-  pglb <- read.csv(paste0("global/",glb), header=FALSE, sep=",")
-  pglb$turn <- str_split(glb, "_")[[1]][2]
-  pglb$color <- NA
-  pglb$output <- str_remove(str_split(glb, "_")[[1]][4],".csv")
-  pglb$condition <- str_split(glb, "_")[[1]][3]
-  resultglb[[glb]] = pglb
-}
-resultglb
-dfglb <- bind_rows(resultglb)
-# dfglb$color <- NA
-# dfglb$condition <- "post"
-
-# merging farmers and globals
-df <- rbind(df,dfglb)
-upcol <- ncol(df) - 4
-
-for (i in c(1:upcol)) {
-#  names(df)[i] <- paste0("day_", (i - 1))
-  names(df)[i] <-  (i - 1)
-  print(i - 1)
-}
-
-long_df <- pivot_longer(df,cols = c(1:(ncol(df) - 4)), names_to = c("time"), values_to = "score")
-
-# check for names correction
-#long_df[long_df$condition == "post3",]$condition <- "post"
-long_df$note <- "used malus 100 Euro costante"
-write.csv(long_df,file = "final/BR01_13_11_2024.csv", row.names = FALSE)
-
-# Compose Genova####
+# Compose Genova ABM####
 long_df1 <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/GE01/final/GE01_sim.csv",sep=",")
 long_df2 <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/GE02/final/GE02_sim.csv",sep=",")
 
@@ -288,7 +291,7 @@ dfglb$color <- NA
 df <- rbind(df,dfglb)
 
 val <- c(22050, 21668.8, 21444.8, 21277.4, 21163.8, 21099.6, 21061.4, 21053.6, 20123.6, 19614.2, 19319.8, 19254, 19376.6, 19590.8, 19890, 20159.27, 18999.78, 18028.49, 17496.49, 17340, 17449.4,
-                  17783, 18249.6, 15732.6, 14235.6, 13555.4, 13502.2, 14002.8, 14513, 17711.66, 15214.42, 13708.79, 13004.1, 13008.95, 13798.34, 15023.86, "GEO4","pre",NA,"risenergtot")
+         17783, 18249.6, 15732.6, 14235.6, 13555.4, 13502.2, 14002.8, 14513, 17711.66, 15214.42, 13708.79, 13004.1, 13008.95, 13798.34, 15023.86, "GEO4","pre",NA,"risenergtot")
 
 df <- rbind(df,val)
 
@@ -319,5 +322,13 @@ long_dfGE <- rbind(long_df1,long_df2,long_df3, long_df4)
 
 write.csv(long_dfGE,file = "C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/simulationsGE24.csv", row.names = FALSE)
 long_dfGE <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/simulationsGE24.csv",sep=",")
+
+
+
+
+
+
+
+
 
 
