@@ -7,8 +7,31 @@ library(readr)
 library(writexl)
 library(stringr)
 library(readxl)
+library("xlsx")
 
-# data preparation ###########
+# data preparation ####
+
+setwd("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/")
+
+BR02 <- read_xlsx("data_upload/Questionario_20241120_RM02.xlsx")
+
+BR02$turn <- "BR02"
+BR02$smartphone <- 1
+BR02$colore_stringa <- "colorestringa"
+BR02[BR02$colore == 1,]$colore_stringa <- "azzurro"
+BR02[BR02$colore == 2,]$colore_stringa <- "blu"
+BR02[BR02$colore == 3,]$colore_stringa <- "giallo"
+BR02[BR02$colore == 4,]$colore_stringa <- "rosa"
+BR02[BR02$colore == 5,]$colore_stringa <- "rosso"
+BR02[BR02$colore == 0,]$colore_stringa <- "nullo"
+
+writexl::write_xlsx(BR02, "Roma_BR/BR02/BR02_studenti.xlsx")
+
+
+
+
+
+# data preparation Genova ###########
 
 setwd("C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/")
 
@@ -174,7 +197,7 @@ long_df <- pivot_longer(df,cols = c(1:(ncol(df) - 4)), names_to = c("time"), val
 long_df$note <- "used malus 100 Euro costante"
 write.csv(long_df,file = "final/BR01_13_11_2024.csv", row.names = FALSE)
 
-# Compose Genova ####
+# Compose Genova####
 long_df1 <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/GE01/final/GE01_sim.csv",sep=",")
 long_df2 <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/GE02/final/GE02_sim.csv",sep=",")
 
