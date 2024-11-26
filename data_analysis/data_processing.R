@@ -8,6 +8,43 @@ library(writexl)
 library(stringr)
 library(readxl)
 
+## Merge dataset ####
+
+genova <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Genova/simulationsGE24.csv",sep=",")
+
+genova$time <- str_remove(genova$time,"day_")
+genova$time <- as.numeric(genova$time)
+genova$note <- "genova"
+
+rmBR01 <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR01/simulationsBR01.csv",sep=",")
+rmBR02 <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations.csv",sep=",")
+
+df_simulations <- rbind(genova,rmBR01,rmBR02)
+
+write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv", 
+          row.names = FALSE)
+
+
+studentsgenova <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Genova/genova24_studenti.xlsx")
+BR02studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_studenti.xlsx")
+studentsgenova <- studentsgenova[,-49]
+BR02studenti$StartDate <- as.character(BR02studenti$StartDate)
+BR02studenti$EndDate <- as.character(BR02studenti$EndDate)
+
+df_studenti <- rbind(studentsgenova,BR02studenti)
+writexl::write_xlsx(df_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
+
+docentigenova <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Genova/genova24_docenti.xlsx")
+docentiBR01 <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR01/docentiBR01.xlsx")
+docentiBR01$StartDate <- as.character(docentiBR01$StartDate)
+docentiBR01$EndDate <- as.character(docentiBR01$EndDate)
+docentiBR02 <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_docenti.xlsx")
+docentiBR02$StartDate <- as.character(docentiBR02$StartDate)
+docentiBR02$EndDate <- as.character(docentiBR02$EndDate)
+
+df_docenti <- rbind(docentigenova,docentiBR01,docentiBR02)
+writexl::write_xlsx(df_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
+
 ## ABM preprocess data####
 
 setwd("C:/Users/rocpa/OneDrive/Desktop/BR02_20_11_2024/data/upload")
@@ -334,6 +371,7 @@ long_dfGE <- rbind(long_df1,long_df2,long_df3, long_df4)
 
 write.csv(long_dfGE,file = "C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/simulationsGE24.csv", row.names = FALSE)
 long_dfGE <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/GENOVA_wya/archiviati/simulationsGE24.csv",sep=",")
+
 
 
 
