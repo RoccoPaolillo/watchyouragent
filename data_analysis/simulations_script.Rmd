@@ -1,5 +1,5 @@
 ---
-title: "simulations_BR02"
+title: "GE03,GE04"
 output: word_document
 date: "2024-11-20"
 ---
@@ -15,21 +15,32 @@ library(readr)
 library(writexl)
 library(stringr)
 library(ggplot2)
+library(caret)
 
-long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations.csv",sep=",")
+long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv",sep=",")
 
 long_df[long_df$output == "capital",]$output <- "Capitale totale"
-long_df[long_df$output == "ccr",]$output <- "Contributo comune rigenerazione"
+long_df[long_df$output == "ccr",]$output <- "Contributo comune"
 long_df[long_df$output == "daysurvived",]$output <- "Giorni in vita farmers"
 long_df[long_df$output == "energiaaquisita",]$output <- "Energia acquisita"
 long_df[long_df$output == "giornaliero",]$output <- "Guadagno giornaliero"
 long_df[long_df$output == "mucche",]$output <- "Mucche in vita"
 long_df[long_df$output == "muccheperse",]$output <- "Mucche perse"
-long_df[long_df$output == "muccheslider",]$output <- "Mucche acquisite a settimana"
+long_df[long_df$output == "muccheslider",]$output <- "Mucche acquisite"
 long_df[long_df$output == "giorno",]$output <- "Giorno"
 long_df[long_df$output == "risenergtot",]$output <- "Risorse ambientali"
 long_df[long_df$condition == "pre",]$condition <- "Prima simulazione"
 long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
+
+
+long_dfnor <- long_df %>% filter(!is.na(score)) %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score)), na.rm=T) %>%  ungroup() 
+
+# replace(is.na(.), 0) %>%
+# long_dfnorm1 <- long_df %>% filter(condition == "Prima simulazione") %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score))) %>%  ungroup() 
+# long_dfnorm2 <- long_df %>% filter(condition == "Seconda simulazione") %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score))) %>%  ungroup() 
+# 
+# long_dfnor <- rbind(long_dfnorm1,long_dfnorm2)
+
 
 ```
 
@@ -37,23 +48,48 @@ long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
 
 - Here used rinnovo energetico 0.32, not malus
 
-```{r read_data, echo=FALSE}
+```{r read_data1, echo=FALSE, include = FALSE}
 
 variables <- c("Capitale totale","Guadagno giornaliero","Contributo comune rigenerazione","Mucche acquisite a settimana",
          "Mucche in vita","Mucche perse","Energia acquisita","Risorse ambientali","Giorni in vita farmers","Giorno")
 
+long_df <- long_df %>% filter(turn %in% c("BR01"))
+
 for (i in variables){
- 
+
 plot_i <- long_df[long_df$output == i,] %>% ggplot(aes(x = time, y = score)) + geom_line(aes(color = color)) +
   scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) +
   scale_x_continuous(breaks=seq(0,35,7)) +
 facet_grid(turn ~ factor(condition, levels = c("Prima simulazione","Seconda simulazione")), scales = "free_y") +
-  labs(title = i, x = "giorni", y = i) + 
-  theme_bw( ) + 
+  labs(title = i, x = "giorni", y = i) +
+  theme_bw( ) +
   theme(
     axis.text.x = element_text(angle = 45),legend.position = "bottom")
-  
+
 plot(plot_i)
 
 }
+```
+
+
+```{r read_data, echo=FALSE, fig.width=9, fig.height=7}
+
+variables <- c("Contributo comune","Mucche acquisite","Capitale totale",
+         "Mucche perse","Energia acquisita")
+
+long_df <- long_df %>% filter(turn %in% c("GE03","GE04","BR01","BR02") & condition == "Prima simulazione" & time >= 8) 
+
+
+plot_i <- long_df %>%  filter(output %in% variables) %>% ggplot(aes(x = time, y = score)) + geom_line(aes(color = color)) +
+  scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) +
+  scale_x_continuous(breaks=seq(8,36,7)) +
+facet_wrap(turn ~ factor(output,levels = c("Contributo comune","Mucche acquisite","Capitale totale", "Mucche perse","Energia acquisita")) , scales = "free_y", ncol = 5) +
+  ggtitle(long_df$condition) + 
+  labs(x = "giorni", y = "") +
+  theme_bw( ) + 
+  theme(axis.text.x = element_text(angle = 45),legend.position = "bottom")
+  
+plot(plot_i)
+
+
 ```
