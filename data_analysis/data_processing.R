@@ -25,21 +25,24 @@ write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatura
           row.names = FALSE)
 
 
-studentsgenova <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Genova/genova24_studenti.xlsx")
-BR02studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_studenti.xlsx")
-studentsgenova <- studentsgenova[,-49]
-BR02studenti$StartDate <- as.character(BR02studenti$StartDate)
-BR02studenti$EndDate <- as.character(BR02studenti$EndDate)
+df_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
+BR03_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR03/BR03_studenti.xlsx")
 
-df_studenti <- rbind(studentsgenova,BR02studenti)
+# studentsgenova <- studentsgenova[,-49]
+# BR02studenti$StartDate <- as.character(BR02studenti$StartDate)
+# BR02studenti$EndDate <- as.character(BR02studenti$EndDate)
+
+df_studenti <- rbind(df_studenti,BR03_studenti)
 writexl::write_xlsx(df_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
 
 df_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
-docentiBR03 <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_upload/Docenti_20241127_RM03.xlsx")
-docentiBR03$StartDate <- as.character(docentiBR03$StartDate)
-docentiBR03$EndDate <- as.character(docentiBR03$EndDate)
-docentiBR03$turn <- "BR03"
-df_docenti$convivenza <- NA
+BR03_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_upload/Docenti_20241127_RM03.xlsx")
+BR03_docenti$StartDate <- as.character(docentiBR03$StartDate)
+BR03_docenti$EndDate <- as.character(docentiBR03$EndDate)
+BR03_docenti$turn <- "BR03"
+writexl::write_xlsx(BR03_docenti, "Roma_BR/BR03/BR03_docenti.xlsx")
+
+#df_docenti$convivenza <- NA
 
 df_docenti <- rbind(df_docenti,docentiBR03)
 
@@ -119,24 +122,20 @@ BR02 <- read.csv("final/BR02_simulations.csv", sep=",")
 
 setwd("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/")
 
-BR02_studenti <- read_xlsx("data_upload/Docenti_20241120_RM02.xlsx")
+BR03_studenti <- read_xlsx("data_upload/Questionario_20241127_RM03.xlsx")
+BR03_studenti$StartDate <- as.character(BR03_studenti$StartDate)
+BR03_studenti$EndDate <- as.character(BR03_studenti$EndDate)
+BR03_studenti$turn <- "BR03"
+BR03_studenti$smartphone <- 1
+BR03_studenti$colore_stringa <- "colorestringa"
+BR03_studenti[BR03_studenti$colore == 1,]$colore_stringa <- "azzurro"
+BR03_studenti[BR03_studenti$colore == 2,]$colore_stringa <- "blu"
+BR03_studenti[BR03_studenti$colore == 3,]$colore_stringa <- "giallo"
+BR03_studenti[BR03_studenti$colore == 4,]$colore_stringa <- "rosa"
+BR03_studenti[BR03_studenti$colore == 5,]$colore_stringa <- "rosso"
+BR03_studenti[BR03_studenti$colore == 0,]$colore_stringa <- "nullo"
 
-BR02_studenti$turn <- "BR02"
-BR02_studenti$smartphone <- 1
-BR02_studenti$colore_stringa <- "colorestringa"
-BR02_studenti[BR02_studenti$colore == 1,]$colore_stringa <- "azzurro"
-BR02_studenti[BR02_studenti$colore == 2,]$colore_stringa <- "blu"
-BR02_studenti[BR02_studenti$colore == 3,]$colore_stringa <- "giallo"
-BR02_studenti[BR02_studenti$colore == 4,]$colore_stringa <- "rosa"
-BR02_studenti[BR02_studenti$colore == 5,]$colore_stringa <- "rosso"
-BR02_studenti[BR02_studenti$colore == 0,]$colore_stringa <- "nullo"
-
-writexl::write_xlsx(BR02, "Roma_BR/BR02/BR02_studenti.xlsx")
-
-BR03_docenti <- read_xlsx("data_upload/Docenti_20241127_RM03.xlsx")
-BR02_docenti$turn <- "BR02"
-
-writexl::write_xlsx(BR02_docenti, "Roma_BR/BR02/BR02_docenti.xlsx")
+writexl::write_xlsx(BR03_studenti, "Roma_BR/BR03/BR03_studenti.xlsx")
 
 
 
