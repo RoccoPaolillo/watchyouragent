@@ -50,9 +50,10 @@ df_docenti <- rbind(df_docenti,docentiBR03)
 writexl::write_xlsx(df_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
 
 
+
 ## ABM preprocess data####
 
-setwd("C:/Users/rocpa/OneDrive/Desktop/BR02_20_11_2024/data/upload")
+setwd("C:/Users/rocpa/OneDrive/Desktop/BR03_27_11_2024/data/upload")
 
 # farmers
 
