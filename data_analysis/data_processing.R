@@ -34,16 +34,18 @@ BR02studenti$EndDate <- as.character(BR02studenti$EndDate)
 df_studenti <- rbind(studentsgenova,BR02studenti)
 writexl::write_xlsx(df_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
 
-docentigenova <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Genova/genova24_docenti.xlsx")
-docentiBR01 <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR01/docentiBR01.xlsx")
-docentiBR01$StartDate <- as.character(docentiBR01$StartDate)
-docentiBR01$EndDate <- as.character(docentiBR01$EndDate)
-docentiBR02 <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_docenti.xlsx")
-docentiBR02$StartDate <- as.character(docentiBR02$StartDate)
-docentiBR02$EndDate <- as.character(docentiBR02$EndDate)
+df_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
+docentiBR03 <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_upload/Docenti_20241127_RM03.xlsx")
+docentiBR03$StartDate <- as.character(docentiBR03$StartDate)
+docentiBR03$EndDate <- as.character(docentiBR03$EndDate)
+docentiBR03$turn <- "BR03"
+df_docenti$convivenza <- NA
 
-df_docenti <- rbind(docentigenova,docentiBR01,docentiBR02)
+df_docenti <- rbind(df_docenti,docentiBR03)
+
+
 writexl::write_xlsx(df_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
+
 
 ## ABM preprocess data####
 
@@ -131,7 +133,7 @@ BR02_studenti[BR02_studenti$colore == 0,]$colore_stringa <- "nullo"
 
 writexl::write_xlsx(BR02, "Roma_BR/BR02/BR02_studenti.xlsx")
 
-BR02_docenti <- read_xlsx("data_upload/Docenti_20241120_RM02.xlsx")
+BR03_docenti <- read_xlsx("data_upload/Docenti_20241127_RM03.xlsx")
 BR02_docenti$turn <- "BR02"
 
 writexl::write_xlsx(BR02_docenti, "Roma_BR/BR02/BR02_docenti.xlsx")
