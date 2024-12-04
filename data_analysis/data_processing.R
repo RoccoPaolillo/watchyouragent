@@ -28,6 +28,10 @@ write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatura
 df_simulations <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv")
 BR03_simulations <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR03/BR03_simulations.csv")
 
+df_simulations <- rbind(df_simulations,BR03_simulations)
+
+write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv", 
+          row.names = FALSE)
 
 
 # 
