@@ -24,30 +24,46 @@ df_simulations <- rbind(genova,rmBR01,rmBR02)
 write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv", 
           row.names = FALSE)
 
+# simulations
+df_simulations <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv")
+BR03_simulations <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR03/BR03_simulations.csv")
 
-studentsgenova <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Genova/genova24_studenti.xlsx")
-BR02studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_studenti.xlsx")
-studentsgenova <- studentsgenova[,-49]
-BR02studenti$StartDate <- as.character(BR02studenti$StartDate)
-BR02studenti$EndDate <- as.character(BR02studenti$EndDate)
+df_simulations <- rbind(df_simulations,BR03_simulations)
 
-df_studenti <- rbind(studentsgenova,BR02studenti)
+write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv", 
+          row.names = FALSE)
+
+
+# 
+df_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
+BR03_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR03/BR03_studenti.xlsx")
+
+# studentsgenova <- studentsgenova[,-49]
+# BR02studenti$StartDate <- as.character(BR02studenti$StartDate)
+# BR02studenti$EndDate <- as.character(BR02studenti$EndDate)
+
+df_studenti <- rbind(df_studenti,BR03_studenti)
 writexl::write_xlsx(df_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
 
-docentigenova <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Genova/genova24_docenti.xlsx")
-docentiBR01 <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR01/docentiBR01.xlsx")
-docentiBR01$StartDate <- as.character(docentiBR01$StartDate)
-docentiBR01$EndDate <- as.character(docentiBR01$EndDate)
-docentiBR02 <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_docenti.xlsx")
-docentiBR02$StartDate <- as.character(docentiBR02$StartDate)
-docentiBR02$EndDate <- as.character(docentiBR02$EndDate)
+df_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
+BR03_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_upload/Docenti_20241127_RM03.xlsx")
+BR03_docenti$StartDate <- as.character(docentiBR03$StartDate)
+BR03_docenti$EndDate <- as.character(docentiBR03$EndDate)
+BR03_docenti$turn <- "BR03"
+writexl::write_xlsx(BR03_docenti, "Roma_BR/BR03/BR03_docenti.xlsx")
 
-df_docenti <- rbind(docentigenova,docentiBR01,docentiBR02)
+#df_docenti$convivenza <- NA
+
+df_docenti <- rbind(df_docenti,docentiBR03)
+
+
 writexl::write_xlsx(df_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
+
+
 
 ## ABM preprocess data####
 
-setwd("C:/Users/rocpa/OneDrive/Desktop/BR02_20_11_2024/data/upload")
+setwd("C:/Users/rocpa/OneDrive/Desktop/BR03_27_11_2024/data/upload")
 
 # farmers
 
@@ -88,53 +104,49 @@ dfglb <- bind_rows(resultglb)
 df <- rbind(df,dfglb)
 upcol <- ncol(df) - 4
 
-for (i in c(1:29)) {
+for (i in c(1:upcol)) {
   #  names(df)[i] <- paste0("day_", (i - 1))
   names(df)[i] <-  (i - 1)
   print(i - 1)
 }
 
-names(df)[34] <-  29  #in case the 2 simulations have different number of days
-names(df)[35] <-  30
-names(df)[36] <-  31
-names(df)[37] <-  32
-names(df)[38] <-  33
-names(df)[39] <-  34
-names(df)[40] <-  35
+# names(df)[34] <-  29  #in case the 2 simulations have different number of days
+# names(df)[35] <-  30
+# names(df)[36] <-  31
+# names(df)[37] <-  32
+# names(df)[38] <-  33
+# names(df)[39] <-  34
+# names(df)[40] <-  35
 
-long_df <- pivot_longer(df,cols = c((1:29),(34:40)), names_to = c("time"), values_to = "score")
+long_df <- pivot_longer(df,cols = c(1:29), names_to = c("time"), values_to = "score")
 
 
 
 # check for names correction
 #long_df[long_df$condition == "post3",]$condition <- "post"
 long_df$note <- "no malus, rinnovo energetico 0.35"
-write.csv(long_df,file = "final/BR02_simulations.csv", row.names = FALSE)
+write.csv(long_df,file = "final/BR03_simulations.csv", row.names = FALSE)
 
-BR02 <- read.csv("final/BR02_simulations.csv", sep=",")
+BR03 <- read.csv("final/BR03_simulations.csv", sep=",")
 
 # Questionari preprocess data ####
 
 setwd("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/")
 
-BR02_studenti <- read_xlsx("data_upload/Docenti_20241120_RM02.xlsx")
+BR03_studenti <- read_xlsx("data_upload/Questionario_20241127_RM03.xlsx")
+BR03_studenti$StartDate <- as.character(BR03_studenti$StartDate)
+BR03_studenti$EndDate <- as.character(BR03_studenti$EndDate)
+BR03_studenti$turn <- "BR03"
+BR03_studenti$smartphone <- 1
+BR03_studenti$colore_stringa <- "colorestringa"
+BR03_studenti[BR03_studenti$colore == 1,]$colore_stringa <- "azzurro"
+BR03_studenti[BR03_studenti$colore == 2,]$colore_stringa <- "blu"
+BR03_studenti[BR03_studenti$colore == 3,]$colore_stringa <- "giallo"
+BR03_studenti[BR03_studenti$colore == 4,]$colore_stringa <- "rosa"
+BR03_studenti[BR03_studenti$colore == 5,]$colore_stringa <- "rosso"
+BR03_studenti[BR03_studenti$colore == 0,]$colore_stringa <- "nullo"
 
-BR02_studenti$turn <- "BR02"
-BR02_studenti$smartphone <- 1
-BR02_studenti$colore_stringa <- "colorestringa"
-BR02_studenti[BR02_studenti$colore == 1,]$colore_stringa <- "azzurro"
-BR02_studenti[BR02_studenti$colore == 2,]$colore_stringa <- "blu"
-BR02_studenti[BR02_studenti$colore == 3,]$colore_stringa <- "giallo"
-BR02_studenti[BR02_studenti$colore == 4,]$colore_stringa <- "rosa"
-BR02_studenti[BR02_studenti$colore == 5,]$colore_stringa <- "rosso"
-BR02_studenti[BR02_studenti$colore == 0,]$colore_stringa <- "nullo"
-
-writexl::write_xlsx(BR02, "Roma_BR/BR02/BR02_studenti.xlsx")
-
-BR02_docenti <- read_xlsx("data_upload/Docenti_20241120_RM02.xlsx")
-BR02_docenti$turn <- "BR02"
-
-writexl::write_xlsx(BR02_docenti, "Roma_BR/BR02/BR02_docenti.xlsx")
+writexl::write_xlsx(BR03_studenti, "Roma_BR/BR03/BR03_studenti.xlsx")
 
 
 
