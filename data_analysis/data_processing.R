@@ -26,9 +26,10 @@ write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatura
 
 # simulations
 df_simulations <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv")
-BR03_simulations <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR03/BR03_simulations.csv")
+BR04_simulations <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR04/BR04_simulations.csv")
+BR04_simulations$note <- "no malus, rinnovo energetico 0.35"
 
-df_simulations <- rbind(df_simulations,BR03_simulations)
+df_simulations <- rbind(df_simulations,BR04_simulations)
 
 write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv", 
           row.names = FALSE)
@@ -79,7 +80,7 @@ writexl::write_xlsx(df_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/traged
 
 ## ABM preprocess data####
 
-setwd("C:/Users/rocpa/OneDrive/Desktop/BR03_27_11_2024/data/upload")
+setwd("C:/Users/rocpa/OneDrive/Desktop/BR04_04_12_2024_primoturno/data/upload")
 
 # farmers
 
@@ -141,9 +142,9 @@ long_df <- pivot_longer(df,cols = c(1:29), names_to = c("time"), values_to = "sc
 # check for names correction
 #long_df[long_df$condition == "post3",]$condition <- "post"
 long_df$note <- "no malus, rinnovo energetico 0.35"
-write.csv(long_df,file = "final/BR03_simulations.csv", row.names = FALSE)
+write.csv(long_df,file = "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR04/BR04_simulations.csv", row.names = FALSE)
 
-BR03 <- read.csv("final/BR03_simulations.csv", sep=",")
+BR04 <- read.csv("", sep=",")
 
 # Questionari preprocess data ####
 
