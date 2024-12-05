@@ -42,23 +42,39 @@ BR03_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatu
 # BR02studenti$StartDate <- as.character(BR02studenti$StartDate)
 # BR02studenti$EndDate <- as.character(BR02studenti$EndDate)
 
-df_studenti <- rbind(df_studenti,BR03_studenti)
+
+BR04_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Desktop/BR04_04_12_2024_primoturno/questionariupload/Questionario_20241204_RM04.xlsx")
+BR04_studenti$StartDate <- as.character(BR04_studenti$StartDate)
+BR04_studenti$EndDate <- as.character(BR04_studenti$EndDate)
+BR04_studenti$turn <- "BR04"
+BR04_studenti$smartphone <- 1
+BR04_studenti$colore_stringa <- "colorestringa"
+BR04_studenti[BR04_studenti$colore == 1,]$colore_stringa <- "azzurro"
+BR04_studenti[BR04_studenti$colore == 2,]$colore_stringa <- "blu"
+BR04_studenti[BR04_studenti$colore == 3,]$colore_stringa <- "giallo"
+BR04_studenti[BR04_studenti$colore == 4,]$colore_stringa <- "rosa"
+BR04_studenti[BR04_studenti$colore == 5,]$colore_stringa <- "rosso"
+BR04_studenti[BR04_studenti$colore == 0,]$colore_stringa <- "nullo"
+writexl::write_xlsx(BR04_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR04/BR04_studenti.xlsx")
+
+# merge with df_studenti
+df_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
+BR04_studenti <- read_xlsx( "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR04/BR04_studenti.xlsx")
+df_studenti <- rbind(df_studenti, BR04_studenti)
 writexl::write_xlsx(df_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
 
+
+BR04_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Desktop/BR04_04_12_2024_primoturno/questionariupload/Docenti_20241204_RM04.xlsx")
+BR04_docenti$StartDate <- as.character(BR04_docenti$StartDate)
+BR04_docenti$EndDate <- as.character(BR04_docenti$EndDate)
+BR04_docenti$turn <- "BR04"
+writexl::write_xlsx(BR04_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR04/BR04_docenti.xlsx")
+
 df_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
-BR03_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_upload/Docenti_20241127_RM03.xlsx")
-BR03_docenti$StartDate <- as.character(docentiBR03$StartDate)
-BR03_docenti$EndDate <- as.character(docentiBR03$EndDate)
-BR03_docenti$turn <- "BR03"
-writexl::write_xlsx(BR03_docenti, "Roma_BR/BR03/BR03_docenti.xlsx")
+BR04_docenti <-  read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR04/BR04_docenti.xlsx")
 
-#df_docenti$convivenza <- NA
-
-df_docenti <- rbind(df_docenti,docentiBR03)
-
-
+df_docenti <- rbind(df_docenti,BR04_docenti)
 writexl::write_xlsx(df_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
-
 
 
 ## ABM preprocess data####
