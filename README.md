@@ -9,3 +9,8 @@ rosso\
 giallo
 
 Ogni singola unità assorbe energia dalla cella dove si trova, che viene convertito in guadagno giornaliero. Il capitale del singolo farmer è dato dal guadagno giornaliero delle sue singole unità cui è sottratto il costo delle unità. Ad intervalli regolari la simulazione è bloccata, chiedendo ai partecipanti di continuare ad investire nelle proprie unità e/o investire in un contributo comune per risanare le risorse consumate. I contributi comuni investiti vengono sommati e divisi tra le celle la cui riserva energetica è al di sotto della soglia max 50.
+
+Roma_BR:
+BR01: 13/11
+BR02: 20/11
+BR03: 27/11
