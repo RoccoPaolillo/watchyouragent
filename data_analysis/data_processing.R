@@ -61,7 +61,7 @@ writexl::write_xlsx(BR05_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tra
 
 # merge with df_studenti
 df_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
-BR05_studenti <- read_xlsx( "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR05/BR05_studenti.xlsx")
+BR03_studenti <- read_xlsx( "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR03/BR03_studenti.xlsx")
 df_studenti <- rbind(df_studenti, cartacei)
 writexl::write_xlsx(df_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
 
@@ -77,6 +77,7 @@ BR05_docenti <-  read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatu
 
 df_docenti <- rbind(df_docenti,BR05_docenti)
 writexl::write_xlsx(df_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
+
 
 
 ## ABM preprocess data####
