@@ -37,12 +37,13 @@ write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatura
 
 # 
 df_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
-BR03_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR03/BR03_studenti.xlsx")
+cartacei <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/cartacei_BR.xlsx")
 
 # studentsgenova <- studentsgenova[,-49]
 # BR02studenti$StartDate <- as.character(BR02studenti$StartDate)
 # BR02studenti$EndDate <- as.character(BR02studenti$EndDate)
-
+# cartacei$StartDate <- as.character(cartacei$StartDate)
+# cartacei$EndDate <- as.character(cartacei$EndDate)
 
 BR05_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Desktop/BR05_04_12_2024_secondoturno/uploadquestionario/Questionario_20241204_RM05.xlsx")
 BR05_studenti$StartDate <- as.character(BR05_studenti$StartDate)
@@ -60,8 +61,8 @@ writexl::write_xlsx(BR05_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tra
 
 # merge with df_studenti
 df_studenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
-BR05_studenti <- read_xlsx( "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR05/BR05_studenti.xlsx")
-df_studenti <- rbind(df_studenti, BR05_studenti)
+BR03_studenti <- read_xlsx( "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR03/BR03_studenti.xlsx")
+df_studenti <- rbind(df_studenti, cartacei)
 writexl::write_xlsx(df_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
 
 
@@ -76,6 +77,7 @@ BR05_docenti <-  read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatu
 
 df_docenti <- rbind(df_docenti,BR05_docenti)
 writexl::write_xlsx(df_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
+
 
 
 ## ABM preprocess data####
