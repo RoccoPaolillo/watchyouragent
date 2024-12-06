@@ -1,5 +1,5 @@
 ---
-title: "27-11-2024"
+title: "BR05 04/12/2024"
 output: word_document
 date: "2024-12-04"
 ---
@@ -46,13 +46,13 @@ long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
 
 ## Explorative by groups
 
-Simulations unitl 27-11-2024
+
 
 ```{r read_data1, echo=FALSE, include = TRUE}
 
 variables <- c("Capitale totale","Guadagno giornaliero","Contributo comune","Mucche acquisite", "Mucche in vita","Mucche perse","Energia acquisita","Risorse ambientali","Giorni in vita farmers","Giorno")
 
-long_df <- long_df %>% filter(turn %in% c("BR03"))
+long_df <- long_df %>% filter(turn %in% c("BR05"))
 
 for (i in variables){
 
