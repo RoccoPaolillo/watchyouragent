@@ -65,16 +65,16 @@ df_studenti <- rbind(df_studenti, BR05_studenti)
 writexl::write_xlsx(df_studenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_studenti.xlsx")
 
 
-BR04_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Desktop/BR04_04_12_2024_primoturno/questionariupload/Docenti_20241204_RM04.xlsx")
-BR04_docenti$StartDate <- as.character(BR04_docenti$StartDate)
-BR04_docenti$EndDate <- as.character(BR04_docenti$EndDate)
-BR04_docenti$turn <- "BR04"
-writexl::write_xlsx(BR04_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR04/BR04_docenti.xlsx")
+BR05_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Desktop/BR05_04_12_2024_secondoturno/uploadquestionario/Docenti_20241204_RM05.xlsx")
+BR05_docenti$StartDate <- as.character(BR05_docenti$StartDate)
+BR05_docenti$EndDate <- as.character(BR05_docenti$EndDate)
+BR05_docenti$turn <- "BR05"
+writexl::write_xlsx(BR05_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR05/BR05_docenti.xlsx")
 
 df_docenti <- read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
-BR04_docenti <-  read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR04/BR04_docenti.xlsx")
+BR05_docenti <-  read_xlsx("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR05/BR05_docenti.xlsx")
 
-df_docenti <- rbind(df_docenti,BR04_docenti)
+df_docenti <- rbind(df_docenti,BR05_docenti)
 writexl::write_xlsx(df_docenti, "C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_docenti.xlsx")
 
 
