@@ -1,7 +1,7 @@
 ---
-title: "BR05 04/12/2024"
+title: "BR02 20/11/2024"
 output: word_document
-date: "2024-12-04"
+date: "2024-12-16"
 ---
 
 ```{r setup, include=FALSE}
@@ -19,6 +19,13 @@ library(caret)
 
 long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv",sep=",")
 
+long_df <- long_df %>% filter(long_df$turn != "BR02")
+
+BR02_corrected <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations_corrected.csv",sep = ";")
+
+long_df <- rbind(long_df, BR02_corrected)
+
+
 long_df[long_df$output == "capital",]$output <- "Capitale totale"
 long_df[long_df$output == "ccr",]$output <- "Contributo comune"
 long_df[long_df$output == "daysurvived",]$output <- "Giorni in vita farmers"
@@ -31,7 +38,6 @@ long_df[long_df$output == "giorno",]$output <- "Giorno"
 long_df[long_df$output == "risenergtot",]$output <- "Risorse ambientali"
 long_df[long_df$condition == "pre",]$condition <- "Prima simulazione"
 long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
-
 
 # long_dfnor <- long_df %>% filter(!is.na(score)) %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score)), na.rm=T) %>%  ungroup() 
 
@@ -46,13 +52,16 @@ long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
 
 ## Explorative by groups
 
+Corrected BR02, gruppo rosso, seconda simulazione, day 27, 28, Mucche Acquistite 50 -> 11
+Corrected BR02, gruppo azzurro, seconda simulazione, day 33, 34, 35 , Mucche Acquisite 16 -> 14
+Corrected BR02, gruppo blu, seconda simulazione, day 35, CCR 520 -> 260
 
 
 ```{r read_data1, echo=FALSE, include = TRUE}
 
 variables <- c("Capitale totale","Guadagno giornaliero","Contributo comune","Mucche acquisite", "Mucche in vita","Mucche perse","Energia acquisita","Risorse ambientali","Giorni in vita farmers","Giorno")
 
-long_df <- long_df %>% filter(turn %in% c("BR05"))
+long_df <- long_df %>% filter(turn %in% c("BR02"))
 
 for (i in variables){
 

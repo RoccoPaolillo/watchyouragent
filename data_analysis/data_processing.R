@@ -26,8 +26,9 @@ write.csv(df_simulations,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatura
 
 # simulations
 df_simulations <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv")
-BR05_simulations <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR05/BR05_simulations.csv")
-
+BR02_corrected <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations_corrected27_28.csv",sep = ";")
+write.csv(BR02_corrected,"C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations_corrected27_28_2.csv", 
+          row.names = FALSE)
 
 df_simulations <- rbind(df_simulations,BR05_simulations)
 

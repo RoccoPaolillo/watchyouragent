@@ -1,0 +1,5 @@
+﻿day;Capitale Totale;Mucche Acquisite;Guadagno  Giornaliero;Contributo Comune Rigenerazione;Mucche Vive;Mucche Perse;Energia Acquisita;Capitale Totale of successive da;Guadagno Giornaliero (difference Energia Acquisita from previous day), by number cow
+32;3040;13;120;260;4;25;6070;3040 + 80 - (13 * 10) = 2990;
+33;2990;13;80;260;2;27;6150;2990 + 0 - (13 * 10) = 2860;
+34;2860;13;0;260;0;28;6150;2860 + 0 - (13 * 10) = 2730;
+35;2730;13;0;520;0;29;6150;;
