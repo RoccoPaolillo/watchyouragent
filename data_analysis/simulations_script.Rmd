@@ -47,6 +47,9 @@ long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
 # 
 # long_dfnor <- rbind(long_dfnorm1,long_dfnorm2)
 
+data_wide <- spread(long_df, output, score)
+
+data_wide$prop_comp <-  ((data_wide$`Mucche acquisite` * 10)  / data_wide$`Capitale totale`)
 
 ```
 
