@@ -19,11 +19,11 @@ library(caret)
 
 long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv",sep=",")
 
-long_df <- long_df %>% filter(long_df$turn != "BR02")
+# long_df <- long_df %>% filter(long_df$turn != "BR02")
 
-BR02_corrected <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations_corrected.csv",sep = ";")
-
-long_df <- rbind(long_df, BR02_corrected)
+# BR02_corrected <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations_corrected.csv",sep = ";")
+# 
+# long_df <- rbind(long_df, BR02_corrected)
 
 
 long_df[long_df$output == "capital",]$output <- "Capitale totale"
