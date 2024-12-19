@@ -47,11 +47,49 @@ long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
 # 
 # long_dfnor <- rbind(long_dfnorm1,long_dfnorm2)
 
-data_wide <- spread(long_df, output, score)
 
-data_wide$prop_comp <-  ((data_wide$`Mucche acquisite` * 10)  / data_wide$`Capitale totale`)
 
 ```
+
+```{r coop, echo=FALSE, include = FALSE}
+
+# link reverse bars
+
+data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
+
+datawide_ccrtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(ccrtot = sum(ccr))
+datawide_nrgtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(nrgtot = sum(energiaaquisita))
+
+df <- merge(data_wide, datawide_ccrtot, by = c("turn","time","condition","note"))
+df <- merge(df, datawide_nrgtot, by = c("turn","time","condition","note"))
+
+df$propccr <- df$ccr / df$ccrtot
+df$propnrg <- df$energiaaquisita / df$nrgtot
+
+dfpropccr <- df %>% filter(time %in% c(8,15,22,29)) %>% select(turn,color,time,condition,note,propccr) %>% replace(is.na(.), 0) 
+dfpropccr$week <- 0
+dfpropccr[dfpropccr$time == 8,]$week <-  2
+dfpropccr[dfpropccr$time == 15,]$week <- 3
+dfpropccr[dfpropccr$time == 22,]$week <- 4
+dfpropccr[dfpropccr$time == 29,]$week <- 5
+  
+dfpropnrg <- df %>% filter(time %in% c(14,21,28,35)) %>% select(turn,color,time,condition,note,propnrg) %>% replace(is.na(.), 0)
+dfpropnrg$week <- 0
+dfpropnrg[dfpropnrg$time == 14,]$week <-  2
+dfpropnrg[dfpropnrg$time == 21,]$week <- 3
+dfpropnrg[dfpropnrg$time == 28,]$week <- 4
+dfpropnrg[dfpropnrg$time == 35,]$week <- 5
+
+df_propcoop <- merge(dfpropccr,dfpropnrg,by=c("turn","color","condition","note")) %>% filter(color != 0)
+df2 <- df_propcoop %>% filter(week.x == week.y)
+df2$weekfin <- df2$week.x
+
+df2long <- df2 %>% pivot_longer(cols = c(6,9), names_to = c("indicator"), values_to = "score")
+  
+ggplot(df2long, aes(x = weekfin,y = score, fill = indicator, color = color ))  + geom_bar(position = "dodge", stat = "identity")  + facet_grid(turn ~ condition)
+  
+```
+
 
 ## Explorative by groups
 
