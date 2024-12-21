@@ -63,16 +63,13 @@ long_df[long_df$time %in% c(5,12,19,26,33),]$weekday <- 5
 long_df[long_df$time %in% c(6,13,20,27,34),]$weekday <- 6
 long_df[long_df$time %in% c(7,14,21,28,35),]$weekday <- 7
 
-
-write.csv(long_df,file="C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv", row.names = F)
-
 ```
 
 ```{r coop, echo=FALSE, include = FALSE}
 
 # link reverse bars
 
-data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
+data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(color != 0) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
 
 datawide_ccrtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(ccrtot = sum(ccr))
 datawide_nrgtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(nrgtot = sum(energiaaquisita))
@@ -83,28 +80,25 @@ df <- merge(df, datawide_nrgtot, by = c("turn","time","condition","note"))
 df$propccr <- df$ccr / df$ccrtot
 df$propnrg <- df$energiaaquisita / df$nrgtot
 
-dfpropccr <- df %>% filter(time %in% c(8,15,22,29)) %>% select(turn,color,time,condition,note,propccr) %>% replace(is.na(.), 0) 
-dfpropccr$week <- 0
-dfpropccr[dfpropccr$time == 8,]$week <-  2
-dfpropccr[dfpropccr$time == 15,]$week <- 3
-dfpropccr[dfpropccr$time == 22,]$week <- 4
-dfpropccr[dfpropccr$time == 29,]$week <- 5
-  
-dfpropnrg <- df %>% filter(time %in% c(14,21,28,35)) %>% select(turn,color,time,condition,note,propnrg) %>% replace(is.na(.), 0)
-dfpropnrg$week <- 0
-dfpropnrg[dfpropnrg$time == 14,]$week <-  2
-dfpropnrg[dfpropnrg$time == 21,]$week <- 3
-dfpropnrg[dfpropnrg$time == 28,]$week <- 4
-dfpropnrg[dfpropnrg$time == 35,]$week <- 5
+dfpropcr <- df %>% filter(weekday == 1) %>% select(turn,color,week,condition, propccr)
+dfpropng <- df %>% filter(weekday == 7) %>% select(turn,color,week,condition, propnrg)
 
-df_propcoop <- merge(dfpropccr,dfpropnrg,by=c("turn","color","condition","note")) %>% filter(color != 0)
-df2 <- df_propcoop %>% filter(week.x == week.y)
-df2$weekfin <- df2$week.x
+dffin <- merge(dfpropcr, dfpropng, by = c("turn","color","condition","week"))
 
-df2long <- df2 %>% pivot_longer(cols = c(6,9), names_to = c("indicator"), values_to = "score")
-  
-ggplot(df2long, aes(x = weekfin,y = score, fill = indicator, color = color ))  + geom_bar(position = "dodge", stat = "identity")  + facet_grid(turn ~ condition)
-  
+dffinlong <- dffin %>%  pivot_longer(cols = c(5,6), names_to = c("variable"), values_to = "score")  %>% replace(is.na(.), 0) 
+
+dffinlong <- dffinlong %>%
+  mutate(score = ifelse(variable == "propccr",
+                                 score,
+                                 -1*score))
+
+dffinlong %>% filter(condition == "pre",color == "rosso",turn == "BR01") %>%
+  ggplot(aes(x = week, y = score, fill = variable))+
+  geom_bar(stat = "identity")+
+  coord_flip()
+
+
+
 ```
 
 
