@@ -19,11 +19,7 @@ library(caret)
 
 long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv",sep=",")
 
-# long_df <- long_df %>% filter(long_df$turn != "BR02")
-
-# BR02_corrected <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations_corrected.csv",sep = ";")
-# 
-# long_df <- rbind(long_df, BR02_corrected)
+data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(color != 0) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
 
 
 long_df[long_df$output == "capital",]$output <- "Capitale totale"
@@ -39,37 +35,9 @@ long_df[long_df$output == "risenergtot",]$output <- "Risorse ambientali"
 long_df[long_df$condition == "pre",]$condition <- "Prima simulazione"
 long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
 
-# long_dfnor <- long_df %>% filter(!is.na(score)) %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score)), na.rm=T) %>%  ungroup() 
-
-# replace(is.na(.), 0) %>%
-# long_dfnorm1 <- long_df %>% filter(condition == "Prima simulazione") %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score))) %>%  ungroup() 
-# long_dfnorm2 <- long_df %>% filter(condition == "Seconda simulazione") %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score))) %>%  ungroup() 
-# 
-# long_dfnor <- rbind(long_dfnorm1,long_dfnorm2)
-
-long_df$week <- 0
-long_df[long_df$time %in% c(1:7),]$week <- 1
-long_df[long_df$time %in% c(8:14),]$week <- 2
-long_df[long_df$time %in% c(15:21),]$week <- 3
-long_df[long_df$time %in% c(22:28),]$week <- 4
-long_df[long_df$time %in% c(29:35),]$week <- 5
-
-long_df$weekday <-0
-long_df[long_df$time %in% c(1,8,15,22,29),]$weekday <- 1
-long_df[long_df$time %in% c(2,9,16,23,30),]$weekday <- 2
-long_df[long_df$time %in% c(3,10,17,24,31),]$weekday <- 3
-long_df[long_df$time %in% c(4,11,18,25,32),]$weekday <- 4
-long_df[long_df$time %in% c(5,12,19,26,33),]$weekday <- 5
-long_df[long_df$time %in% c(6,13,20,27,34),]$weekday <- 6
-long_df[long_df$time %in% c(7,14,21,28,35),]$weekday <- 7
-
 ```
 
 ```{r coop, echo=FALSE, include = FALSE}
-
-# link reverse bars
-
-data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(color != 0) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
 
 datawide_ccrtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(ccrtot = sum(ccr))
 datawide_nrgtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(nrgtot = sum(energiaaquisita))
@@ -87,27 +55,7 @@ dffin <- merge(dfpropcr, dfpropng, by = c("turn","color","condition","week")) %>
 dffin <- dffin %>% mutate(propdiff = (propccr - propnrg))
 dffin <- dffin %>% mutate(propfract = (propccr / propnrg))
 
-
-
 dffinlong <- dffin %>%  pivot_longer(cols = c(5,6), names_to = c("variable"), values_to = "score") 
-
-
-# dffinlong %>% 
-#   ggplot(aes(fill=color, y=score, x=variable)) + 
-#     geom_bar(position="stack", stat="identity") + 
-#   scale_fill_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"))
-# 
-# dffin %>%  filter(turn == "BR05" & condition == "post") %>% ggplot(aes(x = week, y = propfract)) +
-#   geom_line(aes(color = color)) +
-#    scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink")) +
-#   theme_bw()
-# 
-# 
-# dffinlong %>% filter(turn == "BR05" & condition == "post" & variable == "propnrg") %>%
-#   ggplot(aes(y=score, x=week, fill = color)) + 
-#     geom_bar(position="stack", stat="identity") + 
-#   scale_fill_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink")) + 
-#   theme_bw()
 
 dffinlong[dffinlong$condition == "pre",]$condition <- "First Simulation"
 dffinlong[dffinlong$condition == "post",]$condition <- "Second Simulation"
@@ -132,6 +80,55 @@ ggsave(file= "propcoop.png",width = 8, height = 11)
 ```
 
 
+```{r capital_proportion, echo=FALSE, include = FALSE}
+
+dftfirst <- data_wide  %>% filter(time %in% c(8,15,22,29)) %>% select(turn,color, condition, time,week,weekday, mucche, muccheslider, muccheperse, capital, ccr)
+dftlast <- data_wide %>% filter(time %in% c(7,14,21,28,35)) %>% select(turn,color, condition, time,week,weekday, mucche, muccheslider, muccheperse, capital, ccr)
+
+
+dft8 <- merge(dftfirst,dftlast,by=c("turn","color", "condition"))
+
+dft9 <- dft8 %>% filter(time.x == 8 & time.y == 7| time.x == 15 & time.y == 14 | time.x == 22 & time.y == 21|
+                          time.x ==29 & time.y == 28)
+
+dft9$mucchenew <- ifelse(dft9$muccheslider.x > dft9$mucche.y, dft9$muccheslider.x - dft9$mucche.y,dft9$muccheslider.x)
+dft9$mucchenewcost <- dft9$mucchenew * 10
+dft9$mucchemngcost <- dft9$muccheslider.x * 70
+dft9$mucchetotalcost <- dft9$mucchenewcost + dft9$mucchemngcost
+dft9$propbuycow <- dft9$mucchenewcost / dft9$capital.y
+dft9$propinvccr <- dft9$ccr.x / dft9$capital.y 
+dft9$totcosts <- (dft9$mucchenewcost + dft9$ccr.x)
+dft9$propsaving <- (dft9$capital.y - dft9$totcosts) / dft9$capital.y
+dft9$totinvest <- dft9$propbuycow + dft9$propinvccr + dft9$propsaving
+
+
+long_dft9 <- dft9 %>%  pivot_longer(cols = c(24,25,27), names_to = c("variable"), values_to = "score")  %>% replace(is.na(.), 0)
+
+long_dft9[long_dft9$condition == "pre",]$condition <- "First Simulation"
+long_dft9[long_dft9$condition == "post",]$condition <- "Second Simulation"
+
+long_dft9 %>% 
+ggplot(aes(x = week.x, y = score, color = color)) + 
+geom_line(aes(linetype = variable, color = color)) +
+  geom_point(aes(shape = variable, color = color), size = 2) +
+  scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"), name = "group") + 
+  scale_shape_manual(values = c("propbuycow" = "triangle", "propsaving" = "square", "propsaving" = "circle"),
+                      name = "indicator", labels = c("new cows", "energy renewal","saving")
+                      ) + 
+  scale_linetype_manual(values = c("propbuycow" = "solid", "propsaving" = "dotted", "propsaving" = "dashed"),
+                      name = "indicator", labels = c("new cows", "energy renewal","saving")
+                      
+                      ) + 
+facet_wrap(~ turn + factor(condition,c("First Simulation","Second Simulation")),
+             scales = "free_y", ncol = 2) + 
+  theme_bw() +
+  guides(shape = guide_legend(position =  "bottom")) + 
+  guides(color = guide_legend(position = "bottom")) +
+  guides(linetype = "none")
+ggsave(file= "propinvestments.png",width = 8, height = 11)
+
+
+```
 
 
 ## Explorative by groups
