@@ -87,59 +87,29 @@ dffin <- merge(dfpropcr, dfpropng, by = c("turn","color","condition","week"))
 
 dffinlong <- dffin %>%  pivot_longer(cols = c(5,6), names_to = c("variable"), values_to = "score")  %>% replace(is.na(.), 0) 
 
-dffinlong <- dffinlong %>%
-  mutate(score = ifelse(variable == "propccr",
-                                 score,
-                                 -1*score))
 
-dffinlong %>% filter(condition == "pre",color == "rosso",turn == "BR01") %>%
-  ggplot(aes(x = week, y = score, fill = variable))+
-  geom_bar(stat = "identity")+
-  coord_flip()
+dffinlong %>% 
+  ggplot(aes(fill=color, y=score, x=variable)) + 
+    geom_bar(position="stack", stat="identity") + 
+  scale_fill_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"))
+
+pl <- dffinlong %>% filter(turn == "BR05" & condition == "post") %>%
+  ggplot(aes(y=score, x=week)) + 
+  geom_line(aes(linetype = variable, color = color)) + 
+  geom_point(aes(color = color, shape = variable), size = 2) +
+   scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink")) + 
+   scale_shape_manual(values = c("propccr" = "square", "propnrg" = "triangle")) + 
+   scale_linetype_manual(values = c("propccr" = "solid","propnrg" = "longdash")) +
+  theme_bw()
+
+plotly::ggplotly(pl)
+
 
 
 
 ```
 
 
-```{r coop2, echo=FALSE, include = FALSE}
-
-# link reverse bars
-
-data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
-
-datawide_ccrtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(ccrtot = sum(ccr))
-datawide_nrgtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(nrgtot = sum(energiaaquisita))
-
-df <- merge(data_wide, datawide_ccrtot, by = c("turn","time","condition","note"))
-df <- merge(df, datawide_nrgtot, by = c("turn","time","condition","note"))
-
-df$propccr <- df$ccr / df$ccrtot
-df$propnrg <- df$energiaaquisita / df$nrgtot
-
-dfpropccr <- df %>% filter(time %in% c(8,15,22,29)) %>% select(turn,color,time,condition,note,propccr) %>% replace(is.na(.), 0) 
-dfpropccr$week <- 0
-dfpropccr[dfpropccr$time == 8,]$week <-  2
-dfpropccr[dfpropccr$time == 15,]$week <- 3
-dfpropccr[dfpropccr$time == 22,]$week <- 4
-dfpropccr[dfpropccr$time == 29,]$week <- 5
-  
-dfpropnrg <- df %>% filter(time %in% c(14,21,28,35)) %>% select(turn,color,time,condition,note,propnrg) %>% replace(is.na(.), 0)
-dfpropnrg$week <- 0
-dfpropnrg[dfpropnrg$time == 14,]$week <-  2
-dfpropnrg[dfpropnrg$time == 21,]$week <- 3
-dfpropnrg[dfpropnrg$time == 28,]$week <- 4
-dfpropnrg[dfpropnrg$time == 35,]$week <- 5
-
-df_propcoop <- merge(dfpropccr,dfpropnrg,by=c("turn","color","condition","note")) %>% filter(color != 0)
-df2 <- df_propcoop %>% filter(week.x == week.y)
-df2$weekfin <- df2$week.x
-
-df2long <- df2 %>% pivot_longer(cols = c(6,9), names_to = c("indicator"), values_to = "score")
-  
-ggplot(df2long, aes(x = weekfin,y = score, fill = indicator, color = color ))  + geom_bar(position = "dodge", stat = "identity")  + facet_grid(turn ~ condition)
-  
-```
 
 
 ## Explorative by groups
