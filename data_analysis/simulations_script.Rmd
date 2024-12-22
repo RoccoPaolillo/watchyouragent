@@ -83,28 +83,50 @@ df$propnrg <- df$energiaaquisita / df$nrgtot
 dfpropcr <- df %>% filter(weekday == 1) %>% select(turn,color,week,condition, propccr)
 dfpropng <- df %>% filter(weekday == 7) %>% select(turn,color,week,condition, propnrg)
 
-dffin <- merge(dfpropcr, dfpropng, by = c("turn","color","condition","week"))
+dffin <- merge(dfpropcr, dfpropng, by = c("turn","color","condition","week")) %>% replace(is.na(.), 0)
+dffin <- dffin %>% mutate(propdiff = (propccr - propnrg))
+dffin <- dffin %>% mutate(propfract = (propccr / propnrg))
 
-dffinlong <- dffin %>%  pivot_longer(cols = c(5,6), names_to = c("variable"), values_to = "score")  %>% replace(is.na(.), 0) 
 
+
+dffinlong <- dffin %>%  pivot_longer(cols = c(5,6), names_to = c("variable"), values_to = "score") 
+
+
+# dffinlong %>% 
+#   ggplot(aes(fill=color, y=score, x=variable)) + 
+#     geom_bar(position="stack", stat="identity") + 
+#   scale_fill_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"))
+# 
+# dffin %>%  filter(turn == "BR05" & condition == "post") %>% ggplot(aes(x = week, y = propfract)) +
+#   geom_line(aes(color = color)) +
+#    scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink")) +
+#   theme_bw()
+# 
+# 
+# dffinlong %>% filter(turn == "BR05" & condition == "post" & variable == "propnrg") %>%
+#   ggplot(aes(y=score, x=week, fill = color)) + 
+#     geom_bar(position="stack", stat="identity") + 
+#   scale_fill_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink")) + 
+#   theme_bw()
+
+dffinlong[dffinlong$condition == "pre",]$condition <- "First Simulation"
+dffinlong[dffinlong$condition == "post",]$condition <- "Second Simulation"
 
 dffinlong %>% 
-  ggplot(aes(fill=color, y=score, x=variable)) + 
-    geom_bar(position="stack", stat="identity") + 
-  scale_fill_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"))
-
-pl <- dffinlong %>% filter(turn == "BR05" & condition == "post") %>%
   ggplot(aes(y=score, x=week)) + 
   geom_line(aes(linetype = variable, color = color)) + 
   geom_point(aes(color = color, shape = variable), size = 2) +
-   scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink")) + 
-   scale_shape_manual(values = c("propccr" = "square", "propnrg" = "triangle")) + 
-   scale_linetype_manual(values = c("propccr" = "solid","propnrg" = "longdash")) +
-  theme_bw()
-
-plotly::ggplotly(pl)
-
-
+   scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"), name = "group") + 
+   scale_shape_manual(values = c("propccr" = "square", "propnrg" = "triangle"),
+                      name = "indicator", labels = c("% energy renewal", "% energy consumption")
+                      ) + 
+   scale_linetype_manual(values = c("propccr" = "solid","propnrg" = "longdash"),guide = "none") +
+  facet_wrap(~ turn + factor(condition,c("First Simulation","Second Simulation")),
+             scales = "free_y", ncol = 2) + 
+  theme_bw() +
+  guides(shape = guide_legend(position =  "bottom", nrow = 2)) + 
+  guides(color = guide_legend(position = "bottom"))
+ggsave(file= "propcoop.png",width = 8, height = 11)
 
 
 ```
