@@ -19,6 +19,7 @@ library(caret)
 
 long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv",sep=",")
 
+# later for selection and handling
 data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(color != 0) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
 
 
