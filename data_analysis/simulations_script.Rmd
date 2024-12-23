@@ -19,11 +19,7 @@ library(caret)
 
 long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv",sep=",")
 
-# long_df <- long_df %>% filter(long_df$turn != "BR02")
-
-# BR02_corrected <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/Roma_BR/BR02/BR02_simulations_corrected.csv",sep = ";")
-# 
-# long_df <- rbind(long_df, BR02_corrected)
+data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(color != 0) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
 
 
 long_df[long_df$output == "capital",]$output <- "Capitale totale"
@@ -39,25 +35,142 @@ long_df[long_df$output == "risenergtot",]$output <- "Risorse ambientali"
 long_df[long_df$condition == "pre",]$condition <- "Prima simulazione"
 long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
 
-# long_dfnor <- long_df %>% filter(!is.na(score)) %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score)), na.rm=T) %>%  ungroup() 
+```
 
-# replace(is.na(.), 0) %>%
-# long_dfnorm1 <- long_df %>% filter(condition == "Prima simulazione") %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score))) %>%  ungroup() 
-# long_dfnorm2 <- long_df %>% filter(condition == "Seconda simulazione") %>% group_by(turn, output, condition)%>% mutate(xnorm = (score - min(score)) / (max(score) - min(score))) %>%  ungroup() 
-# 
-# long_dfnor <- rbind(long_dfnorm1,long_dfnorm2)
+```{r coop, echo=FALSE, include = FALSE}
 
-data_wide <- spread(long_df, output, score)
+# Question: how much each group has contributed to renewal of energy consumed together with the others, compared to how much it consumed shared energy resources? And how it differs before and after discussion, and for each turn?
 
-data_wide$prop_comp <-  ((data_wide$`Mucche acquisite` * 10)  / data_wide$`Capitale totale`)
+# to compute sum of contributo comune (ccr) and energy consumption (energiaacquisita: energy taken by cows of farmers), grouped by turn, each time step and condition (pre vs post discussion)
+datawide_ccrtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(ccrtot = sum(ccr))
+datawide_nrgtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(nrgtot = sum(energiaaquisita))
+
+# datasets are merged
+df <- merge(data_wide, datawide_ccrtot, by = c("turn","time","condition","note"))
+df <- merge(df, datawide_nrgtot, by = c("turn","time","condition","note"))
+
+# proportion of own investment of each group over all sum contributo comune
+df$propccr <- df$ccr / df$ccrtot
+# proportion of own energy consumption of each group (i.e. energy consumed by all cows of each group) all over energy consumed
+df$propnrg <- df$energiaaquisita / df$nrgtot
+
+# selection of data frame for analysis: for contributo comune at the day 1 of the week (when they make the decision), for energy consumption at day 7 of the week (it reports the total amount of collected energy consumed during that week)
+dfpropcr <- df %>% filter(weekday == 1) %>% select(turn,color,week,condition, propccr)
+dfpropng <- df %>% filter(weekday == 7) %>% select(turn,color,week,condition, propnrg)
+
+# merge of datasets
+dffin <- merge(dfpropcr, dfpropng, by = c("turn","color","condition","week")) %>% replace(is.na(.), 0)
+# additional measures: for each group, difference between own propotion contributo comune over all contributo comune and own proportion energy consumption over all energy consumption
+dffin <- dffin %>% mutate(propdiff = (propccr - propnrg))
+# additional measures: fraction of own proportion contributo comune over own fraction energy consumption. An index 4 means the group contributed 4 times more on all contributo comune than how much it contributed to energy consumption
+dffin <- dffin %>% mutate(propfract = (propccr / propnrg))
+
+# long format for visualizations
+dffinlong <- dffin %>%  pivot_longer(cols = c(5,6), names_to = c("variable"), values_to = "score") 
+
+# relabel pre vs post discussion, just for labeling
+dffinlong[dffinlong$condition == "pre",]$condition <- "First Simulation"
+dffinlong[dffinlong$condition == "post",]$condition <- "Second Simulation"
+
+# final graph: each week reports for each group the own contribution over contributo comune (energy renewal) and energy consumed. Faceted also by turns and pre vs post dicussion (First Simulation, Second Simulation) as a measure of change
+
+dffinlong %>% 
+  ggplot(aes(y=score, x=week)) + 
+  geom_line(aes(linetype = variable, color = color)) + 
+  geom_point(aes(color = color, shape = variable), size = 2) +
+   scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"), name = "group") + 
+   scale_shape_manual(values = c("propccr" = "square", "propnrg" = "triangle"),
+                      name = "indicator", labels = c("% energy renewal", "% energy consumption")
+                      ) + 
+   scale_linetype_manual(values = c("propccr" = "solid","propnrg" = "longdash"),guide = "none") +
+  facet_wrap(~ turn + factor(condition,c("First Simulation","Second Simulation")),
+             scales = "free_y", ncol = 2) + 
+  theme_bw() +
+  guides(shape = guide_legend(position =  "bottom", nrow = 2)) + 
+  guides(color = guide_legend(position = "bottom"))
+ggsave(file= "propcoop.png",width = 8, height = 11)
+
 
 ```
 
-## Explorative by groups
 
-Corrected BR02, gruppo rosso, seconda simulazione, day 27, 28, Mucche Acquistite 50 -> 11
-Corrected BR02, gruppo azzurro, seconda simulazione, day 33, 34, 35 , Mucche Acquisite 16 -> 14
-Corrected BR02, gruppo blu, seconda simulazione, day 35, CCR 520 -> 260
+```{r decision_proportion, echo=FALSE, include = FALSE}
+
+# Question: how much does each group decide to invest the own resources into competitive behavior (invest in the own cows), cooperative behavior (invest in contributo comune) or saving the own resources? And how does this differ befor and after the discussion?
+
+# The sum of the three dimensions gives 1, with range [0,1]: the higher the proportion, the more the group decided to invest in that behavior compared to others.
+# It needs to compute from the capital of last day of the previous week (capital accumulated during the week) and measures of the first day (out of the decision when stopped)
+# (BR01,	rosa,	First Simulation, week	4) and (BR02,	blu, First Simulation, week	2) are below 0. This because combining contributo comune and competitive behavior they spent more than they could potentially afford. The first group indeed died not paying their debt, the second group covered it up in the next days
+
+# filtered first days of the week
+dftfirst <- data_wide  %>% filter(time %in% c(8,15,22,29)) %>% select(turn,color, condition, time,week,weekday, mucche, muccheslider, muccheperse, capital, ccr)
+# filtered last days of the week
+dftlast <- data_wide %>% filter(time %in% c(7,14,21,28,35)) %>% select(turn,color, condition, time,week,weekday, mucche, muccheslider, muccheperse, capital, ccr)
+
+# datasets merged
+dft_prop <- merge(dftfirst,dftlast,by=c("turn","color", "condition"))
+
+# filtered so to have for each row the first day of the week (.x) and the last day of the previous week (.y)
+dft_prop <- dft_prop %>% filter(time.x == 8 & time.y == 7| time.x == 15 & time.y == 14 | time.x == 22 & time.y == 21|
+                          time.x ==29 & time.y == 28)
+
+# report new  cows bought.
+dft_prop$mucchenew <- ifelse(dft_prop$muccheslider.x > dft_prop$mucche.y, dft_prop$muccheslider.x - dft_prop$mucche.y,dft_prop$muccheslider.x)
+# cost to buy new mucche: if the number of cows they want in the market (muccheslider.x) is higher than the actual number of cows survived from the week before (mucche.y), then the difference is taken as number of new mucche (equal to mucchenew) and multiplied by costs of buying a new cow (10 Euros). If the number of cows wanted is lower than the actual number of cows survived, then there is no cost associated
+dft_prop$mucchenewcost <- ifelse(dft_prop$muccheslider.x > dft_prop$mucche.y, ((dft_prop$muccheslider.x - dft_prop$mucche.y) * 10),0)
+# not used,out of boundaries: cost for management of cows in the market: the number of cows wanted time 70 Euros costs for each week, not used
+dft_prop$mucchemngcost <- dft_prop$muccheslider.x * 70
+
+# proportion of cows buying and management over the own capital from week before (capital.y) at the moment of decision
+dft_prop$propbuycow <- dft_prop$mucchenewcost / dft_prop$capital.y
+# proportion of investment on contributo comune over the own capital from week before (capital.y) at the moment of decision
+dft_prop$propinvccr <- dft_prop$ccr.x / dft_prop$capital.y 
+# proportion of total costs () over the own capital from week before at the moment of decision
+dft_prop$totcosts <- (dft_prop$mucchenewcost + dft_prop$ccr.x)
+# proportion of saving over the own capital at moment of decision: saving is computed as difference between available capital from the week before (capital.y) and total costs
+dft_prop$propsaving <- (dft_prop$capital.y - dft_prop$totcosts) / dft_prop$capital.y
+# to check that the sum of proportions is equal to 1
+dft_prop$totinvest <- dft_prop$propbuycow + dft_prop$propinvccr + dft_prop$propsaving
+
+# long format for aesthetics: the three proportion as score of one variable
+long_dft_prop <- dft_prop %>%  pivot_longer(cols = c(23,24,26), names_to = c("variable"), values_to = "score")  %>% replace(is.na(.), 0)
+
+# relabeling pre vs post discussion just for aesthetics
+long_dft_prop[long_dft_prop$condition == "pre",]$condition <- "First Simulation"
+long_dft_prop[long_dft_prop$condition == "post",]$condition <- "Second Simulation"
+
+# final graph: at each week it reports the proportions of the three dimensions for each group. Faceted by First Simulation vs Second Simulation and turn
+
+long_dft_prop %>% 
+ggplot(aes(x = week.x, y = score, color = color)) + 
+geom_line(aes(linetype = variable, color = color)) +
+  geom_point(aes(shape = variable, color = color), size = 2) +
+  scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"), name = "group") + 
+  scale_shape_manual(values = c("propbuycow" = "triangle", "propinvccr" = "square", "propsaving" = "circle"),
+                      name = "indicator", labels = c("new cows", "energy renewal","saving")
+                      ) + 
+  scale_linetype_manual(values = c("propbuycow" = "solid", "propinvccr" = "dotted", "propsaving" = "dashed"),
+                      name = "indicator", labels = c("new cows", "energy renewal","saving")
+                      
+                      ) + 
+facet_wrap(~ turn + factor(condition,c("First Simulation","Second Simulation")),
+             scales = "free_y", ncol = 2) + 
+  theme_bw() +
+  guides(linetype = guide_legend(position =  "bottom", nrow = 2)) + 
+  guides(color = guide_legend(position = "bottom")) +
+  guides(shape = guide_legend(position =  "bottom", nrow = 2))
+ggsave(file= "propinvestments.png",width = 8, height = 11)
+
+# report in .xls: variables selected
+long_dfdecision <- long_dft_prop %>% select(turn, color, condition, week.x, totinvest, variable, score)
+names(long_dfdecision)[names(long_dfdecision) == 'week.x'] <- 'week'
+# written .xls report
+writexl::write_xlsx(long_dfdecision, "prop_decision.xlsx")
+
+```
+
+
+## Explorative by groups
 
 
 ```{r read_data1, echo=FALSE, include = TRUE}
