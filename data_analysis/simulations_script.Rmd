@@ -92,6 +92,25 @@ dffinlong %>%
 ggsave(file= "propcoop.png",width = 8, height = 11)
 
 
+# alternative coop
+
+dffinlong %>% 
+  filter(turn == "BR03") %>%
+  ggplot(aes(y=score, x=week)) + 
+  geom_line(aes(linetype = condition, color = variable)) + 
+  geom_point(aes(color = variable), size = 2) +
+   scale_color_manual(values = c("propccr" = "darkgreen","propnrg" = "purple"), name = "indicator", labels = c("% energy renewal", "% energy consumption")) + 
+#   scale_shape_manual(values = c("propccr" = "square", "propnrg" = "triangle"),
+#                      name = "indicator", labels = c("% energy renewal", "% energy consumption")
+#                      ) + 
+   scale_linetype_manual(values = c("First Simulation" = "solid","Second Simulation" = "longdash"), name = "Simulation") +
+  facet_wrap(~ color,
+             scales = "free_y", ncol = 1) + 
+  theme_bw() +
+  ggtitle("Turn BR03") + 
+  guides(linetype = guide_legend(position =  "bottom", nrow = 2)) + 
+  guides(color = guide_legend(position = "bottom", nrow = 2))
+ggsave(file= "propcoop2_BR03.png",width = 6, height = 9)
 ```
 
 
