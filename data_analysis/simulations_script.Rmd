@@ -38,6 +38,13 @@ long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
 
 ```
 
+
+
+
+
+
+
+
 ```{r coop, echo=FALSE, include = FALSE}
 
 # Question: how much each group has contributed to renewal of energy consumed together with the others, compared to how much it consumed shared energy resources? And how it differs before and after discussion, and for each turn?
@@ -111,6 +118,32 @@ dffinlong %>%
   guides(linetype = guide_legend(position =  "bottom", nrow = 2)) + 
   guides(color = guide_legend(position = "bottom", nrow = 2))
 ggsave(file= "propcoop2_BR03.png",width = 6, height = 9)
+```
+
+```{r energydeterioration, echo=FALSE, include = FALSE}
+
+datawide_nrgtot$energylost <- 22050 - datawide_nrgtot$nrgtot
+
+datawide_nrgtot %>% filter(turn %in% c("BR02","BR03","BR04","BR05")) %>%
+  filter(condition == "post" | condition == "pre" & time <= 28) %>%
+  ggplot(aes(x = time,y =energylost)) +
+  geom_line() +
+  scale_y_continuous(limits=c(-6080, 23000)) +
+    facet_grid(turn ~ factor(condition,levels = c("pre","post")),
+             scales = "free_y") + 
+  theme_bw()
+
+dffin$ccrtotconverted <- dffin$ccrtot * 10
+
+dffin %>% filter(turn %in% c("BR02","BR03","BR04","BR05")) %>%
+  filter(condition == "post" | condition == "pre" & time <= 28) %>%
+  ggplot(aes(x = time,y =ccrtotconverted)) +
+  geom_line() +
+#  scale_y_continuous(limits=c(-6080, 23000)) +
+    facet_grid(turn ~ factor(condition,levels = c("pre","post")),
+             scales = "free_y") + 
+  theme_bw()
+
 ```
 
 
@@ -197,11 +230,66 @@ writexl::write_xlsx(long_dfdecision, "prop_decision.xlsx")
 
 variables <- c("Capitale totale","Guadagno giornaliero","Contributo comune","Mucche acquisite", "Mucche in vita","Mucche perse","Energia acquisita","Risorse ambientali","Giorni in vita farmers","Giorno")
 
-long_df <- long_df %>% filter(turn %in% c("BR02"))
+
+
+long_df <- long_df %>% filter(turn %in% c("BR02","BR03","BR04","BR05"))
 
 for (i in variables){
 
-plot_i <- long_df[long_df$output == i,] %>% ggplot(aes(x = time, y = score)) + geom_line(aes(color = color)) +
+plot_i <- long_df[long_df$output == i,] %>% ggplot(aes(x = time, y = score)) +
+  geom_line(aes(color = color)) +
+  scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) +
+  scale_x_continuous(breaks=seq(0,35,7)) +
+facet_wrap(~turn + factor(condition, levels = c("Prima simulazione","Seconda simulazione")), scales = "free_y") +
+  labs(title = i, x = "giorni", y = i) +
+  theme_bw( ) +
+  theme(
+    axis.text.x = element_text(angle = 45),legend.position = "bottom")
+
+plot(plot_i)
+
+}
+```
+
+```{r energy consumption, echo=FALSE, include = TRUE}
+
+variables <- c("Risorse ambientali")
+
+long_df <- long_df %>% filter(turn %in% c("BR02","BR03","BR04","BR05"))
+
+for (i in variables){
+
+plot_i <- long_df[long_df$output == i,] %>% ggplot(aes(x = time, y = score)) +
+  geom_line(aes(color = turn), size =  1.2) +
+  scale_color_manual("gruppo", values=c("BR02"="darkgreen", "BR03"="darkviolet", "BR04" = "darkorange", "BR05" = "darkblue")) +
+  scale_x_continuous(breaks=seq(0,35,7)) +
+  scale_y_continuous(breaks =  seq(0,22050, 4410)) +
+facet_wrap(~ factor(condition, levels = c("Prima simulazione","Seconda simulazione")), scales = "free_y") +
+  labs(title = NULL, x = "giorni", y = i) +
+  theme_bw( ) +
+  ylab("Natural Resources") +
+  xlab("Days") + 
+  theme(
+    axis.text.x = element_text(angle = 45),legend.position = "bottom"
+    )
+
+plot(plot_i)
+ggsave(file= "tragedyresources.png",width = 6, height = 4)
+}
+```
+
+```{r energyconsumed, echo=FALSE, include = TRUE}
+
+variables <- c("Energia acquisita")
+
+
+
+long_df <- long_df %>% filter(turn %in% c("BR02","BR03","BR04","BR05"))
+
+for (i in variables){
+
+plot_i <- long_df[long_df$output == i,] %>% ggplot(aes(x = time, y = score)) +
+  geom_line(aes(color = color)) +
   scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) +
   scale_x_continuous(breaks=seq(0,35,7)) +
 facet_grid(turn ~ factor(condition, levels = c("Prima simulazione","Seconda simulazione")), scales = "free_y") +
@@ -216,24 +304,51 @@ plot(plot_i)
 ```
 
 
-<!-- ```{r read_data, echo=FALSE, fig.width=9, fig.height=7} -->
+```{r newdiff, echo=FALSE, include = FALSE}
 
-<!-- variables <- c("Contributo comune","Mucche acquisite","Capitale totale", -->
-<!--          "Mucche perse","Energia acquisita") -->
+# Question: how much each group has contributed to renewal of energy consumed together with the others, compared to how much it consumed shared energy resources? And how it differs before and after discussion, and for each turn?
 
-<!-- long_df <- long_df %>% filter(turn %in% c("GE03","GE04","BR01","BR02","BR03") & condition == "Prima simulazione" & time >= 8) -->
+# to compute sum of contributo comune (ccr) and energy consumption (energiaacquisita: energy taken by cows of farmers), grouped by turn, each time step and condition (pre vs post discussion)
+datawide_ccrtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(ccrtot = sum(ccr))
+datawide_nrgtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(nrgtot = sum(energiaaquisita))
+
+# datasets are merged
+df <- merge(data_wide, datawide_ccrtot, by = c("turn","time","condition","note"))
+df <- merge(df, datawide_nrgtot, by = c("turn","time","condition","note"))
+
+df <- df %>% filter(turn != "BR01") %>%   filter(condition == "post" | condition == "pre" & time <= 28)
+
+dft0 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 0) %>% select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft7 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 7) %>% select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft14 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 14) %>% select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft21 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 21) %>% select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft28 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 28) %>% select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft35 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 35) %>% select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+
+dft1w <- merge(dft7,dft0, by = c("turn","condition","note","color"))
+dft2w <- merge(dft14,dft7, by = c("turn","condition","note","color"))
+dft3w <- merge(dft21,dft14, by = c("turn","condition","note","color"))
+dft4w <- merge(dft28,dft21, by = c("turn","condition","note","color"))
+dft5w <- merge(dft35,dft28, by = c("turn","condition","note","color"))
+
+dft <- rbind(dft1w,dft2w,dft3w,dft4w,dft5w) 
+dft$nrgacqweek <- (dft$energiaaquisita.x - dft$energiaaquisita.y)
+dft$newnrgtotweek <- dft$ccrtot.x * 10
+dft$ownnrgweek <- dft$ccr.x * 10
+
+dft$actualcontr <- dft$ownnrgweek - dft$nrgacqweek
+dft$actualcontrprop <- dft$ownnrgweek / dft$nrgacqweek
+dft$actualnrgacprop <- dft$nrgacqweek / dft$ownnrgweek
+
+ggplot(dft,aes(x = week.x, y = actualnrgacprop, color = color)) +
+  geom_line() +
+  geom_point() + 
+    scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) +
+facet_wrap(~ turn + factor(condition, levels = c("pre","post")), scales = "free_y") +
+  theme_bw()
 
 
-<!-- plot_i <- long_df %>%  filter(output %in% variables) %>% ggplot(aes(x = time, y = score)) + geom_line(aes(color = color)) + -->
-<!--   scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) + -->
-<!--   scale_x_continuous(breaks=seq(8,36,7)) + -->
-<!-- facet_wrap(turn ~ factor(output,levels = c("Contributo comune","Mucche acquisite","Capitale totale", "Mucche perse","Energia acquisita")) , scales = "free_y", ncol = 5) + -->
-<!--   ggtitle(long_df$condition) + -->
-<!--   labs(x = "giorni", y = "") + -->
-<!--   theme_bw( ) + -->
-<!--   theme(axis.text.x = element_text(angle = 45),legend.position = "bottom") -->
-
-<!-- plot(plot_i) -->
 
 
-<!-- ``` -->
+
+```
