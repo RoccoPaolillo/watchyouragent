@@ -332,23 +332,28 @@ dft4w <- merge(dft28,dft21, by = c("turn","condition","note","color"))
 dft5w <- merge(dft35,dft28, by = c("turn","condition","note","color"))
 
 dft <- rbind(dft1w,dft2w,dft3w,dft4w,dft5w) 
+
+# bringing on same scale
+# energy acquired in the week from common good
 dft$nrgacqweek <- (dft$energiaaquisita.x - dft$energiaaquisita.y)
+# new energy produced from contributo comune invested
+dft$newnrgweek <- dft$ccr.x * 10
+# total new energy of the week
 dft$newnrgtotweek <- dft$ccrtot.x * 10
-dft$ownnrgweek <- dft$ccr.x * 10
 
-dft$actualcontr <- dft$ownnrgweek - dft$nrgacqweek
-dft$actualcontrprop <- dft$ownnrgweek / dft$nrgacqweek
-dft$actualnrgacprop <- dft$nrgacqweek / dft$ownnrgweek
 
-ggplot(dft,aes(x = week.x, y = actualnrgacprop, color = color)) +
+dft$actualnewrng <- dft$newnrgweek - dft$nrgacqweek
+dft$actualnrgac <-  dft$nrgacqweek - dft$newnrgweek
+dft$relatnewnrg <- dft$newnrgweek / dft$nrgacqweek
+dft$relatacqnrg <- dft$nrgacqweek / dft$newnrgweek
+
+dft %>% filter(week.x > 1) %>%
+  ggplot(aes(x = week.x, y = relatnewnrg, color = color)) +
   geom_line() +
   geom_point() + 
     scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) +
-facet_wrap(~ turn + factor(condition, levels = c("pre","post")), scales = "free_y") +
+facet_wrap(~ turn + factor(condition, levels = c("pre","post")), scales = "free", ncol = 2) +
   theme_bw()
-
-
-
 
 
 ```
