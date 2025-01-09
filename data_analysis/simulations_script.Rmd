@@ -22,6 +22,9 @@ long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/dat
 # later for selection and handling
 data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(color != 0) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
 
+data_wide[data_wide$condition == "pre",]$condition <- "First Simulation"
+data_wide[data_wide$condition == "post",]$condition <- "Second Simulation"
+
 
 long_df[long_df$output == "capital",]$output <- "Capitale totale"
 long_df[long_df$output == "ccr",]$output <- "Contributo comune"
@@ -304,7 +307,7 @@ plot(plot_i)
 ```
 
 
-```{r newdiff, echo=FALSE, include = FALSE}
+```{r samescales, echo=FALSE, include = FALSE}
 
 # Question: how much each group has contributed to renewal of energy consumed together with the others, compared to how much it consumed shared energy resources? And how it differs before and after discussion, and for each turn?
 
@@ -316,7 +319,7 @@ datawide_nrgtot <- data_wide %>% group_by(turn,time,condition,note) %>% summaris
 df <- merge(data_wide, datawide_ccrtot, by = c("turn","time","condition","note"))
 df <- merge(df, datawide_nrgtot, by = c("turn","time","condition","note"))
 
-df <- df %>% filter(turn != "BR01") %>%   filter(condition == "post" | condition == "pre" & time <= 28)
+df <- df %>% filter(turn != "BR01") %>%   filter(condition == "Second Simulation" | condition == "First Simulation" & time <= 28)
 
 dft0 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 0) %>% select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
 dft7 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 7) %>% select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
@@ -336,6 +339,8 @@ dft <- rbind(dft1w,dft2w,dft3w,dft4w,dft5w)
 # bringing on same scale
 # energy acquired in the week from common good
 dft$nrgacqweek <- (dft$energiaaquisita.x - dft$energiaaquisita.y)
+# total energy consumed that week
+dft$nrgacqtotweek <- (dft$nrgtot.x - dft$nrgtot.y)
 # new energy produced from contributo comune invested
 dft$newnrgweek <- dft$ccr.x * 10
 # total new energy of the week
@@ -346,14 +351,58 @@ dft$actualnewrng <- dft$newnrgweek - dft$nrgacqweek
 dft$actualnrgac <-  dft$nrgacqweek - dft$newnrgweek
 dft$relatnewnrg <- dft$newnrgweek / dft$nrgacqweek
 dft$relatacqnrg <- dft$nrgacqweek / dft$newnrgweek
+dft$propnrgacq <- dft$nrgacqweek / dft$nrgacqtotweek
+dft$propnrenrg <- dft$newnrgweek / dft$newnrgtotweek
 
 dft %>% filter(week.x > 1) %>%
-  ggplot(aes(x = week.x, y = relatnewnrg, color = color)) +
+  ggplot(aes(x = week.x, y = relatnewnrg,color = color)) +
   geom_line() +
   geom_point() + 
-    scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) +
-facet_wrap(~ turn + factor(condition, levels = c("pre","post")), scales = "free", ncol = 2) +
-  theme_bw()
+    scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink")) +
+facet_wrap(~ turn + factor(condition, levels = c("First Simulation","Second Simulation")), scales = "free", ncol = 2) +
+  scale_x_continuous(breaks = seq(2, 6, 1)) +
+  labs(y = "Energy renewal / Energy consumption", x = "week") + 
+  theme_bw() 
+ggsave(file= "relativeinvestment.png",width = 5, height =6)
 
+# proportion of two dimensions
+
+
+dftlong <- dft %>% filter(week.x > 1) %>%
+  pivot_longer(cols = c(25,26), names_to = c("proportion"), values_to = "score")
+
+dftlong %>%
+  ggplot(aes(x = week.x, y = score,linetype = proportion, color = color)) +
+  geom_line() +
+  geom_point() + 
+    scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink")) +
+  scale_linetype_manual("proportion", values = c("propnrgacq" = "dashed","propnrenrg" = "solid"), name = "indicator",
+                        labels = c("propnrgacq" = "Energy consumption","propnrenrg" = "Energy renewal")) +
+ facet_wrap(~ turn + factor(condition, levels = c("First Simulation","Second Simulation")), scales = "free", ncol = 2) +
+  scale_x_continuous(breaks = seq(2, 6, 1)) +
+  labs(y = "Proportion to other groups", x = "week") + 
+    guides(linetype = guide_legend(position =  "bottom")) +
+  theme_bw() 
+ggsave(file= "proportion2.png",width = 5, height =6)
+
+
+dftlong %>% 
+  filter(turn == "BR03") %>%
+  ggplot(aes(y=score, x=week.x, color = color, linetype = condition,shape= proportion)) + 
+  geom_line(aes(linetype = condition, color = color)) + 
+  geom_point(aes(color = color, shape = proportion), size = 2) +
+     scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink")) +
+  scale_shape_manual("proportion", values = c("propnrgacq" = "triangle","propnrenrg" = "square"), name = "indicator",
+                        labels = c("propnrgacq" = "Energy consumption","propnrenrg" = "Energy renewal")) +
+  scale_linetype_manual("condition", values = c("First Simulation" = "solid","Second Simulation" = "dashed"), name = "indicator") +
+   facet_wrap(~ color, scales = "free_y", ncol = 1) + 
+    scale_x_continuous(breaks = seq(2, 6, 1)) +
+  labs(x = "week", y = "Proportion compared to other groups") + 
+  theme_bw() +
+  ggtitle("Turn BR03") + 
+  guides(linetype = guide_legend(position =  "bottom", nrow = 2)) + 
+ # guides(color = guide_legend(position = "bottom", nrow = 2)) + 
+  guides(shape = guide_legend(position = "bottom", nrow = 2))
+ggsave(file= "propcoopBR03_2.png",width = 6, height = 9)
 
 ```
