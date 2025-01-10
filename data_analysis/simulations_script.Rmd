@@ -17,110 +17,284 @@ library(stringr)
 library(ggplot2)
 library(caret)
 
+# original simulations dataset 
 long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv",sep=",")
 
-# later for selection and handling
+
+# later for selection and handling on energy consumption and energy renewal
 data_wide <- spread(long_df, output, score) %>% replace(is.na(.), 0) %>% filter(turn %in% c("BR01","BR02","BR03","BR04","BR05")) %>% filter(color != 0) %>% filter(time %in% c(0,1,7,8,14,15,21,22,28,29,35))
 
+data_wide[data_wide$condition == "pre",]$condition <- "First Simulation"
+data_wide[data_wide$condition == "post",]$condition <- "Second Simulation"
 
-long_df[long_df$output == "capital",]$output <- "Capitale totale"
-long_df[long_df$output == "ccr",]$output <- "Contributo comune"
-long_df[long_df$output == "daysurvived",]$output <- "Giorni in vita farmers"
-long_df[long_df$output == "energiaaquisita",]$output <- "Energia acquisita"
-long_df[long_df$output == "giornaliero",]$output <- "Guadagno giornaliero"
-long_df[long_df$output == "mucche",]$output <- "Mucche in vita"
-long_df[long_df$output == "muccheperse",]$output <- "Mucche perse"
-long_df[long_df$output == "muccheslider",]$output <- "Mucche acquisite"
-long_df[long_df$output == "giorno",]$output <- "Giorno"
-long_df[long_df$output == "risenergtot",]$output <- "Risorse ambientali"
-long_df[long_df$condition == "pre",]$condition <- "Prima simulazione"
-long_df[long_df$condition == "post",]$condition <- "Seconda simulazione"
+
+long_df[long_df$output == "capital",]$output <- "Total Capital"
+long_df[long_df$output == "ccr",]$output <- "Contributio Energy Renewal"
+long_df[long_df$output == "daysurvived",]$output <- "Farmers Days Alive "
+long_df[long_df$output == "energiaaquisita",]$output <- "Energy Consumption"
+long_df[long_df$output == "giornaliero",]$output <- "Daily Profit"
+long_df[long_df$output == "mucche",]$output <- "Cows Alive"
+long_df[long_df$output == "muccheperse",]$output <- "Dead Cows"
+long_df[long_df$output == "muccheslider",]$output <- "New Cows"
+long_df[long_df$output == "giorno",]$output <- "Day"
+long_df[long_df$output == "risenergtot",]$output <- "Natural Resources"
+long_df[long_df$condition == "pre",]$condition <- "First Simulation"
+long_df[long_df$condition == "post",]$condition <- "Second Simulation"
+
 
 ```
 
-```{r coop, echo=FALSE, include = FALSE}
 
-# Question: how much each group has contributed to renewal of energy consumed together with the others, compared to how much it consumed shared energy resources? And how it differs before and after discussion, and for each turn?
+```{r tragedycommons_raw,"Global tragedycommons as plotted during game and energy consumption" echo=FALSE, include = TRUE}
 
-# to compute sum of contributo comune (ccr) and energy consumption (energiaacquisita: energy taken by cows of farmers), grouped by turn, each time step and condition (pre vs post discussion)
+# natural resources lost (including energy renewal + regrowth constant)
+long_df %>% filter(turn %in% c("BR02","BR03","BR04","BR05")) %>% filter(output == "Natural Resources") %>%
+  filter(time <= 28 & condition == "First Simulation" | condition == "Second Simulation") %>%
+  ggplot(aes(x = time, y = score)) +
+  geom_line(aes(color = turn), size =  1.2) +
+  scale_color_manual("gruppo", values=c("BR02"="darkgreen", "BR03"="darkviolet", "BR04" = "darkorange", "BR05" = "darkblue"),
+                     name = "Turn") +
+  scale_x_continuous(breaks=seq(0,35,7)) +
+  scale_y_continuous(breaks =  seq(0,22050, 4410)) +
+facet_wrap(~ factor(condition, levels = c("First Simulation","Second Simulation")), scales = "free") +
+  labs(title = NULL, x = "Days", y = "Natural resources",
+       subtitle = "Including energy renewal and constant regrowth") +
+  theme_bw( ) +
+  theme(
+    axis.text.x = element_text(angle = 45),legend.position = "bottom"
+    )
+ggsave(file= "tragedyresources.png",width = 6, height = 4)
+
+
+# energy consumption raw numbers (energy renewal raw numbers in samescales chunk because decided once a week)
+# here reported daily, to show cumulative progress, energy renewal on week
+
+long_df %>% filter(turn %in% c("BR02","BR03","BR04","BR05")) %>% filter(output == "Energy Consumption")  %>%
+    filter(time <= 28 & condition == "First Simulation" | condition == "Second Simulation") %>%
+  ggplot(aes(x = time, y = score)) +
+  geom_line(aes(color = color),linewidth = 1.2) +
+  scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink"), name = "Group") +
+  scale_x_continuous(breaks=seq(0,35,7)) +
+facet_grid(turn ~ factor(condition, levels = c("First Simulation","Second Simulation")), scales = "free") +
+  labs(x = "Days", y = "Energy consumption") +
+  theme_bw( ) +
+  theme(
+    axis.text.x = element_text(angle = 45),legend.position = "bottom")
+ggsave(file= "images/energyconsumption_raw.png",width = 5, height = 5)
+
+
+```
+
+
+
+```{r samescales,"To put energy renewal and energy consumption on the same scale" ,echo=FALSE, include = FALSE}
+
+# total contributo comune (poi moltiplicato * 10 per diventare energy renewal)
 datawide_ccrtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(ccrtot = sum(ccr))
+# total energia acquisita dei farmers (energy consumption)
 datawide_nrgtot <- data_wide %>% group_by(turn,time,condition,note) %>% summarise(nrgtot = sum(energiaaquisita))
 
+
+# To bring on the same scales energy consumption and energy renewal
 # datasets are merged
 df <- merge(data_wide, datawide_ccrtot, by = c("turn","time","condition","note"))
 df <- merge(df, datawide_nrgtot, by = c("turn","time","condition","note"))
 
-# proportion of own investment of each group over all sum contributo comune
-df$propccr <- df$ccr / df$ccrtot
-# proportion of own energy consumption of each group (i.e. energy consumed by all cows of each group) all over energy consumed
-df$propnrg <- df$energiaaquisita / df$nrgtot
+# to select turns and four weeks first simulation
+df <- df %>% filter(turn %in% c("BR02","BR03","BR04","BR05")) %>%   filter(condition == "Second Simulation" | condition == "First Simulation" & time <= 28)
 
-# selection of data frame for analysis: for contributo comune at the day 1 of the week (when they make the decision), for energy consumption at day 7 of the week (it reports the total amount of collected energy consumed during that week)
-dfpropcr <- df %>% filter(weekday == 1) %>% select(turn,color,week,condition, propccr)
-dfpropng <- df %>% filter(weekday == 7) %>% select(turn,color,week,condition, propnrg)
+# first and last days of the week [0] [1 week 1:7] [2 week 8:14][3 week 15:21][4 week 22:28][5 week 29:35]
+# day 1 not necessary here and not included: during first week  they got the capital from harvesting
+dft0 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 0) %>% 
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft7 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 7) %>% 
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft14 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 14) %>%
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft21 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 21) %>%
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft28 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 28) %>%
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft35 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 35) %>%
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft8 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 8) %>%
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft15 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 15) %>%
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft22 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 22) %>%
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+dft29 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 29) %>%
+  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
 
-# merge of datasets
-dffin <- merge(dfpropcr, dfpropng, by = c("turn","color","condition","week")) %>% replace(is.na(.), 0)
-# additional measures: for each group, difference between own propotion contributo comune over all contributo comune and own proportion energy consumption over all energy consumption
-dffin <- dffin %>% mutate(propdiff = (propccr - propnrg))
-# additional measures: fraction of own proportion contributo comune over own fraction energy consumption. An index 4 means the group contributed 4 times more on all contributo comune than how much it contributed to energy consumption
-dffin <- dffin %>% mutate(propfract = (propccr / propnrg))
+#  dataset combined to compute between weeks, last days of week (week.x, week.y) to compute difference energy consumption
+dft1w <- merge(dft7,dft0, by = c("turn","condition","note","color"))
+dft2w <- merge(dft14,dft7, by = c("turn","condition","note","color"))
+dft3w <- merge(dft21,dft14, by = c("turn","condition","note","color"))
+dft4w <- merge(dft28,dft21, by = c("turn","condition","note","color"))
+dft5w <- merge(dft35,dft28, by = c("turn","condition","note","color"))
 
-# long format for visualizations
-dffinlong <- dffin %>%  pivot_longer(cols = c(5,6), names_to = c("variable"), values_to = "score") 
 
-# relabel pre vs post discussion, just for labeling
-dffinlong[dffinlong$condition == "pre",]$condition <- "First Simulation"
-dffinlong[dffinlong$condition == "post",]$condition <- "Second Simulation"
+# adding first day of the week for contributo comune
+dft1w <- merge(dft1w,dft8,by = c("turn","condition","note","color"))
+dft2w <- merge(dft2w,dft8,by = c("turn","condition","note","color"))
+dft3w <- merge(dft3w,dft15,by = c("turn","condition","note","color"))
+dft4w <- merge(dft4w,dft22,by = c("turn","condition","note","color"))
+dft5w <- merge(dft5w,dft29,by = c("turn","condition","note","color"))
 
-# final graph: each week reports for each group the own contribution over contributo comune (energy renewal) and energy consumed. Faceted also by turns and pre vs post dicussion (First Simulation, Second Simulation) as a measure of change
+# final dataset for same scales
+dft <- rbind(dft1w,dft2w,dft3w,dft4w,dft5w) 
 
-dffinlong %>% 
-  ggplot(aes(y=score, x=week)) + 
-  geom_line(aes(linetype = variable, color = color)) + 
-  geom_point(aes(color = color, shape = variable), size = 2) +
-   scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"), name = "group") + 
-   scale_shape_manual(values = c("propccr" = "square", "propnrg" = "triangle"),
-                      name = "indicator", labels = c("% energy renewal", "% energy consumption")
-                      ) + 
-   scale_linetype_manual(values = c("propccr" = "solid","propnrg" = "longdash"),guide = "none") +
-  facet_wrap(~ turn + factor(condition,c("First Simulation","Second Simulation")),
-             scales = "free_y", ncol = 2) + 
+# same scales
+# energy acquired in the week by individual group (end of week.x - end of previous week.y)
+dft$nrgacqweek <- (dft$energiaaquisita.x - dft$energiaaquisita.y)
+# total energy consumed that week by all groups together (end of week.x - end of previous week.y)
+dft$nrgacqtotweek <- (dft$nrgtot.x - dft$nrgtot.y)
+# energy renewal from contributo comune invested by individual group (beginning of week, second block)
+dft$newnrgweek <- dft$ccr * 10
+# total energy renewal of the week by all groups together (beginning of week)
+dft$newnrgtotweek <- dft$ccrtot * 10
+
+# computed measures now on the same scale: 
+dft$actualnewrng <- dft$newnrgweek - dft$nrgacqweek # energy renewal - energy consumption 
+dft$actualnrgacq <-  dft$nrgacqweek - dft$newnrgweek # energy consumption - energy renewal
+dft$relatnewnrg <- dft$newnrgweek / dft$nrgacqweek # fraction energy renewal / energy consumption
+dft$relatacqnrg <- dft$nrgacqweek / dft$newnrgweek # fraction energy consumption / energy renewal
+
+dft$propnrgacq <- dft$nrgacqweek / dft$nrgacqtotweek # proportion of own energy consumption / energy consumption all groups
+dft$propnewnrg <- dft$newnrgweek / dft$newnrgtotweek # proportion of own energy renewal / energy renewal all groups
+
+# fraction energy renewal / energy consumption
+
+dft %>% 
+  filter(week.x > 1) %>%
+  filter(condition == "First Simulation" & week.x <=  4 | condition == "Second Simulation") %>%
+  ggplot(aes(x = time.x, y = relatnewnrg,color = color)) +
+  geom_line() +
+  geom_point() + 
+    scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink"), 
+                       name = "Group") +
+facet_wrap(~ turn + factor(condition, levels = c("First Simulation","Second Simulation")), scales = "free", ncol =2 ) +
+  scale_x_continuous(breaks = seq(2, 6, 1)) +
+ labs(y = "Energy renewal / Energy consumption", x = "Weeks") + 
+#  guides(color = guide_legend(position =  "bottom")) +
+  theme_bw() 
+ggsave(file= "images/renewaloverconsumption.png",width = 5, height =6)
+
+
+# energy renewal (raw number) # example, change y for other observations based on indicators above
+
+dft %>% filter(week.x > 1) %>%
+  ggplot(aes(x = time, y = newnrgweek,color = color)) +
+  geom_line() +
+  geom_point() + 
+    scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink"), 
+                       name = "Group") +
+facet_grid(turn ~ factor(condition, levels = c("First Simulation","Second Simulation")), scales = "free") +
+  scale_x_continuous(breaks = seq(8, 29, 7)) +
+ labs(y = "Energy renewal", x = "Days") + 
+  guides(color = guide_legend(position =  "bottom")) +
+  theme_bw() 
+ggsave(file= "images/energyrenewal_raw.png",width = 5, height =5)
+
+
+
+# proportion of two dimensions compared to other groups: energy renewal and energy consumption
+
+# to make it in long format
+# number of columns: 31 propnrgacq (energy consumption), 32 propnewnrg (energy renewal) 
+dftlong <- dft %>% filter(week.x > 1) %>%
+  pivot_longer(cols = c("propnrgacq","propnewnrg"), names_to = c("proportion"), values_to = "score")  
+
+# energy renewal
+
+dftlong %>%
+  filter(proportion == "propnewnrg" ) %>%
+  ggplot(aes(x = week.x, y = score,color = color)) +
+  geom_line() +
+  geom_point() + 
+    scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink"),
+                       name = "Group") +
+#  scale_linetype_manual("proportion", values = c("propnrgacq" = "dashed","propnrenrg" = "solid"), name = "indicator",
+#                        labels = c("propnrgacq" = "Energy consumption","propnrenrg" = "Energy renewal")) +
+ facet_wrap(~ turn + factor(condition, levels = c("First Simulation","Second Simulation")), scales = "free", ncol = 2) +
+  scale_x_continuous(breaks = seq(2, 6, 1)) +
+  labs(title = "Contribution to energy renewal", x = "Weeks", y = "proportion", subtitle = "compared to other groups") + 
+    guides(linetype = guide_legend(position =  "bottom")) +
+  theme_bw() 
+ggsave(file= "images/renewal_prop.png",width = 5, height =7)
+
+# energy consumption
+
+dftlong %>%
+  filter(proportion == "propnrgacq" ) %>%
+  ggplot(aes(x = week.x, y = score,color = color)) +
+  geom_line() +
+  geom_point() + 
+    scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink"),
+                       name = "Group") +
+#  scale_linetype_manual("proportion", values = c("propnrgacq" = "dashed","propnrenrg" = "solid"), name = "indicator",
+#                        labels = c("propnrgacq" = "Energy consumption","propnrenrg" = "Energy renewal")) +
+ facet_wrap(~ turn + factor(condition, levels = c("First Simulation","Second Simulation")), scales = "free", ncol = 2) +
+  scale_x_continuous(breaks = seq(2, 6, 1)) +
+  labs(title = "Contribution to energy consumption", x = "Weeks", y = "proportion", subtitle = "compared to other groups") + 
+    guides(linetype = guide_legend(position =  "bottom")) +
+  theme_bw() 
+ggsave(file= "images/consumption_prop.png",width = 5, height =7)
+
+
+# individual turn
+for (i in c("BR02","BR03","BR04","BR05")) {
+  
+dftlong %>%
+  filter(turn == i) %>%
+  ggplot(aes(y=score, x=week.x, color = color, linetype = condition,shape= proportion)) +
+  geom_line(aes(linetype = condition, color = color)) +
+  geom_point(aes(color = color, shape = proportion), size = 2) +
+     scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink")) +
+  scale_shape_manual("proportion", values = c("propnrgacq" = "triangle","propnewnrg" = "square"), name = "indicator",
+                        labels = c("propnrgacq" = "Energy consumption","propnewnrg" = "Energy renewal")) +
+  scale_linetype_manual("condition", values = c("First Simulation" = "solid","Second Simulation" = "dashed"), name = "indicator") +
+   facet_wrap(~ color, dir = "h",nrow = 1) +
+    scale_x_continuous(breaks = seq(2, 6, 1)) +
+  scale_y_continuous(limits = c(0,1), breaks = seq(0,1,0.25)) +
+  labs(x = "Weeks", y = "Proportion to other groups") +
   theme_bw() +
-  guides(shape = guide_legend(position =  "bottom", nrow = 2)) + 
-  guides(color = guide_legend(position = "bottom"))
-ggsave(file= "propcoop.png",width = 8, height = 11)
+  ggtitle(paste0("Turn ",i)) +
+  guides(linetype = guide_legend(position =  "bottom")) +
+  guides(color = "none") +
+  guides(shape = guide_legend(position = "bottom"))
+ggsave(file= paste0("images/propturn",i,".png"),width = 8, height = 3)
+ 
+}
 
+# energy consumption from initial pasture energy endowment
 
-# alternative coop
+datawide_nrgtot$energylost <- 22050 - datawide_nrgtot$nrgtot
 
-dffinlong %>% 
-  filter(turn == "BR03") %>%
-  ggplot(aes(y=score, x=week)) + 
-  geom_line(aes(linetype = condition, color = variable)) + 
-  geom_point(aes(color = variable), size = 2) +
-   scale_color_manual(values = c("propccr" = "darkgreen","propnrg" = "purple"), name = "indicator", labels = c("% energy renewal", "% energy consumption")) + 
-#   scale_shape_manual(values = c("propccr" = "square", "propnrg" = "triangle"),
-#                      name = "indicator", labels = c("% energy renewal", "% energy consumption")
-#                      ) + 
-   scale_linetype_manual(values = c("First Simulation" = "solid","Second Simulation" = "longdash"), name = "Simulation") +
-  facet_wrap(~ color,
-             scales = "free_y", ncol = 1) + 
-  theme_bw() +
-  ggtitle("Turn BR03") + 
-  guides(linetype = guide_legend(position =  "bottom", nrow = 2)) + 
-  guides(color = guide_legend(position = "bottom", nrow = 2))
-ggsave(file= "propcoop2_BR03.png",width = 6, height = 9)
+datawide_nrgtot %>% filter(turn %in% c("BR02","BR03","BR04","BR05")) %>%
+  filter(condition == "Second Simulation" | condition == "First Simulation" & time <= 28) %>%
+  ggplot(aes(x = time,y =energylost)) +
+  geom_line(aes(color = turn), size =  1.2) +
+  scale_y_continuous(breaks=c(-6080, 0, 5000, 10000, 22050)) +
+  scale_x_continuous(breaks = seq(0,35,7)) + 
+    scale_color_manual("turn", values=c("BR02"="darkgreen", "BR03"="darkviolet", "BR04" = "darkorange", "BR05" = "darkblue"),
+                       name = "Turn") +
+    facet_grid(turn ~ factor(condition,levels = c("First Simulation","Second Simulation")),
+             scales = "free") + 
+  labs(x = "Days", y = "Natural resources lost due to farmers activity") + 
+  theme_bw()
+ggsave(file= "images/energylost.png",width = 5, height =5)
+
 ```
 
 
-```{r decision_proportion, echo=FALSE, include = FALSE}
 
-# Question: how much does each group decide to invest the own resources into competitive behavior (invest in the own cows), cooperative behavior (invest in contributo comune) or saving the own resources? And how does this differ befor and after the discussion?
 
-# The sum of the three dimensions gives 1, with range [0,1]: the higher the proportion, the more the group decided to invest in that behavior compared to others.
+```{r decision_proportion (back last slide), echo=FALSE, include = FALSE}
+
+# Proportion of invested capital
+
 # It needs to compute from the capital of last day of the previous week (capital accumulated during the week) and measures of the first day (out of the decision when stopped)
-# (BR01,	rosa,	First Simulation, week	4) and (BR02,	blu, First Simulation, week	2) are below 0. This because combining contributo comune and competitive behavior they spent more than they could potentially afford. The first group indeed died not paying their debt, the second group covered it up in the next days
 
 # filtered first days of the week
 dftfirst <- data_wide  %>% filter(time %in% c(8,15,22,29)) %>% select(turn,color, condition, time,week,weekday, mucche, muccheslider, muccheperse, capital, ccr)
@@ -135,105 +309,95 @@ dft_prop <- dft_prop %>% filter(time.x == 8 & time.y == 7| time.x == 15 & time.y
                           time.x ==29 & time.y == 28)
 
 # report new  cows bought.
-dft_prop$mucchenew <- ifelse(dft_prop$muccheslider.x > dft_prop$mucche.y, dft_prop$muccheslider.x - dft_prop$mucche.y,dft_prop$muccheslider.x)
 # cost to buy new mucche: if the number of cows they want in the market (muccheslider.x) is higher than the actual number of cows survived from the week before (mucche.y), then the difference is taken as number of new mucche (equal to mucchenew) and multiplied by costs of buying a new cow (10 Euros). If the number of cows wanted is lower than the actual number of cows survived, then there is no cost associated
+
 dft_prop$mucchenewcost <- ifelse(dft_prop$muccheslider.x > dft_prop$mucche.y, ((dft_prop$muccheslider.x - dft_prop$mucche.y) * 10),0)
+
 # not used,out of boundaries: cost for management of cows in the market: the number of cows wanted time 70 Euros costs for each week, not used
+dft_prop$mucchenew <- ifelse(dft_prop$muccheslider.x > dft_prop$mucche.y, dft_prop$muccheslider.x - dft_prop$mucche.y,dft_prop$muccheslider.x)
 dft_prop$mucchemngcost <- dft_prop$muccheslider.x * 70
 
-# proportion of cows buying and management over the own capital from week before (capital.y) at the moment of decision
-dft_prop$propbuycow <- dft_prop$mucchenewcost / dft_prop$capital.y
-# proportion of investment on contributo comune over the own capital from week before (capital.y) at the moment of decision
-dft_prop$propinvccr <- dft_prop$ccr.x / dft_prop$capital.y 
-# proportion of total costs () over the own capital from week before at the moment of decision
+# actual costs computed: cows to buy and investment ccr
 dft_prop$totcosts <- (dft_prop$mucchenewcost + dft_prop$ccr.x)
+# proportion of buying cows over the own capital from week before (capital.y) at the moment of decision
+dft_prop$propbuycow <- dft_prop$mucchenewcost / dft_prop$totcosts
+# proportion of investment on contributo comune over the own capital from week before (capital.y) at the moment of decision
+dft_prop$propinvccr <- dft_prop$ccr.x / dft_prop$totcosts
+
+## proportion of investment over the own capital from week before at the moment of decision
+dft_prop$invested <-  dft_prop$totcosts / dft_prop$capital.y
+
+
+# check that sum of proportion buy new cows and ccr gives 1
+dft_prop$sumpropinvested <- dft_prop$propbuycow + dft_prop$propinvccr
 # proportion of saving over the own capital at moment of decision: saving is computed as difference between available capital from the week before (capital.y) and total costs
-dft_prop$propsaving <- (dft_prop$capital.y - dft_prop$totcosts) / dft_prop$capital.y
+# dft_prop$propsaving <- (dft_prop$capital.y - dft_prop$totcosts) / dft_prop$capital.y
 # to check that the sum of proportions is equal to 1
-dft_prop$totinvest <- dft_prop$propbuycow + dft_prop$propinvccr + dft_prop$propsaving
+# dft_prop$totinvest <- dft_prop$propbuycow + dft_prop$propinvccr + dft_prop$propsaving
 
 # long format for aesthetics: the three proportion as score of one variable
-long_dft_prop <- dft_prop %>%  pivot_longer(cols = c(23,24,26), names_to = c("variable"), values_to = "score")  %>% replace(is.na(.), 0)
+long_dft_prop <- dft_prop %>%  pivot_longer(cols = c("propbuycow","propinvccr","invested"), names_to = c("variable"), values_to = "score")  %>% replace(is.na(.), 0)
 
-# relabeling pre vs post discussion just for aesthetics
-long_dft_prop[long_dft_prop$condition == "pre",]$condition <- "First Simulation"
-long_dft_prop[long_dft_prop$condition == "post",]$condition <- "Second Simulation"
 
-# final graph: at each week it reports the proportions of the three dimensions for each group. Faceted by First Simulation vs Second Simulation and turn
 
-long_dft_prop %>% 
-ggplot(aes(x = week.x, y = score, color = color)) + 
-geom_line(aes(linetype = variable, color = color)) +
-  geom_point(aes(shape = variable, color = color), size = 2) +
-  scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"), name = "group") + 
-  scale_shape_manual(values = c("propbuycow" = "triangle", "propinvccr" = "square", "propsaving" = "circle"),
-                      name = "indicator", labels = c("new cows", "energy renewal","saving")
-                      ) + 
-  scale_linetype_manual(values = c("propbuycow" = "solid", "propinvccr" = "dotted", "propsaving" = "dashed"),
-                      name = "indicator", labels = c("new cows", "energy renewal","saving")
-                      
-                      ) + 
+# capital
+long_dft_prop %>%
+  filter(turn %in% c("BR02","BR03","BR04","BR05")) %>%
+ filter(condition == "First Simulation"  & week.x <= 4 | condition == "Second Simulation") %>%
+ggplot(aes(x = week.y, y = capital.y, color = color)) +
+geom_line(aes(color = color)) +
+geom_point(aes( color = color), size = 2) +
+  scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"), name = "Group") +
 facet_wrap(~ turn + factor(condition,c("First Simulation","Second Simulation")),
-             scales = "free_y", ncol = 2) + 
+             scales = "free", ncol = 2) +
+  scale_x_continuous(breaks = seq(1,5,1)) +
+  labs(x = "Weeks",y = "Capital") +
   theme_bw() +
-  guides(linetype = guide_legend(position =  "bottom", nrow = 2)) + 
+  guides(linetype = guide_legend(position =  "bottom", nrow = 2)) +
   guides(color = guide_legend(position = "bottom")) +
   guides(shape = guide_legend(position =  "bottom", nrow = 2))
-ggsave(file= "propinvestments.png",width = 8, height = 11)
+ggsave(file= "images/capitalcomparison.png",width = 8, height = 11)
 
-# report in .xls: variables selected
-long_dfdecision <- long_dft_prop %>% select(turn, color, condition, week.x, totinvest, variable, score)
-names(long_dfdecision)[names(long_dfdecision) == 'week.x'] <- 'week'
-# written .xls report
-writexl::write_xlsx(long_dfdecision, "prop_decision.xlsx")
+# investment decision
+
+long_dft_prop %>%
+  filter(turn %in% c("BR02","BR03","BR04","BR05")) %>%
+  filter(variable == "invested")  %>%
+ filter(condition == "First Simulation"  & week.x <= 4 | condition == "Second Simulation") %>%
+ggplot(aes(x = week.x, y = score, color = color)) +
+#geom_line(aes(linetype = variable, color = color)) +
+  geom_line(aes(color = color)) +
+  geom_point(aes(color = color), size = 2) +
+  scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"), name = "Group") +
+facet_wrap(~ turn + factor(condition,c("First Simulation","Second Simulation")),
+             scales = "free", ncol = 2) +
+  labs(x = "Weeks",y = "Capital reinvested") +
+   scale_x_continuous(breaks = seq(2,6,1)) +
+  theme_bw() +
+  guides(linetype = guide_legend(position =  "bottom", nrow = 2)) +
+  guides(color = guide_legend(position = "bottom")) +
+  guides(shape = guide_legend(position =  "bottom", nrow = 2))
+ggsave(file= "images/investedcapital.png",width = 8, height = 11)
+
+# proportion invested in renewal
+
+long_dft_prop %>%
+  filter(turn %in% c("BR02","BR03","BR04","BR05")) %>%
+  filter(variable == "propinvccr")  %>%
+ filter(condition == "First Simulation"  & week.x <= 4 | condition == "Second Simulation") %>%
+ggplot(aes(x = week.x, y = score, color = color)) +
+#geom_line(aes(linetype = variable, color = color)) +
+  geom_line(aes(color = color)) +
+  geom_point(aes(color = color), size = 2) +
+  scale_color_manual(values = c("rosso" = "red","blu" = "blue","azzurro" = "cyan","giallo" = "orange","rosa" = "pink"), name = "Group") +
+facet_wrap(~ turn + factor(condition,c("First Simulation","Second Simulation")),
+             scales = "free", ncol = 2) +
+  labs(x = "Weeks",title = "Investment on energy renewal over new cows") +
+   scale_x_continuous(breaks = seq(2,6,1)) +
+  theme_bw() +
+  guides(linetype = guide_legend(position =  "bottom", nrow = 2)) +
+  guides(color = guide_legend(position = "bottom")) +
+  guides(shape = guide_legend(position =  "bottom", nrow = 2))
+ggsave(file= "images/proprenewal_investment.png",width = 8, height = 11)
 
 ```
-
-
-## Explorative by groups
-
-
-```{r read_data1, echo=FALSE, include = TRUE}
-
-variables <- c("Capitale totale","Guadagno giornaliero","Contributo comune","Mucche acquisite", "Mucche in vita","Mucche perse","Energia acquisita","Risorse ambientali","Giorni in vita farmers","Giorno")
-
-long_df <- long_df %>% filter(turn %in% c("BR02"))
-
-for (i in variables){
-
-plot_i <- long_df[long_df$output == i,] %>% ggplot(aes(x = time, y = score)) + geom_line(aes(color = color)) +
-  scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) +
-  scale_x_continuous(breaks=seq(0,35,7)) +
-facet_grid(turn ~ factor(condition, levels = c("Prima simulazione","Seconda simulazione")), scales = "free_y") +
-  labs(title = i, x = "giorni", y = i) +
-  theme_bw( ) +
-  theme(
-    axis.text.x = element_text(angle = 45),legend.position = "bottom")
-
-plot(plot_i)
-
-}
-```
-
-
-<!-- ```{r read_data, echo=FALSE, fig.width=9, fig.height=7} -->
-
-<!-- variables <- c("Contributo comune","Mucche acquisite","Capitale totale", -->
-<!--          "Mucche perse","Energia acquisita") -->
-
-<!-- long_df <- long_df %>% filter(turn %in% c("GE03","GE04","BR01","BR02","BR03") & condition == "Prima simulazione" & time >= 8) -->
-
-
-<!-- plot_i <- long_df %>%  filter(output %in% variables) %>% ggplot(aes(x = time, y = score)) + geom_line(aes(color = color)) + -->
-<!--   scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "yellow",rosa = "pink")) + -->
-<!--   scale_x_continuous(breaks=seq(8,36,7)) + -->
-<!-- facet_wrap(turn ~ factor(output,levels = c("Contributo comune","Mucche acquisite","Capitale totale", "Mucche perse","Energia acquisita")) , scales = "free_y", ncol = 5) + -->
-<!--   ggtitle(long_df$condition) + -->
-<!--   labs(x = "giorni", y = "") + -->
-<!--   theme_bw( ) + -->
-<!--   theme(axis.text.x = element_text(angle = 45),legend.position = "bottom") -->
-
-<!-- plot(plot_i) -->
-
-
-<!-- ``` -->
