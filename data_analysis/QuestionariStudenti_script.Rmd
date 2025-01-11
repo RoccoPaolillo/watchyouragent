@@ -14,10 +14,14 @@ library(knitr)
 library(conflicted)
 library(readxl)
 library(sjPlot)
+library(ggplot2)
+library(dplyr)
 ```
 ```{r read_data, include=FALSE}
-setwd("/Users/eva/Documents/Work/LABSS/WatchYourAgent/")
+setwd("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis")
 dat <- read_xlsx("genova24_studenti.xlsx")
+
+
 ```
 
 Riassunto delle risposte degli 81 studenti che hanno partecipato ai 4 laboratori 'Watch Your Agent' al Festival della Scienza, Genova
@@ -232,3 +236,115 @@ openResponse %>% print(n = nrow(.), width = Inf)
 
 
 ```
+
+
+```{r decodifica, warning=FALSE, message=FALSE, echo=FALSE, comment=NA}
+
+# definizione sostenibilità
+
+dat_sost <- read_xlsx("open_questions_coded.xlsx", sheet = 1)
+
+dat_sost$label = "label"
+dat_sost[dat_sost$cod == 0,]$label <- "null"
+dat_sost[dat_sost$cod == 1,]$label <- "diminuire l’inquinamento"
+dat_sost[dat_sost$cod == 2,]$label <- "trovare un equilibrio"
+dat_sost[dat_sost$cod == 3,]$label <- "riciclare"
+dat_sost[dat_sost$cod == 4,]$label <- "capace di durare nel tempo"
+dat_sost[dat_sost$cod == 5,]$label <- "curare il ben-essere del sistema pianeta"
+dat_sost[dat_sost$cod == 6,]$label <- "consapevolezza delle proprie azioni"
+dat_sost[dat_sost$cod == 7,]$label <- "bilanciare costi e guadagni"
+dat_sost[dat_sost$cod == 8,]$label <- "cooperare"
+dat_sost[dat_sost$cod == 9,]$label <- "essere ecologisti"
+dat_sost[dat_sost$cod == 10,]$label <- "ridurre il consumo"
+dat_sost[dat_sost$cod == 11,]$label <- "altro"
+
+dat_sost$labeleng = "label"
+dat_sost[dat_sost$cod == 0,]$labeleng <- "null"
+dat_sost[dat_sost$cod == 1,]$labeleng <- "decrease pollution"
+dat_sost[dat_sost$cod == 2,]$labeleng <- "find a balance"
+dat_sost[dat_sost$cod == 3,]$labeleng <- "recycling"
+dat_sost[dat_sost$cod == 4,]$labeleng <- "capable of enduring"
+dat_sost[dat_sost$cod == 5,]$labeleng <- "curing the well-being of the planetary system"
+dat_sost[dat_sost$cod == 6,]$labeleng <- "awareness of one's actions"
+dat_sost[dat_sost$cod == 7,]$labeleng <- "balancing costs and earnings"
+dat_sost[dat_sost$cod == 8,]$labeleng <- "cooperate"
+dat_sost[dat_sost$cod == 9,]$labeleng <- "be environmentalists"
+dat_sost[dat_sost$cod == 10,]$labeleng <- "reduce consumption"
+dat_sost[dat_sost$cod == 11,]$labeleng <- "other"
+
+dat_sost <- dat_sost %>%  
+  group_by(cod) %>% 
+  mutate(codcount = n())
+
+# 
+# dat_sost %>% 
+#   dplyr::filter(labeleng != "null") %>%
+#   ggplot(aes(x = as.factor(labeleng))) +
+#   geom_bar(fill = "beige") +
+#   geom_text(stat='count', aes(label=..count..),hjust = 1) + 
+#   coord_flip() +
+#   theme_bw() +
+#   theme(axis.title.y = element_blank()) 
+# ggsave("images/def_sustainability.png",width = 5,height = 4)
+
+dat_sost %>% 
+  dplyr::filter(labeleng != "null") %>%
+  ggplot(aes(x = reorder(labeleng, codcount))) + 
+  geom_bar(fill = "beige") +
+  geom_text(stat='count', aes(label=..count..),hjust = 1) + 
+  coord_flip() +
+  theme_bw() +
+  theme(axis.title.y = element_blank()) 
+ggsave("images/def_sustainability.png",width = 5,height = 4)
+  
+# cosa ho imparato
+
+dat_imp <- read_xlsx("open_questions_coded.xlsx", sheet = 2)
+
+dat_imp$label = "label"
+dat_imp[dat_imp$cod == 0,]$label <- "null"
+dat_imp[dat_imp$cod == 1,]$label <- "importanza della cooperazione"
+dat_imp[dat_imp$cod == 2,]$label <- "punire le strategie non rispettate"
+dat_imp[dat_imp$cod == 3,]$label <- "pianificare /essere strategici"
+dat_imp[dat_imp$cod == 4,]$label <- "essere altruisti"
+dat_imp[dat_imp$cod == 5,]$label <- "critica al capitalismo"
+dat_imp[dat_imp$cod == 6,]$label <- "essere egoisti"
+dat_imp[dat_imp$cod == 7,]$label <- "sostenibilità delle scelte/azioni"
+dat_imp[dat_imp$cod == 8,]$label <- "non farsi condizionare dal pensiero degli altri"
+dat_imp[dat_imp$cod == 9,]$label <- "importanza nell’investimento"
+dat_imp[dat_imp$cod == 10,]$label <- "arte del commercio"
+
+dat_imp$labeleng = "label"
+dat_imp[dat_imp$cod == 0,]$labeleng <- "null"
+dat_imp[dat_imp$cod == 1,]$labeleng <- "importance of cooperation"
+dat_imp[dat_imp$cod == 2,]$labeleng <- "punishing strategies not adhered to"
+dat_imp[dat_imp$cod == 3,]$labeleng <- "planning/being strategic"
+dat_imp[dat_imp$cod == 4,]$labeleng <- "being altruistic"
+dat_imp[dat_imp$cod == 5,]$labeleng <- "criticism of capitalism"
+dat_imp[dat_imp$cod == 6,]$labeleng <- "being selfish"
+dat_imp[dat_imp$cod == 7,]$labeleng <- "sustainability of choices/actions"
+dat_imp[dat_imp$cod == 8,]$labeleng <- "not to be influenced by the thinking of others"
+dat_imp[dat_imp$cod == 9,]$labeleng <- "importance in investing"
+dat_imp[dat_imp$cod == 10,]$labeleng <- "art of trade"
+
+
+dat_imp <- dat_imp %>%  
+  group_by(cod) %>% 
+  mutate(codcount = n())
+
+dat_imp %>% 
+  dplyr::filter(labeleng != "null") %>%
+  ggplot(aes(x = reorder(labeleng, codcount))) + 
+  geom_bar(fill = "beige") +
+  geom_text(stat='count', aes(label=..count..),hjust = 1) + 
+  coord_flip() +
+  theme_bw() +
+  theme(axis.title.y = element_blank()) 
+ggsave("images/learnt_game.png",width = 5,height = 4)
+
+
+```
+
+
+
+
