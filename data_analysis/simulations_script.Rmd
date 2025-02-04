@@ -248,13 +248,13 @@ for (i in c("BR02","BR03","BR04","BR05")) {
 dftlong %>%
   filter(turn == i) %>%
   ggplot(aes(y=score, x=week.x, color = color, linetype = condition,shape= proportion)) +
-  geom_line(aes(linetype = condition, color = color)) +
+  geom_line(aes(linetype = proportion, color = color)) +
   geom_point(aes(color = color, shape = proportion), size = 2) +
      scale_color_manual("gruppo", values=c(azzurro="cyan", blu="blue", rosso = "red",giallo = "orange",rosa = "pink")) +
-  scale_shape_manual("proportion", values = c("propnrgacq" = "triangle","propnewnrg" = "square"), name = "indicator",
+  scale_shape_manual("proportion", values = c("propnrgacq" = "triangle","propnewnrg" = "square")) + 
+  scale_linetype_manual("proportion", values = c("propnrgacq" = "solid","propnewnrg" = "dashed"),  name = "indicator",
                         labels = c("propnrgacq" = "Energy consumption","propnewnrg" = "Energy renewal")) +
-  scale_linetype_manual("condition", values = c("First Simulation" = "solid","Second Simulation" = "dashed"), name = "indicator") +
-   facet_wrap(~ color, dir = "h",nrow = 1) +
+   facet_grid(condition ~ color) +
     scale_x_continuous(breaks = seq(2, 6, 1)) +
   scale_y_continuous(limits = c(0,1), breaks = seq(0,1,0.25)) +
   labs(x = "Weeks", y = "Proportion to other groups") +
@@ -262,8 +262,8 @@ dftlong %>%
   ggtitle(paste0("Turn ",i)) +
   guides(linetype = guide_legend(position =  "bottom")) +
   guides(color = "none") +
-  guides(shape = guide_legend(position = "bottom"))
-ggsave(file= paste0("images/propturn",i,".png"),width = 8, height = 3)
+  guides(shape = "none")
+ggsave(file= paste0("images/propturn",i,".png"),width = 8, height = 4)
  
 }
 
