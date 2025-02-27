@@ -308,6 +308,7 @@ dft_prop <- merge(dftfirst,dftlast,by=c("turn","color", "condition"))
 dft_prop <- dft_prop %>% filter(time.x == 8 & time.y == 7| time.x == 15 & time.y == 14 | time.x == 22 & time.y == 21|
                           time.x ==29 & time.y == 28)
 
+dft_prop <- dft_prop %>% filter(turn != "BR01")
 # report new  cows bought.
 # cost to buy new mucche: if the number of cows they want in the market (muccheslider.x) is higher than the actual number of cows survived from the week before (mucche.y), then the difference is taken as number of new mucche (equal to mucchenew) and multiplied by costs of buying a new cow (10 Euros). If the number of cows wanted is lower than the actual number of cows survived, then there is no cost associated
 
@@ -326,7 +327,6 @@ dft_prop$propinvccr <- dft_prop$ccr.x / dft_prop$totcosts
 
 ## proportion of investment over the own capital from week before at the moment of decision
 dft_prop$invested <-  dft_prop$totcosts / dft_prop$capital.y
-
 
 # check that sum of proportion buy new cows and ccr gives 1
 dft_prop$sumpropinvested <- dft_prop$propbuycow + dft_prop$propinvccr
@@ -399,5 +399,16 @@ facet_wrap(~ turn + factor(condition,c("First Simulation","Second Simulation")),
   guides(color = guide_legend(position = "bottom")) +
   guides(shape = guide_legend(position =  "bottom", nrow = 2))
 ggsave(file= "images/proprenewal_investment.png",width = 8, height = 11)
+
+###
+# cooperative (ccr) and competitive (buy new cows) over the capital and not the only cost: risk because they can spend more than they have, suggested to avoid
+
+
+dft_prop$buycow_capital <- dft_prop$mucchenewcost / dft_prop$capital.y
+dft_prop$ccr_capital <- dft_prop$ccr.x / dft_prop$capital.y
+dft_prop$spare_capital <- (dft_prop$mucchenewcost + dft_prop$ccr.x) / dft_prop$capital.y
+
+
+
 
 ```
