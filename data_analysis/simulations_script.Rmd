@@ -18,7 +18,7 @@ library(ggplot2)
 library(caret)
 
 # original simulations dataset 
-long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/tragedynatural/data_analysis/df_simulations.csv",sep=",")
+long_df <- read.csv("C:/Users/rocpa/OneDrive/Documenti/GitHub/watchyouragent/data_analysis/df_simulations.csv",sep=",")
 
 
 # later for selection and handling on energy consumption and energy renewal
