@@ -106,25 +106,25 @@ df <- df %>% filter(turn %in% c("BR02","BR03","BR04","BR05")) %>%   filter(condi
 # first and last days of the week [0] [1 week 1:7] [2 week 8:14][3 week 15:21][4 week 22:28][5 week 29:35]
 # day 1 not necessary here and not included: during first week  they got the capital from harvesting
 dft0 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 0) %>% 
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 dft7 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 7) %>% 
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 dft14 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 14) %>%
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 dft21 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 21) %>%
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 dft28 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 28) %>%
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 dft35 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 35) %>%
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 dft8 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 8) %>%
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 dft15 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 15) %>%
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 dft22 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 22) %>%
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 dft29 <- df %>% group_by(turn,condition,note,color) %>% filter(time == 29) %>%
-  select(time,week,ccr,energiaaquisita,ccrtot,nrgtot)
+  select(time,week,muccheslider,ccr,energiaaquisita,ccrtot,nrgtot)
 
 #  dataset combined to compute between weeks, last days of week (week.x, week.y) to compute difference energy consumption
 dft1w <- merge(dft7,dft0, by = c("turn","condition","note","color"))
@@ -284,6 +284,14 @@ datawide_nrgtot %>% filter(turn %in% c("BR02","BR03","BR04","BR05")) %>%
   labs(x = "Days", y = "Natural resources lost due to farmers activity") + 
   theme_bw()
 ggsave(file= "images/energylost.png",width = 5, height =5)
+
+
+# selected df for questionnaires time specific for correlations
+
+dft_qst <- dft %>% filter(time.y != 0) %>% #select("time.x","time.y","energiaaquisita.x","energiaaquisita.y","turn","condition","note","color","time","muccheslider","ccr","nrgacqweek","newnrgweek") %>%
+select("turn","condition","color","time.x","week.x","energiaaquisita.x","muccheslider","ccr","nrgacqweek","newnrgweek")
+
+writexl::write_xlsx(dft_qst, "C:/Users/rocpa/OneDrive/Documenti/GitHub/watchyouragent/data_analysis/df_timespecific.xlsx")
 
 ```
 
