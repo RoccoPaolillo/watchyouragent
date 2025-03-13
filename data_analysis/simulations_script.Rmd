@@ -289,7 +289,7 @@ ggsave(file= "images/energylost.png",width = 5, height =5)
 # selected df for questionnaires time specific for correlations
 
 dft_qst <- dft %>% filter(time.y != 0) %>% #select("time.x","time.y","energiaaquisita.x","energiaaquisita.y","turn","condition","note","color","time","muccheslider","ccr","nrgacqweek","newnrgweek") %>%
-select("turn","condition","color","time.x","energiaaquisita.x","muccheslider","ccr","nrgacqweek","newnrgweek")
+select("turn","condition","color","time.x","week.x","energiaaquisita.x","muccheslider","ccr","nrgacqweek","newnrgweek")
 
 writexl::write_xlsx(dft_qst, "C:/Users/rocpa/OneDrive/Documenti/GitHub/watchyouragent/data_analysis/df_timespecific.xlsx")
 
